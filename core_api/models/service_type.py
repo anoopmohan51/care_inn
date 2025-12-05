@@ -1,4 +1,6 @@
 from django.db import models
+from core_api.models.tenant import Tenant
+from core_api.models.appusers import AppUsers
 
 class ServiceType(models.Model):
     name = models.CharField(max_length=255)
