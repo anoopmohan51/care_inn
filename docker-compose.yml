@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=careinn_dev1_db
+      - POSTGRES_USER=careinn_user
+      - POSTGRES_PASSWORD=Careinn12**
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U care_inn_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  care_inn:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DB_NAME=careinn_dev1_db
+      - DB_USER=careinn_user
+      - DB_PASSWORD=Careinn12**
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8090:8080"
+    depends_on:
+      - db
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
+
+volumes:
+  postgres_data:
+

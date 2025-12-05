@@ -1,0 +1,20 @@
+from django.db import models
+
+class Tenant(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255,null=True,unique=True)
+    entity_name = models.CharField(max_length=255,null=True)
+    entity_logo_path = models.CharField(max_length=255,null=True)
+    address = models.TextField(null=True)
+    district = models.CharField(max_length=255,null=True)
+    state = models.CharField(max_length=255,null=True)
+    pincode = models.CharField(max_length=255,null=True)
+    country = models.CharField(max_length=255,null=True)
+    primary_contact_name = models.CharField(max_length=255,null=True)
+    secondary_contact_name = models.CharField(max_length=255,null=True)
+    time_zone = models.CharField(max_length=255,null=True)
+    status = models.BooleanField(default=True)
+    website = models.CharField(max_length=255,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_delete = models.BooleanField(default=False)
