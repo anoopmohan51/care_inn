@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from workorder_api.models import WorkOrderAttributes
+from workorder_api.models import WorkOrderAttributeElements
+from workorder_api.models import WorkOrderAttributeServices
+from workorder_api.models import WorkOrderAttributeRequestItems
 
 class WorkOrderAttributesSerializer(serializers.ModelSerializer):
     class Meta:

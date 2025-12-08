@@ -1,11 +1,11 @@
 from ...serializers.room_serializer import RoomSerializer
 from ...models import Rooms
-from ...response_utils.custom_response import CustomResponse
+from core_api.response_utils.custom_response import CustomResponse
 from rest_framework.views import APIView
 
 class RoomCreateView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
             data=request.data
@@ -37,8 +37,8 @@ class RoomCreateView(APIView):
             )
 
 class RoomUpdateView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
     def get(self, request,pk):
         try:
             room = Rooms.objects.get(id=pk,is_delete=False)

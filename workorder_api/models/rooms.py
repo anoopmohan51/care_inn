@@ -7,8 +7,8 @@ class Rooms(models.Model):
     description = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='created_user')
-    updated_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='updated_user')
+    created_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='rooms_created_user')
+    updated_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='rooms_updated_user')
     tenant = models.ForeignKey(Tenant, on_delete=models.PROTECT,null=True)
     is_delete = models.BooleanField(default=False)
     

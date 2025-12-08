@@ -2,21 +2,47 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from workorder_api.models import WorkOrderAttributes
 from workorder_api.serializers.workorder_attributes_serializer import WorkOrderAttributesSerializer
-from workorder_api.response_utils.custom_response import CustomResponse
-from rest_framework.authentication import JWTAuthentication
+from core_api.response_utils.custom_response import CustomResponse
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from workorder_api.workorder_attribute_utils.workorder_attribute_utils import create_workorder_attribute
+from django.db import transaction
 
 class WorkOrderAttributesCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    @transaction.atomic
     def post(self, request):
         try:
             data = request.data
-            serializer = WorkOrderAttributesSerializer(data=data, context={'request': request})
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
+            success,workorder_attribute_response = create_workorder_attribute(data,request)
+            if success:
+                if data.get('attrbute-type') == "ELEMENT":
+                    if data.get('element-type') == "SERVICES":
+                        services_response = create_update_workorder_attribute_services(
+                            data,
+                            request,
+                            workorder_attribute_response.data.get('id')
+                        )
+                        workorder_attribute_response['services'] = services_response
+                    elif data.get('element-type') == "REQUEST_ITEMS":
+                        request_items_response = create_update_workorder_attribute_request_items(
+                            data,
+                            request,
+                            workorder_attribute_response.data.get('id')
+                        )
+                        workorder_attribute_response['items'] = request_items_response
+                else:
+                    elements_response = create_update_workorder_attribute_elements(
+                        data,
+                        request,
+                        workorder_attribute_response.data.get('id')
+                    )
+                    workorder_attribute_response['elements'] = elements_response
+                instance = WorkOrderAttributes.objects.get(id=workorder_attribute_response.data.get('id'),is_delete=False)
+                instance.cleanup_related_data()
                 return CustomResponse(
-                    data=serializer.data,
+                    data=data,
                     status="success",
                     message=["WorkOrderAttributes created successfully"],
                     status_code=status.HTTP_201_CREATED,
@@ -70,6 +96,24 @@ class WorkOrderAttributesDetailView(APIView):
         try:
             workorder_attribute = WorkOrderAttributes.objects.get(id=pk,is_delete=False)
             serializer = WorkOrderAttributesSerializer(workorder_attribute)
+            workorder_attribute_data=serializer.data
+            if workorder_attribute_data.get('attribute-type') == "ELEMENT":
+                if workorder_attribute_data.get('element-type') == "SERVICES":
+                    workorder_attribute_data['services'] = WorkOrderAttributeServices.objects.filter(attribute=pk).all()
+                    workorder_attribute_data['attributes'] = []
+                    workorder_attribute_data['items'] = []
+                elif workorder_attribute_data.get('element-type') == "REQUEST_ITEMS":
+                    workorder_attribute_data['items'] = WorkOrderAttributeRequestItems.objects.filter(attribute=pk).all()
+                    workorder_attribute_data['attributes'] = []
+                    workorder_attribute_data['services'] = []
+                else:
+                    workorder_attribute_data['attributes'] = []
+                    workorder_attribute_data['services'] = []
+                    workorder_attribute_data['items'] = []
+            else:
+                workorder_attribute_data['attributes'] = WorkOrderAttributes.objects.filter(attribute=pk).all()
+                workorder_attribute_data['services'] = []
+                workorder_attribute_data['items'] = []
             return CustomResponse(
                 data=serializer.data,
                 status="success",
@@ -86,28 +130,52 @@ class WorkOrderAttributesDetailView(APIView):
                 content_type="application/json"
             )
 
+    
+    @transaction.atomic
     def put(self, request,pk):
         try:
             data = request.data
-            workorder_attribute = WorkOrderAttributes.objects.get(id=pk,is_delete=False)
-            serializer = WorkOrderAttributesSerializer(workorder_attribute, data=data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
+            success,workorder_attribute_response = update_workorder_attribute(data,request,pk)
+            if success:
+                if data.get('attrbute-type') == "ELEMENT":
+                    if data.get('element-type') == "SERVICES":
+                        services_response = create_update_workorder_attribute_services(
+                            data,
+                            request,
+                            workorder_attribute_response.data.get('id')
+                        )
+                        workorder_attribute_response['services'] = services_response
+                    elif data.get('element-type') == "REQUEST_ITEMS":
+                        request_items_response = create_update_workorder_attribute_request_items(
+                            data,
+                            request,
+                            workorder_attribute_response.data.get('id')
+                        )
+                        workorder_attribute_response['items'] = request_items_response
+                else:
+                    elements_response = create_update_workorder_attribute_elements(
+                        data,
+                        request,
+                        workorder_attribute_response.data.get('id')
+                    )
+                    workorder_attribute_response['elements'] = elements_response
+                instance = WorkOrderAttributes.objects.get(id=workorder_attribute_response.data.get('id'),is_delete=False)
+                instance.cleanup_related_data()
                 return CustomResponse(
-                    data=serializer.data,
+                    data=workorder_attribute_response,
                     status="success",
                     message=["WorkOrderAttributes updated successfully"],
                     status_code=status.HTTP_200_OK,
                     content_type="application/json"
-                )
+                )   
             else:
                 return CustomResponse(
-                    data=serializer.errors,
+                    data=workorder_attribute_response.errors,
                     status="failed",
                     message=["Error in WorkOrderAttributes updating"],
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
-                )
+                )      
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -122,6 +190,7 @@ class WorkOrderAttributesDetailView(APIView):
             workorder_attribute = WorkOrderAttributes.objects.get(id=pk,is_delete=False)
             workorder_attribute.is_delete = True
             workorder_attribute.save()
+            workorder_attribute.cleanup_related_data()
             return CustomResponse(
                 data=None,
                 status="success",

@@ -2,11 +2,11 @@ from rest_framework.response import Response
 from rest_framework import generics,status
 from workorder_api.models import Services
 from workorder_api.serializers.service_serializer import ServiceSerializer
-from workorder_api.response_utils.custom_response import CustomResponse
+from core_api.response_utils.custom_response import CustomResponse
 
 class ServiceCreateView(generics.CreateAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
             data=request.data
@@ -38,8 +38,8 @@ class ServiceCreateView(generics.CreateAPIView):
             )
 
 class ServiceUpdateView(generics.GenericAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request,pk):
         try:
