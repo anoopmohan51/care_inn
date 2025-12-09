@@ -1,12 +1,13 @@
 from .services import Services
 from .rooms import Rooms
 from .workorder_attributes import WorkOrderAttributes, WorkOrderAttributeElements, WorkOrderAttributeServices, WorkOrderAttributeRequestItems
-
+from .workorder_attribute_icons import WorkOrderAttributeIcons
 __all__ = [
     'Services', 
     'Rooms',
     'WorkOrderAttributes',
     'WorkOrderAttributeElements',
     'WorkOrderAttributeServices',
-    'WorkOrderAttributeRequestItems'
+    'WorkOrderAttributeRequestItems',
+    'WorkOrderAttributeIcons'
 ]

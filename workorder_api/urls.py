@@ -9,5 +9,6 @@ urlpatterns = [
     path('room',RoomCreateView.as_view()),
     path('room/<int:pk>',RoomUpdateView.as_view()),
     path('workorder-attributes',WorkOrderAttributesCreateView.as_view()),
-    path('workorder-attributes/<int:pk>',WorkOrderAttributesListView.as_view())
+    path('workorder-attributes/<int:pk>',WorkOrderAttributesDetailView.as_view()),
+    path('workorder-attributes/filter',WorkOrderAttributesFilterView.as_view()),
 ]

@@ -7,7 +7,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from workorder_api.workorder_attribute_utils.workorder_attribute_utils import create_workorder_attribute
 from django.db import transaction
-
+from core_api.filters.global_filter import GlobalFilter
+from django.db.models import F
+from rest_framework import status
 class WorkOrderAttributesCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -61,29 +63,6 @@ class WorkOrderAttributesCreateView(APIView):
                 data=None,
                 status="failed",
                 message=["Error in WorkOrderAttributes creation"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
-
-class WorkOrderAttributesListView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        try:
-            workorder_attributes = WorkOrderAttributes.objects.all()
-            serializer = WorkOrderAttributesSerializer(workorder_attributes, many=True)
-            return CustomResponse(
-                data=serializer.data,
-                status="success",
-                message=["WorkOrderAttributes list fetched successfully"],
-                status_code=status.HTTP_200_OK,
-                content_type="application/json"
-            )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in WorkOrderAttributes list fetching"],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
@@ -204,5 +183,37 @@ class WorkOrderAttributesDetailView(APIView):
                 status="failed",
                 message=["Error in WorkOrderAttributes deleting"],
                 status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+
+class WorkOrderAttributesFilterView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+            # try:
+            field_lookup = {
+                "id": "id",
+                "name": "name",
+                "attribute_type": "attribute_type",
+                "element_type": "element_type",
+                "is_primary": "is_primary",
+                "created_at": "created_at",
+                "updated_at": "updated_at"
+            }
+
+            global_filter = GlobalFilter(
+                request,
+                field_lookup,
+                WorkOrderAttributes,
+                []
+            )
+            queryset, count = global_filter._get_result(
+                created_user_name = F('created_user__first_name'),
+            )
+            return CustomResponse(
+                data=queryset,
+                status="success",
+                message=["WorkOrderAttributes filter fetched successfully"],
+                status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
