@@ -2,10 +2,14 @@ from ...serializers.room_serializer import RoomSerializer
 from ...models import Rooms
 from core_api.response_utils.custom_response import CustomResponse
 from rest_framework.views import APIView
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from core_api.filters.global_filter import GlobalFilter
+from django.db.models import F
 class RoomCreateView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
             data=request.data
@@ -37,8 +41,8 @@ class RoomCreateView(APIView):
             )
 
 class RoomUpdateView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request,pk):
         try:
             room = Rooms.objects.get(id=pk,is_delete=False)
@@ -136,6 +140,44 @@ class RoomUpdateView(APIView):
                 data=None,
                 status="failed",
                 message=["Error in Room deleting"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+
+class RoomFilterView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        try:
+            field_lookup = {
+                "id": "id",
+                "name": "name",
+                "description": "description",
+                "created_at": "created_at",
+                "updated_at": "updated_at"
+            }
+            global_filter = GlobalFilter(
+                request,
+                field_lookup,
+                Rooms,
+                base_filter=Q(tenant=request.user.tenant,is_delete=False),
+                default_sort="created_at"
+            )
+            queryset, count = global_filter._get_result(
+                created_user_name = F('created_user__first_name'),
+            )
+            return CustomResponse(
+                data=queryset,
+                status="success",
+                message=["Rooms filter fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Rooms filter fetching"],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )

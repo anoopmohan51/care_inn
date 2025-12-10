@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from workorder_api.workorder_attribute_utils.workorder_attribute_utils import create_workorder_attribute
 from django.db import transaction
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F
+from django.db.models import F,Q
 from rest_framework import status
 class WorkOrderAttributesCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -190,7 +190,7 @@ class WorkOrderAttributesFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self, request):
-            # try:
+        try:
             field_lookup = {
                 "id": "id",
                 "name": "name",
@@ -200,12 +200,12 @@ class WorkOrderAttributesFilterView(APIView):
                 "created_at": "created_at",
                 "updated_at": "updated_at"
             }
-
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
                 WorkOrderAttributes,
-                []
+                base_filter=Q(tenant=request.user.tenant,is_delete=False),
+                default_sort="created_at"
             )
             queryset, count = global_filter._get_result(
                 created_user_name = F('created_user__first_name'),
@@ -213,7 +213,16 @@ class WorkOrderAttributesFilterView(APIView):
             return CustomResponse(
                 data=queryset,
                 status="success",
-                message=["WorkOrderAttributes filter fetched successfully"],
+                message=["WorkOrderAttributes list fetched successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e:
+            print("error:::::::::::",e)
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in WorkOrderAttributes filter fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )

@@ -51,7 +51,7 @@ class UserManager(BaseUserManager):
 
 class AppUsers(AbstractBaseUser):
     first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255,null=True)
     email = models.EmailField(max_length=255,null=True,unique=True)
     address=models.TextField(null=True)
     city = models.CharField(max_length=255,null=True)
@@ -74,3 +74,7 @@ class AppUsers(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+    
+    @property
+    def is_superuser(self):
+        return self.role.name == 'SUPERADMIN'

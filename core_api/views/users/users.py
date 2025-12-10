@@ -3,6 +3,11 @@ from rest_framework.response import Response
 from rest_framework import generics,status
 from ...serializers.user_serializer import UserSerializer
 from ...response_utils.custom_response import CustomResponse
+from core_api.filters.global_filter import GlobalFilter
+from django.db.models import F
+from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -27,7 +32,6 @@ class UserCreateView(generics.CreateAPIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error:::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -158,6 +162,45 @@ class UserResetPasswordView(generics.UpdateAPIView):
                 data=None,
                 status="failed",
                 message=["Error in Password resetting"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+
+class UserFilterView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        try:
+            field_lookup = {
+                "id": "id",
+                "name": "name",
+                "description": "description",
+                "created_at": "created_at",
+                "updated_at": "updated_at",
+                "status": "status"
+            }
+            global_filter = GlobalFilter(
+                request,
+                field_lookup,
+                AppUsers,
+                base_filter=Q(is_delete=False),
+                default_sort="created_at"
+            )
+            queryset, count = global_filter._get_result(
+                created_user_name = F('created_user__first_name'),
+            )
+            return CustomResponse(
+                data=queryset,
+                status="success",
+                message=["Users filter fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Users filter fetching"],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )

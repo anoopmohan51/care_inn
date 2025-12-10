@@ -24,11 +24,11 @@ class QueryBuilderMixin:
         return main_query
     
     def get_query(self):
-        filter_query = Q(is_delete=False)
+        filter_query = self.base_filter
         sort_query = []
         if self.filter_by:
-            filter_query = self.build_main_filter_query(self.filter_by)
+            filter_query = filter_query & self.build_main_filter_query(self.filter_by)
+        if self.default_sort:
+            sort_query.append(self.default_sort)
         return filter_query, sort_query
-        # if self.sort_by:
-            
         
