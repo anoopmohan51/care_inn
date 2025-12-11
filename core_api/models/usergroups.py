@@ -14,7 +14,7 @@ class UserGroup(models.Model):
     is_delete=models.BooleanField(default=False)
 
     class Meta:
-        db_table='user_groups'
+        db_table='user_group'
 class UserGroupUsers(models.Model):
     user_group=models.ForeignKey(UserGroup, on_delete=models.PROTECT,null=True,related_name='user_group_users')
     user=models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='user_group_users')

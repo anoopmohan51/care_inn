@@ -3,6 +3,7 @@ from workorder_api.views.workorder_attributes.workorder_attributes import *
 from workorder_api.views.service_view.service_view import *
 from workorder_api.views.room_views.room_views import *
 from workorder_api.views.workorder_attribute_icon.workorder_attribute_icon import *
+from workorder_api.views.wororder_temp.workorder_temp import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -14,5 +15,6 @@ urlpatterns = [
     path('workorder-attributes/filter',WorkOrderAttributesFilterView.as_view()),
     path('workorder-attribute-icons',WorkOrderAttributeIconCreateView.as_view()),
     path('workorder-attribute-icons/<uuid:pk>',WorkOrderAttributeIconDetailView.as_view()),
+    path('workorder-temp',WorkOrderTempCreateView.as_view()),
 
 ]

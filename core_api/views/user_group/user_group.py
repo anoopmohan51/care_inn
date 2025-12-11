@@ -5,7 +5,8 @@ from core_api.response_utils.custom_response import CustomResponse
 from core_api.filters.global_filter import GlobalFilter
 from django.db.models import F,Q
 from rest_framework import status
-from ...models import UserGroup,UserGroupUsers
+from core_api.models.usergroups import UserGroup,UserGroupUsers
+from core_api.serializers.usergroup_serializer import UserGroupSerializer
 from ..user_group.usergroup_utils.user_group_utils import UserGroupUsersService
 
 class UserGroupCreateView(APIView):
@@ -54,6 +55,7 @@ class UserGroupDetialsView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print("error::::::::::::",e.args[0])
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -65,7 +67,7 @@ class UserGroupDetialsView(APIView):
         try:
             data=request.data
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
-            serializer = UserGroupSerializer(user_group, data=data)
+            serializer = UserGroupSerializer(user_group, data=data,context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 if 'users' in data:
@@ -96,7 +98,7 @@ class UserGroupDetialsView(APIView):
         try:
             data=request.data
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
-            serializer = UserGroupSerializer(user_group, data=data, partial=True)
+            serializer = UserGroupSerializer(user_group, data=data, partial=True,context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 if 'users' in data:
@@ -149,46 +151,46 @@ class UserGroupFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self, request):
-    try:
-        field_lookup = {
-            "id": "id",
-            "name": "name",
-            "description": "description",
-            "created_at": "created_at",
-            "updated_at": "updated_at",
-            "status": "status"
-        }
-        global_filter = GlobalFilter(
-            request,
-            field_lookup,
-            UserGroup, 
-            base_filter=Q(tenant=request.user.tenant,is_delete=False),
-            default_sort="created_at"
-        )
-        queryset, count = global_filter._get_result(
-            created_user_name = F('created_user__first_name'),
-        )
-        return CustomResponse(
-            data=queryset,
-            status="success",
-            message=["User group list fetched successfully"],
-            status_code=status.HTTP_200_OK,
-            content_type="application/json"
-        )
-    except Exception as e:
-        return CustomResponse(
-            data=None,
-            status="failed",
-            message=["Error in User group filter fetching"],
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content_type="application/json"
-        )
+        try:
+            field_lookup = {
+                "id": "id",
+                "name": "name",
+                "description": "description",
+                "created_at": "created_at",
+                "updated_at": "updated_at",
+                "status": "status"
+            }
+            global_filter = GlobalFilter(
+                request,
+                field_lookup,
+                UserGroup, 
+                base_filter=Q(tenant=request.user.tenant,is_delete=False),
+                default_sort="created_at"
+            )
+            queryset, count = global_filter._get_result(
+                created_user_name = F('created_user__first_name'),
+            )
+            return CustomResponse(
+                data=queryset,
+                status="success",
+                message=["User group list fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in User group filter fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
 class UserGroupUsersDeleteView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def delete(self,request,pk):
         try:
-            UserGroup.objects.filter(id=pk).delete()
+            UserGroupUsers.objects.filter(id=pk).delete()
             return CustomResponse(
                 data=None,
                 status="success",

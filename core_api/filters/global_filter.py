@@ -3,6 +3,7 @@ from .mixins.filter_parser import FilterParserMixin
 from .mixins.query_builder import QueryBuilderMixin
 from .mixins.field_handler import FieldHandlerMixin
 from .mixins.pagination import PaginationMixin
+from rest_framework.serializers import ModelSerializer
 
 class GlobalFilter(
     FilterParserMixin, 
@@ -42,10 +43,10 @@ class GlobalFilter(
             queryset = queryset.order_by(*sort_args)
         return queryset, count
     
-    def get_serialized_result(self,*args,**kwargs):
+    def get_serialized_result(self,serializer: ModelSerializer):
         filter_args, sort_args = self.get_query()
-        limit = self._get_limit()
-        offset = self._get_offset()
+        limit = self.get_limit()
+        offset = self.get_offset()
         queryset = self.model.objects.filter(filter_args).distinct()
         count = self.get_count(queryset)
         if sort_args:
