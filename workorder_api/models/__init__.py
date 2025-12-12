@@ -4,6 +4,8 @@ from .workorder_attributes import WorkOrderAttributes, WorkOrderAttributeElement
 from .workorder_attribute_icons import WorkOrderAttributeIcons
 from .workorder_temp import WorkOrderTemp
 from .workorder import WorkOrder
+from .workorder_comments import WorkOrderComments
+from .workorder_timeline import WorkOrderTimeline
 __all__ = [
     'Services', 
     'Rooms',
@@ -13,5 +15,7 @@ __all__ = [
     'WorkOrderAttributeRequestItems',
     'WorkOrderAttributeIcons',
     'WorkOrderTemp',
-    'WorkOrder'
+    'WorkOrder',
+    'WorkOrderComments',
+    'WorkOrderTimeline'
 ]
