@@ -17,10 +17,3 @@ ENV/
 *.md
 .DS_Store
 
-# Media files (user uploads)
-media/
-
-# Migration files
-*/migrations/
-**/migrations/
-
