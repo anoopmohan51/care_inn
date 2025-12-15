@@ -5,11 +5,11 @@ from core_api.models.service_type import ServiceType
 from core_api.models.priority import Priority
 
 class Services(models.Model):
-    ASSIGNEE_USER = "1"
-    ASSIGNEE_TEAM = "2"
+    ASSIGNEE_USER = "USER"
+    ASSIGNEE_TEAM = "TEAM"
     ASSIGNEE_CHOICES = [
-        (ASSIGNEE_USER, "User"),
-        (ASSIGNEE_TEAM, "Team"),
+        (ASSIGNEE_USER, "USER"),
+        (ASSIGNEE_TEAM, "TEAM"),
     ]
     name = models.CharField(max_length=255)
     description = models.TextField(null=True)

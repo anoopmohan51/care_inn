@@ -19,12 +19,10 @@ class WorkOrderTempCreateView(APIView):
     def post(self, request):
         try:
             data=request.data
-            print(""""dataa""""",data)
             now = datetime.datetime.now()
             year = '{:02d}'.format(now.year)
             month = '{:02d}'.format(now.month)
-            data["unique_number"] = "WO-" + year + month + id_generator()
-            print(""""dataa""""",data)
+            data["unique_id"] = "WO-" + year + month + id_generator()
             serializer = WorkOrderTempSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()

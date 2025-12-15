@@ -55,7 +55,6 @@ class UserGroupDetialsView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error::::::::::::",e.args[0])
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -87,6 +86,7 @@ class UserGroupDetialsView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",

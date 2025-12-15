@@ -6,7 +6,7 @@ from core_api.response_utils.custom_response import CustomResponse
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F
+from django.db.models import F,Q
 from rest_framework.views import APIView
 
 class ServiceCreateView(generics.CreateAPIView):
@@ -69,7 +69,7 @@ class ServiceUpdateView(generics.GenericAPIView):
     def put(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
-            serializer = ServiceSerializer(service, data=request.data)
+            serializer = ServiceSerializer(service, data=request.data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return CustomResponse(
@@ -99,7 +99,7 @@ class ServiceUpdateView(generics.GenericAPIView):
     def patch(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
-            serializer = ServiceSerializer(service, data=request.data, partial=True)
+            serializer = ServiceSerializer(service, data=request.data, partial=True, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return CustomResponse(
@@ -177,6 +177,7 @@ class ServiceFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",

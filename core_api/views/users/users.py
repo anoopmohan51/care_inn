@@ -4,13 +4,16 @@ from rest_framework import generics,status
 from ...serializers.user_serializer import UserSerializer
 from ...response_utils.custom_response import CustomResponse
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F
+from django.db.models import F,Q
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
 
 
 class UserCreateView(generics.CreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
             data=request.data
@@ -32,6 +35,7 @@ class UserCreateView(generics.CreateAPIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -41,6 +45,8 @@ class UserCreateView(generics.CreateAPIView):
             )
 
 class UserUpdateView(generics.UpdateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -62,30 +68,9 @@ class UserUpdateView(generics.UpdateAPIView):
             )
     
     def put(self, request,pk):
-        user = AppUsers.objects.get(id=pk,is_delete=False)
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return CustomResponse(
-                data=serializer.data,
-                status="success",
-                message=["User updated successfully"],
-                status_code=status.HTTP_200_OK,
-                content_type="application/json"
-            )
-
-        return CustomResponse(
-            data=serializer.errors,
-            status="failed",
-            message=["Error in User updating"],
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content_type="application/json"
-        )
-    
-    def patch(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
-            serializer = UserSerializer(user, data=request.data, partial=True)
+            serializer = UserSerializer(user, data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
                 return CustomResponse(
@@ -103,6 +88,36 @@ class UserUpdateView(generics.UpdateAPIView):
                 content_type="application/json"
             )
         except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in User updating"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+    
+    def patch(self, request,pk):
+        try:
+            user = AppUsers.objects.get(id=pk,is_delete=False)
+            serializer = UserSerializer(user, data=request.data, partial=True, context={'request': request})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return CustomResponse(
+                    data=serializer.data,
+                    status="success",
+                    message=["User updated successfully"],
+                    status_code=status.HTTP_200_OK,
+                    content_type="application/json"
+                )
+            return CustomResponse(
+                data=serializer.errors,
+                status="failed",
+                message=["Error in User updating"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+        except Exception as e:
+            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -133,12 +148,22 @@ class UserUpdateView(generics.UpdateAPIView):
             )
 
 class UserResetPasswordView(generics.UpdateAPIView):
-    def post(self, request):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request,pk):
         try:
             data = request.data
             new_password = data.get('new_password')
             confirm_password = data.get('confirm_password')
-            user_id = data.get('user_id')
+            request_user_id=request.user.id
+            if request_user_id != pk:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=["You are not authorized to reset this password"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
             if new_password != confirm_password:
                 return CustomResponse(
                     data=None,
@@ -147,8 +172,8 @@ class UserResetPasswordView(generics.UpdateAPIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
-            user = get_user_model().objects.get(id=user_id)
-            user.set_password(password)
+            user = get_user_model().objects.get(id=pk)
+            user.set_password(new_password)
             user.save()
             return CustomResponse(
                 data=None,
@@ -183,12 +208,10 @@ class UserFilterView(APIView):
                 request,
                 field_lookup,
                 AppUsers,
-                base_filter=Q(is_delete=False),
+                base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter._get_result(
-                created_user_name = F('created_user__first_name'),
-            )
+            queryset, count = global_filter._get_result()
             return CustomResponse(
                 data=queryset,
                 status="success",

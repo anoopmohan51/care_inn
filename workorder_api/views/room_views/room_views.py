@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F
+from django.db.models import F,Q
 class RoomCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -66,7 +66,7 @@ class RoomUpdateView(APIView):
         try:
             data=request.data
             room = Rooms.objects.get(id=pk,is_delete=False)
-            serializer = RoomSerializer(room, data=data)
+            serializer = RoomSerializer(room, data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return CustomResponse(
@@ -85,6 +85,7 @@ class RoomUpdateView(APIView):
                     content_type="application/json"
                 )
         except Exception as e:
+            print("error:::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -96,7 +97,7 @@ class RoomUpdateView(APIView):
         try:
             data=request.data
             room = Rooms.objects.get(id=pk,is_delete=False)
-            serializer = RoomSerializer(room, data=data, partial=True)
+            serializer = RoomSerializer(room, data=data, partial=True, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return CustomResponse(

@@ -3,13 +3,16 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = get_user_model()
         fields = '__all__'
         extra_kwargs = {
-            'password': {'write_only': True}  # Allow password in requests but not in responses
+            'password': {'write_only': True,}  # Allow password in requests but not in responses
         }
     def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['tenant'] = request.user.tenant
         user = get_user_model().objects.create_user(**validated_data)
         return user
     

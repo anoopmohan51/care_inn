@@ -1,4 +1,5 @@
 from workorder_api.serializers.workorder_attributes_serializer import WorkOrderAttributesSerializer
+from workorder_api.models import WorkOrderAttributes
 
 def create_workorder_attribute(data,request):
     attribute_data ={
