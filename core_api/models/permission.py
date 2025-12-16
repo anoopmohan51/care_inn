@@ -15,4 +15,4 @@ class Permission(models.Model):
     delete = models.BooleanField(default=True)
 
     class Meta:
-        db_table = 'permission'
+        db_table = 'core_permission'

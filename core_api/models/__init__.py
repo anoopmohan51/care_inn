@@ -13,5 +13,7 @@ __all__ = [
     'Role', 
     'Position', 
     'UserGroup', 
-    'PermissionCategory'
+    'PermissionCategory',
+    'Permission',
+    'UserPermission'
 ]

@@ -10,3 +10,4 @@ class WorkOrderAttributeIcons(models.Model):
 
     class Meta:
         db_table = 'workorder_attribute_icons'
+

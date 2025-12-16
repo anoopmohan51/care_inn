@@ -11,4 +11,4 @@ class UserPermission(models.Model):
     delete = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'user_permission'
+        db_table = 'core_user_permission'
