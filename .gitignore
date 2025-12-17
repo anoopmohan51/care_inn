@@ -53,9 +53,9 @@ Thumbs.db
 *.wmv
 
 migration files
-**/migrations/**
-!**/migrations
-!**/migrations/__init__.py
+# **/migrations/**
+# !**/migrations
+# !**/migrations/__init__.py
 
 # media
 app/media/**

@@ -9,6 +9,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
+from django.conf import settings
+from core_api.permission.permission import has_permission
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -35,7 +37,6 @@ class UserCreateView(generics.CreateAPIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -47,6 +48,7 @@ class UserCreateView(generics.CreateAPIView):
 class UserUpdateView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "read")
     def get(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
