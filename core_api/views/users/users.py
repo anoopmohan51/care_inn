@@ -16,6 +16,7 @@ from core_api.permission.permission import has_permission
 class UserCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "create")
     def post(self, request):
         try:
             data=request.data
@@ -68,7 +69,7 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-    
+    # @has_permission("User", "update")
     def put(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -97,7 +98,7 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-    
+    # @has_permission("User", "update")
     def patch(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -119,7 +120,6 @@ class UserUpdateView(generics.UpdateAPIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -127,7 +127,7 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-    
+    # @has_permission("User", "delete")
     def delete(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -152,6 +152,7 @@ class UserUpdateView(generics.UpdateAPIView):
 class UserResetPasswordView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "update")
     def post(self, request,pk):
         try:
             data = request.data
@@ -196,6 +197,7 @@ class UserResetPasswordView(generics.UpdateAPIView):
 class UserFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "read")
     def post(self, request):
         try:
             field_lookup = {

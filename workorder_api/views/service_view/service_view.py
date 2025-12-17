@@ -8,10 +8,13 @@ from rest_framework.permissions import IsAuthenticated
 from core_api.filters.global_filter import GlobalFilter
 from django.db.models import F,Q
 from rest_framework.views import APIView
+from core_api.permission.permission import has_permission
 
 class ServiceCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # @has_permission("Service", "create")
     def post(self, request):
         try:
             data=request.data
@@ -46,6 +49,7 @@ class ServiceUpdateView(generics.GenericAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    # @has_permission("Service", "read")
     def get(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
@@ -66,6 +70,7 @@ class ServiceUpdateView(generics.GenericAPIView):
                 content_type="application/json"
             )
 
+    # @has_permission("Service", "update")
     def put(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
@@ -96,6 +101,7 @@ class ServiceUpdateView(generics.GenericAPIView):
                 content_type="application/json"
             )
 
+    # @has_permission("Service", "update")
     def patch(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
@@ -126,6 +132,7 @@ class ServiceUpdateView(generics.GenericAPIView):
                 content_type="application/json"
             )
 
+    # @has_permission("Service", "delete")
     def delete(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
@@ -150,6 +157,8 @@ class ServiceUpdateView(generics.GenericAPIView):
 class ServiceFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # @has_permission("Service", "read")
     def post(self, request):
         try:
             field_lookup = {
@@ -177,7 +186,6 @@ class ServiceFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
