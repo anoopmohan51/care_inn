@@ -23,7 +23,7 @@ class WorkOrderAttributes(models.Model):
     ]
     name = models.CharField(max_length=255)
     attribute_type = models.CharField(max_length=20,choices=attribute_type_choices)
-    element_type = models.CharField(max_length=20,choices=element_type_choices, default=None,blank=True,null=True)
+    element_type = models.CharField(max_length=20,choices=element_type_choices, default=None,null=True)
     is_primary = models.BooleanField(default=False)
     elment_type = models.CharField(max_length=30,null=True,choices=element_type_choices)
     icon = models.ForeignKey(WorkOrderAttributeIcons, on_delete=models.PROTECT,null=True)
