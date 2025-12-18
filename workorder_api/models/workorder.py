@@ -57,6 +57,7 @@ class WorkOrder(models.Model):
     updated_user=models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='workorder_updated_user')
     is_delete=models.BooleanField(default=False)
     unique_id=models.CharField(max_length=30,null=True)
+    test_field=models.CharField(max_length=255,null=True)
 
     class Meta:
         db_table = 'workorder'
