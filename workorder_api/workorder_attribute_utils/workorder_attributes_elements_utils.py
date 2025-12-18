@@ -2,14 +2,14 @@ from workorder_api.models import WorkOrderAttributeElements
 from workorder_api.serializers.workorder_attributes_serializer import WorkOrderAttributeElementsSerializer
 
 def create_update_workorder_attribute_elements(data,request,workorder_attribute_id):
-    data = data.get('elements')
+    attribute_elements = data.get('attribute_elements')
     response_data = []
-    for element in data:
+    for element in attribute_elements:
         is_added = element.get('is_added')
         if is_added:
             element_data = {
                 "attribute": workorder_attribute_id,
-                "service": element.get('id'),
+                "attribute_element": element.get('attribute_element_id'),
             }
             serializer = WorkOrderAttributeElementsSerializer(
                 data=element_data,

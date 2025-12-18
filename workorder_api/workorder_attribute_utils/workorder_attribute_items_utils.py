@@ -2,9 +2,9 @@ from workorder_api.models import WorkOrderAttributeRequestItems
 from workorder_api.serializers.workorder_attributes_serializer import WorkOrderAttributeRequestItemsSerializer
 
 def create_update_workorder_attribute_request_items(data,request,workorder_attribute_id):
-    data = data.get('request_items')
+    items_data = data.get('request_items')
     response_data = []
-    for request_item in data:
+    for request_item in items_data:
         is_added = request_item.get('is_added')
         if is_added:
             request_item_data = {
