@@ -8,10 +8,12 @@ from rest_framework import status
 from core_api.models.usergroups import UserGroup,UserGroupUsers
 from core_api.serializers.usergroup_serializer import UserGroupSerializer
 from ..user_group.usergroup_utils.user_group_utils import UserGroupUsersService
+from core_api.permission.permission import has_permission
 
 class UserGroupCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("Usergroup", "create")
     def post(self, request):
         try:
             data=request.data
@@ -39,7 +41,7 @@ class UserGroupCreateView(APIView):
 class UserGroupDetialsView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-
+    # @has_permission("Usergroup", "read")
     def get(self, request,pk):
         try:
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
@@ -62,6 +64,7 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+    # @has_permission("Usergroup", "update")
     def put(self,request,pk):
         try:
             data=request.data
@@ -86,7 +89,6 @@ class UserGroupDetialsView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -94,6 +96,8 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+    
+    # @has_permission("UsUsergrouper", "update")
     def patch(self,request,pk):
         try:
             data=request.data
@@ -124,7 +128,9 @@ class UserGroupDetialsView(APIView):
                 message=["Error in User group updating"],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
-            )   
+            )
+
+    # @has_permission("Usergroup", "delete")   
     def delete(self,request,pk):
         try:
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
@@ -150,6 +156,7 @@ class UserGroupDetialsView(APIView):
 class UserGroupFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("Usergroup", "read")
     def post(self, request):
         try:
             field_lookup = {
@@ -188,6 +195,8 @@ class UserGroupFilterView(APIView):
 class UserGroupUsersDeleteView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # @has_permission("Usergroup", "update")
     def delete(self,request,pk):
         try:
             UserGroupUsers.objects.filter(id=pk).delete()

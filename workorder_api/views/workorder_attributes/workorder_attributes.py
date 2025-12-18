@@ -14,14 +14,16 @@ from workorder_api.workorder_attribute_utils.workorder_attribute_services_utils 
 from workorder_api.workorder_attribute_utils.workorder_attribute_items_utils import create_update_workorder_attribute_request_items
 from workorder_api.workorder_attribute_utils.workorder_attributes_elements_utils import create_update_workorder_attribute_elements
 from workorder_api.models import WorkOrderAttributeServices,WorkOrderAttributeRequestItems
+from core_api.permission.permission import has_permission
 
 
 class WorkOrderAttributesCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     @transaction.atomic
+    # @has_permission("Attribute", "create")
     def post(self, request):
-        try:
+            # try:
             data = request.data
             success,workorder_attribute_response = create_workorder_attribute(data,request)
             if success:
@@ -30,21 +32,21 @@ class WorkOrderAttributesCreateView(APIView):
                         services_response = create_update_workorder_attribute_services(
                             data,
                             request,
-                            workorder_attribute_response.data.get('id')
+                            workorder_attribute_response.get('id')
                         )
                         workorder_attribute_response['services'] = services_response
                     elif data.get('element_type') == "REQUEST_ITEMS":
                         request_items_response = create_update_workorder_attribute_request_items(
                             data,
                             request,
-                            workorder_attribute_response.data.get('id')
+                            workorder_attribute_response.get('id')
                         )
                         workorder_attribute_response['items'] = request_items_response
                 else:
                     elements_response = create_update_workorder_attribute_elements(
                         data,
                         request,
-                        workorder_attribute_response.data.get('id')
+                        workorder_attribute_response.get('id')
                     )
                     workorder_attribute_response['elements'] = elements_response
                 return CustomResponse(
@@ -62,19 +64,20 @@ class WorkOrderAttributesCreateView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in WorkOrderAttributes creation"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+            # except Exception as e:
+            #     print(""""""""""error""""""""",e)
+            #     return CustomResponse(
+            #         data=None,
+            #         status="failed",
+            #         message=["Error in WorkOrderAttributes creation"],
+            #         status_code=status.HTTP_400_BAD_REQUEST,
+            #         content_type="application/json"
+            #     )
 
 class WorkOrderAttributesDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-
+    # @has_permission("Attribute", "read")
     def get(self, request,pk):
         try:
             workorder_attribute = WorkOrderAttributes.objects.get(id=pk,is_delete=False)
@@ -113,7 +116,7 @@ class WorkOrderAttributesDetailView(APIView):
                 content_type="application/json"
             )
 
-    
+    # @has_permission("Attribute", "update")
     @transaction.atomic
     def put(self, request,pk):
         try:
@@ -169,6 +172,7 @@ class WorkOrderAttributesDetailView(APIView):
                 content_type="application/json"
             )
     
+    # @has_permission("Attribute", "delete")
     def delete(self, request,pk):
         try:
             workorder_attribute = WorkOrderAttributes.objects.get(id=pk,is_delete=False)
@@ -194,6 +198,7 @@ class WorkOrderAttributesDetailView(APIView):
 class WorkOrderAttributesFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("Attribute", "read")
     def post(self, request):
         try:
             field_lookup = {
@@ -223,7 +228,6 @@ class WorkOrderAttributesFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error:::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
