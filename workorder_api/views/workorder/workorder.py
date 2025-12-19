@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from workorder_api.models import WorkOrder
-from workorder_api.serializers.workoser_serializer import WorkOrderSerializer
+from workorder_api.serializers.workorder_serializer import WorkOrderSerializer
 from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from core_api.filters.global_filter import GlobalFilter

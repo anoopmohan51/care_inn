@@ -3,6 +3,7 @@ from core_api.models.tenant import Tenant
 from core_api.models.appusers import AppUsers
 from core_api.models.service_type import ServiceType
 from core_api.models.priority import Priority
+from staticfiles_api.models.staticfiles import StaticFiles
 
 class Services(models.Model):
     ASSIGNEE_USER = "USER"
@@ -29,4 +30,5 @@ class Services(models.Model):
         choices=ASSIGNEE_CHOICES,
         default=ASSIGNEE_USER,
     )
+    icon=models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
    

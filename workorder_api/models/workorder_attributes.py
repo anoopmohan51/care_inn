@@ -4,7 +4,7 @@ from core_api.models.appusers import AppUsers
 from core_api.models.service_type import ServiceType
 from core_api.models.priority import Priority
 from workorder_api.models.services import Services
-from workorder_api.models.workorder_attribute_icons import WorkOrderAttributeIcons
+from staticfiles_api.models.staticfiles import StaticFiles
 
 class WorkOrderAttributes(models.Model):
     ATTRIBUTE_TYPE_ELEMENT = "ELEMENT"
@@ -26,7 +26,7 @@ class WorkOrderAttributes(models.Model):
     element_type = models.CharField(max_length=20,choices=element_type_choices, default=None,null=True)
     is_primary = models.BooleanField(default=False)
     elment_type = models.CharField(max_length=30,null=True,choices=element_type_choices)
-    icon = models.ForeignKey(WorkOrderAttributeIcons, on_delete=models.PROTECT,null=True)
+    icon = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
     service_name = models.CharField(max_length=255,null=True)#only for elements requested items
     tenant = models.ForeignKey(Tenant, on_delete=models.PROTECT,null=True)
     created_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='attribute_created_user')
