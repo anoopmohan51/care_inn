@@ -15,6 +15,7 @@ from workorder_api.workorder_attribute_utils.workorder_attribute_items_utils imp
 from workorder_api.workorder_attribute_utils.workorder_attributes_elements_utils import create_update_workorder_attribute_elements
 from workorder_api.models import WorkOrderAttributeServices,WorkOrderAttributeRequestItems
 from core_api.permission.permission import has_permission
+from workorder_api.models import WorkOrderAttributeElements
 
 
 class WorkOrderAttributesCreateView(APIView):
@@ -97,7 +98,8 @@ class WorkOrderAttributesDetailView(APIView):
                     workorder_attribute_data['services'] = []
                     workorder_attribute_data['items'] = []
             else:
-                workorder_attribute_data['attributes'] = WorkOrderAttributes.objects.filter(attribute=pk).all()
+                elements_list = list(WorkOrderAttributeElements.objects.filter(attribute=pk).values_list('attribute_element',flat=True))
+                workorder_attribute_data['attributes'] = WorkOrderAttributes.objects.filter(id__in=elements_list,is_delete=False).values()
                 workorder_attribute_data['services'] = []
                 workorder_attribute_data['items'] = []
             return CustomResponse(
