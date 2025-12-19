@@ -11,6 +11,7 @@ def create_workorder_attribute(data,request):
         "tenant": data.get('tenant'),
         "created_user": data.get('created_user'),
         "updated_user": data.get('updated_user'),
+        "icon": data.get('icon'),
         "is_delete": False,
     }
     serializer = WorkOrderAttributesSerializer(data=attribute_data,context={'request':request})
@@ -31,6 +32,7 @@ def update_workorder_attribute(data,request,workorder_attribute_id):
         "tenant": data.get('tenant'),
         "created_user": data.get('created_user'),
         "updated_user": data.get('updated_user'),
+        "icon": data.get('icon'),
         "is_delete": False,
     }
     workorder_attribute = WorkOrderAttributes.objects.get(id=workorder_attribute_id,is_delete=False)
