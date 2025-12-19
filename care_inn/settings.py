@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'core_api',
     'workorder_api',
+    'staticfiles_api',
 ]
 
 # Add REST Framework JWT settings
