@@ -7,6 +7,7 @@ from .workorder import WorkOrder
 from .workorder_comments import WorkOrderComments
 from .workorder_timeline import WorkOrderTimeline
 from .workorder_followers import WorkOrderFollowers
+from .workorder_activity import WorkOrderActivity
 __all__ = [
     'Services', 
     'Rooms',
@@ -19,5 +20,6 @@ __all__ = [
     'WorkOrder',
     'WorkOrderComments',
     'WorkOrderTimeline',
-    'WorkOrderFollowers'
+    'WorkOrderFollowers',
+    'WorkOrderActivity'
 ]

@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'core_api',
-    'workorder_api',
+    'workorder_api.apps.WorkorderApiConfig',
     'staticfiles_api',
 ]
 

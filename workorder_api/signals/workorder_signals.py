@@ -2,16 +2,16 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from workorder_api.models.workorder import WorkOrder
 from workorder_api.workorder_activity.workorder_activity_service import WorkOrderActivityService
-from workorder_api.activity_context.activity_context import set_activity_user, clear_activity_user
+from workorder_api.activity_context.activity_context import set_activity_user, clear_activity_user, get_activity_user
 import logging
 
 logger = logging.getLogger(__name__)
 
 _workorder_cache ={}
 
-important_fields = ['status', 'assignee_type', 'user_group', 'priority', 'when_to_start', 'sla_minutes', 'patient_id', 'description']
+important_fields = ['priority', 'assignee_type', 'user_group', 'priority', 'when_to_start', 'sla_minutes', 'patient_id', 'description']
 
-@receiver(post_save, sender=WorkOrder)
+@receiver(pre_save, sender=WorkOrder)
 def workorder_pre_save(sender, instance, **kwargs):
     if kwargs.get('raw',False) or not instance.pk:
         return
@@ -38,10 +38,41 @@ def workorder_post_save(sender, instance, created, **kwargs):
     created_user = get_activity_user() or (instance.created_user if created else instance.updated_user)
     try:
         if created:
-            WorkOrderActivityService.log_creation(
-                workorder=instance,
-                created_user=created_user,
-            )
+            activity_data=[]
+            activity_data.append({
+                'activity': 'CREATED',
+                'workorder': instance,
+                'initiated_by': created_user
+            })
+            if instance.user_group or instance.user: 
+                activity_data.append({
+                    'activity': 'ASSIGNED',
+                    'to_value': f"TEAM-{instance.user_group}" if instance.user_group else f"USER-{instance.user}",
+                    'initiated_by': created_user,
+                    'workorder': instance
+                })
+            if instance.priority:
+                activity_data.append({
+                    'activity': 'PRIORITY',
+                    'to_value': f"PRIORITY-{instance.priority}",
+                    'initiated_by': created_user,
+                    'workorder': instance
+                })
+            if instance.priority:
+                activity_data.append({
+                    'activity': 'SLA_START_TIME',
+                    'to_value': instance.created_at,
+                    'initiated_by': created_user,
+                    'workorder': instance
+                })
+            if instance.sla_minutes:
+                activity_data.append({
+                    'activity': 'SLA',
+                    'to_value': instance.sla_minutes,
+                    'initiated_by': created_user,
+                    'workorder': instance
+                })
+            WorkOrderActivityService.log_creation(activity_data)
         else:
             original = _workorder_cache.get(instance.pk,None)
             if orginal:
