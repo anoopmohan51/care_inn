@@ -12,13 +12,13 @@ from django.db.models import Q
 from core_api.permission.permission import has_permission
 
 class WorkOrderCreateView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "create")
     def post(self, request):
         try:
             data = request.data
-            workorder_data = WorkOrderTemp.objects.filter(id=data['id']).values('workorder_type','workorder_attribute','room','assignee_type','user','user_group','tenant','description','priority','when_to_start','sla_minutes','patient_id','status','created_at','updated_at','created_user','updated_user','is_delete','unique_id').first()
+            # workorder_data = WorkOrderTemp.objects.filter(id=data['id']).values('workorder_type','workorder_attribute','room','assignee_type','user','user_group','tenant','description','priority','when_to_start','sla_minutes','patient_id','status','created_at','updated_at','created_user','updated_user','is_delete','unique_id').first()
             if not workorder_data:
                 return CustomResponse(
                     data=None,
@@ -27,7 +27,7 @@ class WorkOrderCreateView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
-            serializer = WorkOrderSerializer(data=workorder_data, context={'request': request})
+            serializer = WorkOrderSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return CustomResponse(
@@ -38,7 +38,6 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json"
                 )
             else:
-                print(""""serializer.errors""""",serializer.errors)
                 return CustomResponse(
                     data=serializer.errors,
                     status="failed",
@@ -47,7 +46,6 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json" 
                 )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -56,8 +54,8 @@ class WorkOrderCreateView(APIView):
                 content_type="application/json"
             )
 class WorkorderDeleteView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "read")
     def get(self, request,pk):
         try:
@@ -142,8 +140,8 @@ class WorkorderDeleteView(APIView):
             )
 
 class WorkorderFilterView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     # @has_permission("Workorder", "read")
     def post(self, request):
@@ -161,7 +159,7 @@ class WorkorderFilterView(APIView):
                 request,
                 field_lookup,
                 WorkOrder,
-                base_filter=Q(is_delete=False),
+                base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSerializer)
