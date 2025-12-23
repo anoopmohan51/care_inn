@@ -129,7 +129,6 @@ def workorder_post_save(sender, instance, created, **kwargs):
                         'initiated_by': created_user,
                         'workorder': instance
                     })
-                print(""""..............changes""""",changes)
                 # Only create activity if there are actual changes
                 if changes:
                     WorkOrderActivityService.log_creation(changes)

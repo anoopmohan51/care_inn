@@ -18,81 +18,8 @@ class WorkOrderActivityService:
         return activity
     
     @staticmethod
-    def log_status_change(
-        workorder: WorkOrder,
-        from_status: str,
-        to_status: str,
-        user: AppUsers,
-    ) -> None:
-        return WorkOrderActivityService.create_workorder_activity(
-            workorder=workorder,
-            activity='STATUS',
-            message=f"Status changed from {from_status} to {to_status}",
-            is_added_by_patient=False,
-            from_value=from_status,
-            to_value=to_status,
-            from_user=user,
-            to_user=user,
-            assigned_user=None,
-            accepted_user=None,
-            user_group=None,
-        )
-    
-    @staticmethod
-    def log_assingment(
-        workorder: WorkOrder,
-        assigned_user: AppUsers = None,
-        user_group=None,
-        from_user: AppUsers = None,
-        created_user: AppUsers = None,
-        message: str = None
-    ) -> None:
-        return WorkOrderActivityService.create_workorder_activity(
-            workorder=workorder,
-            activity='ASSIGNED',
-            message=message,
-            is_added_by_patient=False,
-            from_value=None,
-            to_value=None,
-            from_user=from_user,
-            to_user=assigned_user,
-            assigned_user=assigned_user,
-            accepted_user=None,
-            user_group=user_group,
-        )
-    
-    @staticmethod
-    def log_accepted(
-        workorder: WorkOrder,
-        accepted_user: AppUsers = None,
-        from_user: AppUsers = None,
-        created_user: AppUsers = None,
-        message: str = None
-    ) -> None:
-        return WorkOrderActivityService.create_workorder_activity(
-            workorder=workorder,
-            activity='ACCEPTED',
-            message=message,
-            is_added_by_patient=False,
-            from_value=None,
-            to_value=None,
-            from_user=from_user,
-            to_user=accepted_user,
-            assigned_user=None,
-            accepted_user=accepted_user,
-            user_group=None,
-        )
-    
-    @staticmethod
     def log_creation(
         data: list
     ) -> None:
         for record in data:
             WorkOrderActivityService.create_workorder_activity(record)
-    
-    # @staticmethod
-    # def log_due_date_change(
-    #     workorder: WorkOrder,
-    #     from_due_date: str,
-    #     to_due_date: str,
-    #     user: AppUsers,
