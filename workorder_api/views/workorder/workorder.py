@@ -6,28 +6,20 @@ from workorder_api.serializers.workorder_serializer import WorkOrderSerializer
 from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F
+from django.db.models import F,Value
 from workorder_api.models import WorkOrderTemp
 from django.db.models import Q
 from core_api.permission.permission import has_permission
+from django.db.models.functions import Concat
 
 class WorkOrderCreateView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "create")
     def post(self, request):
         try:
             data = request.data
-            workorder_data = WorkOrderTemp.objects.filter(id=data['id']).values('workorder_type','workorder_attribute','room','assignee_type','user','user_group','tenant','description','priority','when_to_start','sla_minutes','mrd_id','status','created_at','updated_at','created_user','updated_user','is_delete','unique_id','start_date','end_date').first()
-            if not workorder_data:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=["Error in Work order creation"],
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content_type="application/json"
-                )
-            serializer = WorkOrderSerializer(data=workorder_data, context={'request': request})
+            serializer = WorkOrderSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return CustomResponse(
@@ -54,8 +46,8 @@ class WorkOrderCreateView(APIView):
                 content_type="application/json"
             )
 class WorkorderDeleteView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "read")
     def get(self, request,pk):
         try:
@@ -152,9 +144,10 @@ class WorkorderFilterView(APIView):
                 "description": "description",
                 "created_at": "created_at",
                 "updated_at": "updated_at",
-                "status": "status"
+                "status": "status",
+                "service": "service",
+                "created_user": "created_user"
             }
-            tenant_id = request.query_params.get('tenant_id')
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
@@ -162,7 +155,12 @@ class WorkorderFilterView(APIView):
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSerializer)
+            queryset, count = global_filter._get_result(
+                created_user_name = Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
+                assigned_user = Concat(F('user__first_name'), Value(' '), F('user__last_name')),
+                assigned_user_group = F('user_group__name'),
+                service_name = F('service__name'),
+            )
             return CustomResponse(
                 data=queryset,
                 status="success",

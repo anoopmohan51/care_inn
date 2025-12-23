@@ -1,8 +1,7 @@
 from django.db import models
 from core_api.models.tenant import Tenant
 from core_api.models.appusers import AppUsers
-from core_api.models.service_type import ServiceType
-from core_api.models.priority import Priority
+from workorder_api.models.services import Services
 from workorder_api.models.rooms import Rooms
 from workorder_api.models.workorder_attributes import WorkOrderAttributes
 from core_api.models.usergroups import UserGroup
@@ -69,6 +68,7 @@ class WorkOrder(models.Model):
     source = models.CharField(max_length=20,null=True,choices=SOURCE_CHOICES,default='USER')
     start_date=models.DateTimeField(null=True)
     end_date=models.DateTimeField(null=True)
+    service = models.ForeignKey(Services, on_delete=models.PROTECT,null=True)
 
     class Meta:
         db_table = 'workorder'
