@@ -27,6 +27,8 @@ SECRET_KEY = 'x%12sgvvl$sm4x5-n7e+w!%h1fs56s5#mi_fh_k2wt3c1jttrw'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = ['*']
 
 
 # Application definition
@@ -78,6 +80,7 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -87,7 +90,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'care_inn.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
