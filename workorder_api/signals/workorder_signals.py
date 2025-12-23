@@ -18,7 +18,6 @@ def workorder_pre_save(sender, instance, **kwargs):
     try:
         # Use only() to fetch only important fields - reduces query overhead
         original = WorkOrder.objects.get(pk=instance.pk)
-        print(""""..............1/original""""",original)
         _workorder_cache[instance.pk] = original
     except WorkOrder.DoesNotExist:
         _workorder_cache[instance.pk] = None
@@ -74,10 +73,7 @@ def workorder_post_save(sender, instance, created, **kwargs):
             WorkOrderActivityService.log_creation(activity_data)
         else:
             original = _workorder_cache.get(instance.pk,None)
-            print(""""..............2/original""""",original)
-            print(""""..............original""""",original)
             if original:
-                print("inside if original")
                 changes = []
                 activity_type = 'NOTE'
                 from_value = None
@@ -86,44 +82,57 @@ def workorder_post_save(sender, instance, created, **kwargs):
                 to_user = None
                 assigned_user = None
                 user_group = None
-                
-                # Track status changes
-                if original.status != instance.status:
-                    activity_type = 'STATUS'
-                    from_value = original.status or 'None'
-                    to_value = instance.status or 'None'
-                    changes.append(f"Status: {from_value} → {to_value}")
-                
-                # Track assignment changes
-                elif original.user != instance.user or original.user_group != instance.user_group:
-                    activity_type = 'ASSIGNED'
-                    from_user = original.user
-                    to_user = instance.user
-                    assigned_user = instance.user
-                    user_group = instance.user_group
-                    changes.append("Assignment changed")
-                
-                # Track priority changes
-                elif original.priority != instance.priority:
-                    activity_type = 'PRIORITY'
-                    from_value = original.priority.name if original.priority else 'None'
-                    to_value = instance.priority.name if instance.priority else 'None'
-                    changes.append(f"Priority: {from_value} → {to_value}")
-                
+                if original.priority != instance.priority:
+                    changes.append({
+                        'activity': 'PRIORITY',
+                        'from_value': original.priority,
+                        'to_value': instance.priority,
+                        'initiated_by': created_user,
+                        'workorder': instance
+                    })
+                elif original.assignee_type != instance.assignee_type:
+                    if instance.assignee_type == 'USER' and original.assignee_type=='TEAM':
+                        changes.append({
+                            'activity': 'ASSIGNED',
+                            'from_value': f"TEAM-{original.user_group}",
+                            'to_value': f"USER-{instance.user}",
+                            'initiated_by': created_user,
+                            'workorder': instance
+                        })
+                    elif instance.assignee_type == 'TEAM' and original.assignee_type=='USER':
+                        changes.append({
+                            'activity': 'ASSIGNED',
+                            'from_value': f"USER-{original.user}",
+                            'to_value': f"USER-{instance.user_group}",
+                            'initiated_by': created_user,
+                            'workorder': instance
+                        })
+                elif instance.start_date!=original.start_date:
+                    changes.append({
+                        'activity': 'START_DATE',
+                        'from_value': original.start_date,
+                        'to_value': instance.start_date,
+                        'initiated_by': created_user,
+                        'workorder': instance
+                    })
+                elif instance.end_date!=original.end_date:
+                    if original.end_date==None:
+                        from_value = None
+                        to_value = instance.end_date
+                    elif instance.end_date==None:
+                        from_value = original.end_date
+                        to_value = instance.end_date
+                    changes.append({
+                        'activity': 'END_DATE',
+                        'from_value':from_value,
+                        'to_value': to_value,
+                        'initiated_by': created_user,
+                        'workorder': instance
+                    })
+                print(""""..............changes""""",changes)
                 # Only create activity if there are actual changes
-                # if changes:
-                #     WorkOrderActivityService.create_activity(
-                #         workorder=instance,
-                #         activity_type=activity_type,
-                #         created_user=created_user,
-                #         message=" | ".join(changes),
-                #         from_value=from_value,
-                #         to_value=to_value,
-                #         from_user=from_user,
-                #         to_user=to_user,
-                #         assigned_user=assigned_user,
-                #         user_group=user_group
-                #     )
+                if changes:
+                    WorkOrderActivityService.log_creation(changes)
     except Exception as e:
         # Don't break the save operation - log error but continue
         logger.error(f"Error creating workorder activity: {str(e)}", exc_info=True)
