@@ -109,7 +109,7 @@ def workorder_post_save(sender, instance, created, **kwargs):
                         })
                 elif instance.start_date!=original.start_date:
                     changes.append({
-                        'activity': 'START_DATE',
+                        'activity': 'SLA_STARTTIME',
                         'from_value': original.start_date,
                         'to_value': instance.start_date,
                         'initiated_by': created_user,
@@ -123,7 +123,7 @@ def workorder_post_save(sender, instance, created, **kwargs):
                         from_value = original.end_date
                         to_value = instance.end_date
                     changes.append({
-                        'activity': 'END_DATE',
+                        'activity': 'DUE_DATE',
                         'from_value':from_value,
                         'to_value': to_value,
                         'initiated_by': created_user,

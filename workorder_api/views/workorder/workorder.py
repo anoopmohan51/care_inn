@@ -12,8 +12,8 @@ from django.db.models import Q
 from core_api.permission.permission import has_permission
 
 class WorkOrderCreateView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "create")
     def post(self, request):
         try:
@@ -54,8 +54,8 @@ class WorkOrderCreateView(APIView):
                 content_type="application/json"
             )
 class WorkorderDeleteView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "read")
     def get(self, request,pk):
         try:
