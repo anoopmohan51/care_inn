@@ -12,8 +12,8 @@ from django.db.models import Q
 from core_api.permission.permission import has_permission
 
 class WorkOrderCreateView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "create")
     def post(self, request):
         try:
@@ -54,8 +54,8 @@ class WorkOrderCreateView(APIView):
                 content_type="application/json"
             )
 class WorkorderDeleteView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "read")
     def get(self, request,pk):
         try:
@@ -140,8 +140,8 @@ class WorkorderDeleteView(APIView):
             )
 
 class WorkorderFilterView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     # @has_permission("Workorder", "read")
     def post(self, request):
@@ -159,7 +159,7 @@ class WorkorderFilterView(APIView):
                 request,
                 field_lookup,
                 WorkOrder,
-                base_filter=Q(is_delete=False),
+                base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSerializer)
