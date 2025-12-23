@@ -17,9 +17,8 @@ def workorder_pre_save(sender, instance, **kwargs):
         return
     try:
         # Use only() to fetch only important fields - reduces query overhead
-        original = WorkOrder.objects.only(
-            'status', 'user', 'user_group', 'priority', 'tenant'
-        ).select_related('user', 'user_group', 'priority', 'tenant').get(pk=instance.pk)
+        original = WorkOrder.objects.get(pk=instance.pk)
+        print(""""..............1/original""""",original)
         _workorder_cache[instance.pk] = original
     except WorkOrder.DoesNotExist:
         _workorder_cache[instance.pk] = None
@@ -75,7 +74,10 @@ def workorder_post_save(sender, instance, created, **kwargs):
             WorkOrderActivityService.log_creation(activity_data)
         else:
             original = _workorder_cache.get(instance.pk,None)
-            if orginal:
+            print(""""..............2/original""""",original)
+            print(""""..............original""""",original)
+            if original:
+                print("inside if original")
                 changes = []
                 activity_type = 'NOTE'
                 from_value = None
@@ -109,19 +111,19 @@ def workorder_post_save(sender, instance, created, **kwargs):
                     changes.append(f"Priority: {from_value} → {to_value}")
                 
                 # Only create activity if there are actual changes
-                if changes:
-                    WorkOrderActivityService.create_activity(
-                        workorder=instance,
-                        activity_type=activity_type,
-                        created_user=created_user,
-                        message=" | ".join(changes),
-                        from_value=from_value,
-                        to_value=to_value,
-                        from_user=from_user,
-                        to_user=to_user,
-                        assigned_user=assigned_user,
-                        user_group=user_group
-                    )
+                # if changes:
+                #     WorkOrderActivityService.create_activity(
+                #         workorder=instance,
+                #         activity_type=activity_type,
+                #         created_user=created_user,
+                #         message=" | ".join(changes),
+                #         from_value=from_value,
+                #         to_value=to_value,
+                #         from_user=from_user,
+                #         to_user=to_user,
+                #         assigned_user=assigned_user,
+                #         user_group=user_group
+                #     )
     except Exception as e:
         # Don't break the save operation - log error but continue
         logger.error(f"Error creating workorder activity: {str(e)}", exc_info=True)

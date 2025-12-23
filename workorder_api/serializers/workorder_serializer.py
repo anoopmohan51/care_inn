@@ -22,8 +22,8 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         request = self.context.get('request')
-        if  request and request.user:
-            set_activity_user(request.user)
+        user = get_user_model().objects.get(email=validated_data.get('created_user'),is_delete=False)
+        set_activity_user(user)
         try:
             return super().update(instance, validated_data)
         finally:

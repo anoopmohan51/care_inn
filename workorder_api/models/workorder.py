@@ -67,8 +67,8 @@ class WorkOrder(models.Model):
     is_delete=models.BooleanField(default=False)
     unique_id=models.CharField(max_length=30,null=True)
     source = models.CharField(max_length=20,null=True,choices=SOURCE_CHOICES,default='USER')
-    # start_date=models.DateTimeField(null=True)
-    # end_date=models.DateTimeField(null=True)
+    start_date=models.DateTimeField(null=True)
+    end_date=models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'workorder'
