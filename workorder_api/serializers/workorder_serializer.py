@@ -13,7 +13,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
         # }
     def create(self, validated_data):
         request = self.context.get('request')
-        user = get_user_model().objects.get(email=validated_data.get('created_user'),is_delete=False)
+        user = get_user_model().objects.get(id=request.user.id,is_delete=False)
         set_activity_user(user)
         try:
             return super().create(validated_data)
@@ -22,7 +22,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         request = self.context.get('request')
-        user = get_user_model().objects.get(email=validated_data.get('created_user'),is_delete=False)
+        user = get_user_model().objects.get(id=request.user.id,is_delete=False)
         set_activity_user(user)
         try:
             return super().update(instance, validated_data)

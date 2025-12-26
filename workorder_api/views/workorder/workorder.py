@@ -17,7 +17,7 @@ class WorkOrderCreateView(APIView):
     permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "create")
     def post(self, request):
-        try:
+        # try:
             data = request.data
             serializer = WorkOrderSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
@@ -37,14 +37,14 @@ class WorkOrderCreateView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json" 
                 )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in Work order creation"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except Exception as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Error in Work order creation"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
 class WorkorderDeleteView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
