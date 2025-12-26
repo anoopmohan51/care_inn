@@ -9,7 +9,7 @@ from .workorder_followers import WorkOrderFollowers
 from .workorder_activity import WorkOrderActivity
 from .folder import Folder
 from .folder_informations import FolderInformations
-from .folder_requested_items import FolderRequestedItems
+# from .folder_requested_items import FolderRequestedItems
 __all__ = [
     'Services', 
     'Rooms',
@@ -25,5 +25,5 @@ __all__ = [
     'WorkOrderActivity',
     'Folder',
     'FolderInformations',
-    'FolderRequestedItems'
+    # 'FolderRequestedItems'
 ]
