@@ -5,6 +5,7 @@ from workorder_api.models.services import Services
 from workorder_api.models.rooms import Rooms
 from workorder_api.models.workorder_attributes import WorkOrderAttributes
 from core_api.models.usergroups import UserGroup
+from staticfiles_api.models.staticfiles import StaticFiles
 
 class WorkOrder(models.Model):
     ASSIGNEE_USER = "USER"
@@ -69,6 +70,8 @@ class WorkOrder(models.Model):
     start_date=models.DateTimeField(null=True)
     end_date=models.DateTimeField(null=True)
     service = models.ForeignKey(Services, on_delete=models.PROTECT,null=True)
+    primary_image = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
+
 
     class Meta:
         db_table = 'workorder'
