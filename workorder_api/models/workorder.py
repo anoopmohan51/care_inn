@@ -71,6 +71,7 @@ class WorkOrder(models.Model):
     end_date=models.DateTimeField(null=True)
     service = models.ForeignKey(Services, on_delete=models.PROTECT,null=True)
     primary_image = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
+    test_field123 = models.CharField(max_length=255,null=True)  
 
 
     class Meta:
