@@ -72,6 +72,7 @@ class WorkOrder(models.Model):
     service = models.ForeignKey(Services, on_delete=models.PROTECT,null=True)
     primary_image = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
     is_auto_created = models.BooleanField(default=False)
+    test_field = models.CharField(max_length=255,null=True)
 
 
     class Meta:
