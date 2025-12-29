@@ -7,6 +7,7 @@ from workorder_api.views.workorder.workorder import *
 from workorder_api.views.workorder_comments.workorder_comments import *
 from workorder_api.views.workorder_timeline.workorder_timeline import *
 from workorder_api.views.workorder_activity.workorder_activity import *
+from workorder_api.views.workorder_follower.workorder_follower import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -28,6 +29,9 @@ urlpatterns = [
     path('workorder-timeline/<int:workorder_id>',WorkOrderTimelineListView.as_view()),
     path('workorder-activity/<int:workorder_id>',WorkOrderActivityListView.as_view()),
     path('nursing-station/approve/workorder',WorkorderStatusCreateView.as_view()),
+    path('workorder-followers',WorkOrderFollowerCreateView.as_view()),
+    path('workorder-followers/<int:id>',WorkOrderFollowerDetailView.as_view()),
+    path('workorder-followers/<int:workorder_id>',WorkOrderFollowerListView.as_view()),
 
 
 
