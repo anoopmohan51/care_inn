@@ -145,13 +145,31 @@ class WorkOrderSettingsDetailView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+    def delete(self, request, id):
+        try:
+            workorder_settings = WorkOrderSettings.objects.filter(id=id).update(is_delete=True)
+            return CustomResponse(
+                data=None,
+                status="success",
+                message=[f"WorkOrderSettings deleted successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Error in WorkOrderSettings deleting"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
 
 class WorkOrderSettingsFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # try:
+        try:
             field_lookup = {
                 "id": "id",
                 "name": "name",
@@ -174,11 +192,11 @@ class WorkOrderSettingsFilterView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        # except Exception as e:
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=[f"Error in WorkOrderSettings filter fetching"],
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content_type="application/json"
-        #     )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Error in WorkOrderSettings filter fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )

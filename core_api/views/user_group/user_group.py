@@ -176,6 +176,7 @@ class UserGroupFilterView(APIView):
             )
             queryset, count = global_filter._get_result(
                 created_user_name = F('created_user__first_name'),
+                members_count = Count('user_group_users')
             )
             return CustomResponse(
                 data=queryset,

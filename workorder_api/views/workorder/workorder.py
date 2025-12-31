@@ -160,6 +160,8 @@ class WorkorderFilterView(APIView):
                 assigned_user = Concat(F('user__first_name'), Value(' '), F('user__last_name')),
                 assigned_user_group = F('user_group__name'),
                 service_name = F('service__name'),
+                room_number = F('room__name'),
+                room_description = F('room__description')
             )
             return CustomResponse(
                 data=queryset,

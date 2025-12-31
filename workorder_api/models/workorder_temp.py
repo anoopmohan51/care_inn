@@ -3,7 +3,6 @@ from core_api.models.tenant import Tenant
 from core_api.models.appusers import AppUsers
 from workorder_api.models.services import Services
 from workorder_api.models.rooms import Rooms
-from workorder_api.models.workorder_attributes import WorkOrderAttributes
 from core_api.models.usergroups import UserGroup
 
 class WorkOrderTemp(models.Model):
@@ -47,7 +46,6 @@ class WorkOrderTemp(models.Model):
         ('HIGH','HIGH'),
     ]
     workorder_type = models.CharField(max_length=255,choices=WORKORDER_TYPE_CHOICES,null=True)
-    workorder_attribute=models.ForeignKey(WorkOrderAttributes, on_delete=models.PROTECT,null=True)
     room=models.ForeignKey(Rooms, on_delete=models.PROTECT,null=True)
     assignee_type=models.CharField(max_length=255,choices=ASSIGNEE_CHOICES,null=True)
     user=models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True)
