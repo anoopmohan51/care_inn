@@ -8,8 +8,8 @@ from .workorder_timeline import WorkOrderTimeline
 from .workorder_followers import WorkOrderFollowers
 from .workorder_activity import WorkOrderActivity
 from .folder import Folder
-from .folder_informations import FolderInformations
-from .folder_requested_items import FolderRequestedItems
+from .informations import Informations
+from .requested_items import RequestedItems
 __all__ = [
     'Services', 
     'Rooms',

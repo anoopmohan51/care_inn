@@ -9,6 +9,8 @@ from core_api.filters.global_filter import GlobalFilter
 from django.db.models import F,Q
 from rest_framework.views import APIView
 from core_api.permission.permission import has_permission
+from workorder_api.models.workorder_settings import WorkOrderSettings
+from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer
 
 class ServiceCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -18,6 +20,19 @@ class ServiceCreateView(generics.CreateAPIView):
     def post(self, request):
         try:
             data=request.data
+            folder_id = data.get('folder_id',None)
+            workorder_settings = data.get('workorder_settings',None)
+            if not folder_id:
+                workorder_settings_data={
+                    'type': 'SERVICE'
+                }
+                workorder_settings_serializer =  WorkOrderSettingsSerializer(data=workorder_settings_data, context={'request': request})
+                if workorder_settings_serializer.is_valid(raise_exception=True):
+                    workorder_settings_serializer.save()
+                    workorder_settings_id = workorder_settings_serializer.data.get('id')
+                    data.update({
+                        'workorder_settings_id': workorder_settings_id
+                    })
             serializer = ServiceSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()

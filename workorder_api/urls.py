@@ -8,6 +8,9 @@ from workorder_api.views.workorder_comments.workorder_comments import *
 from workorder_api.views.workorder_timeline.workorder_timeline import *
 from workorder_api.views.workorder_activity.workorder_activity import *
 from workorder_api.views.workorder_follower.workorder_follower import *
+from workorder_api.views.workorder_settings.workorder_settings import *
+from workorder_api.views.informations.informations import *
+from workorder_api.views.requested_items.requested_items import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -32,6 +35,13 @@ urlpatterns = [
     path('workorder-followers',WorkOrderFollowerCreateView.as_view()),
     path('workorder-followers/<int:id>',WorkOrderFollowerDetailView.as_view()),
     path('workorder-followers/<int:workorder_id>',WorkOrderFollowerListView.as_view()),
+    path('workorder-settings',WorkOrderSettingsCreateView.as_view()),
+    path('workorder-settings/<int:id>',WorkOrderSettingsDetailView.as_view()),
+    path('workorder-settings/filter',WorkOrderSettingsFilterView.as_view()),
+    path('informations',InformationsCreateView.as_view()),
+    path('informations/<int:id>',InformationsDetailView.as_view()),
+    path('request-items',RequestedItemsCreateView.as_view()),
+    path('request-items/<int:id>',RequestedItemsDetailView.as_view()),
 
 
 

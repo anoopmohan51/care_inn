@@ -4,8 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from workorder_api.models import WorkOrderFollowers
 from workorder_api.serializers.workorder_follower_serializer import WorkOrderFollowerSerializer
 from core_api.response_utils.custom_response import CustomResponse
-from django.db.models import F,Concat
+from django.db.models import F,Value
 from rest_framework import status
+from django.db.models.functions import Concat
 
 
 class WorkOrderFollowerCreateView(APIView):
@@ -42,7 +43,7 @@ class WorkOrderFollowerCreateView(APIView):
                 content_type="application/json"
             )
 
-class WorkOrderFollowerDeleteView(APIView):
+class WorkOrderFollowerDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
