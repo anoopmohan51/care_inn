@@ -3,13 +3,17 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from workorder_api.models.folder import Folder
-from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer,WorkOrderSettingsListSerializer,FolderDetailsListSerializer
+from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer,WorkOrderSettingsListSerializer,FolderDetailsListSerializer,FolderSerializer
 from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from core_api.permission.permission import has_permission
 from django.db import transaction
 from django.db.models import Q
 from core_api.filters.global_filter import GlobalFilter
+from.delete_folder import _delete_folders_recursive
+from workorder_api.models.services import Services
+from workorder_api.models.informations import Informations
+from workorder_api.models.requested_items import RequestedItems
 
 class WorkOrderSettingsCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -18,37 +22,27 @@ class WorkOrderSettingsCreateView(APIView):
     def post(self, request):
         try:
             request_data = request.data
-            parent_folder_id = request_data.get('parent_folder_id',None)
+            folder = request_data.get('folder',None)
             folder_data = None
             data = None
             if request_data.get('type') == 'FOLDER':
                 with transaction.atomic():
-                    folder_data = {
-                                'name': request_data.get('name'),
-                                'parent_folder': parent_folder_id,
-                                'position': request_data.get('position'),
-                                'icon': request_data.get('icon'),
-                                'workorder_settings_id': request_data.get('id',None)
-                            }
-                    if not parent_folder_id:
-                        serializer = WorkOrderSettingsSerializer(data=request_data, context={'request': request})
+                    if not folder:
+                        workorder_settings_data = {
+                            'type': 'FOLDER'
+                        }
+                        serializer = WorkOrderSettingsSerializer(data=workorder_settings_data, context={'request': request})
                         if serializer.is_valid(raise_exception=True):
                             serializer.save()
                             data = serializer.data
-                            folder_data.update({
-                                'workorder_settings_id': serializer.data.get('id')
+                            request_data.update({
+                                'workorder_settings': serializer.data.get('id')
                             })
-                    else:
-                        workorder_settings = WorkOrderSettings.objects.get(id=request_data.get('id'))
-                        serializer = WorkOrderSettingsSerializer(request_data, context={'request': request})
-                        data = serializer.data
-                    folder = Folder.objects.create(**folder_data)
-                    data.update({
-                        "name":folder.name,
-                        "icon":folder.icon
-                    })
+                    serializer = FolderSerializer(data=request_data, context={'request': request})
+                    if serializer.is_valid(raise_exception=True):
+                        serializer.save()
                     return CustomResponse(
-                        data=data,
+                        data=serializer.data,
                         status="success",
                         message=[f"WorkOrderSettings created successfully"],
                         status_code=status.HTTP_201_CREATED,
@@ -77,24 +71,27 @@ class WorkOrderSettingsDetailView(APIView):
 
     def get(self, request, id):
         try:
-            folder_id = request.query_params.get('parent_folder_id',None)
-            responce_data = None
-            if  not folder_id:
-                workorder_settings = WorkOrderSettings.objects.get(id=id)
-                serializer = WorkOrderSettingsListSerializer(workorder_settings)
-                responce_data=serializer.data
-            else:
-                folder = Folder.objects.get(id=folder_id)
+            folder = Folder.objects.get(id=id)
+            if folder:
                 serializer = FolderDetailsListSerializer(folder)
                 responce_data = serializer.data
-            return CustomResponse(
-                data=responce_data,
-                status="success",
-                message=[f"WorkOrderSettings details fetched successfully"],
-                status_code=status.HTTP_200_OK,
-                content_type="application/json"
-            )
+                return CustomResponse(
+                    data=responce_data,
+                    status="success",
+                    message=[f"WorkOrderSettings details fetched successfully"],
+                    status_code=status.HTTP_200_OK,
+                    content_type="application/json"
+                )
+            else:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"Folder not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
         except Exception as e:
+            print("error",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -105,38 +102,34 @@ class WorkOrderSettingsDetailView(APIView):
     def put(self, request, id):
         try:
             request_data = request.data
-            responce_data = {}
-            folder_id = request.query_params.get('parent_folder_id',None)
-            if not folder_id:
-                workorder_settings = WorkOrderSettings.objects.get(id=id)
-                serializer = WorkOrderSettingsSerializer(workorder_settings, data=request_data, context={'request': request})
+            folder = Folder.objects.get(id=id)
+            if folder:
+                serializer = FolderSerializer(folder, data=request_data, context={'request': request})
                 if serializer.is_valid(raise_exception=True):
                     serializer.save()
-                    responce_data = serializer.data
-                    folder = Folder.objects.get(workorder_settings_id=id)
-                    folder.name = request_data.get('name')
-                    folder.icon = request_data.get('icon')
-                    folder.save()
-                    responce_data.update({
-                        "name":folder.name,
-                        "icon":folder.icon
-                    })
+                    return CustomResponse(
+                        data=serializer.data,
+                        status="success",
+                        message=[f"WorkOrderSettings updated successfully"],
+                        status_code=status.HTTP_200_OK,
+                        content_type="application/json"
+                    )
+                else:
+                    return CustomResponse(
+                        data=serializer.errors,
+                        status="failed",
+                        message=[f"Error in WorkOrderSettings updating"],
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        content_type="application/json"
+                    )
             else:
-                folder = Folder.objects.get(id=id)
-                folder.name = request_data.get('name')
-                folder.icon = request_data.get('icon')
-                folder.save()
-                responce_data.update({
-                    "name":folder.name,
-                    "icon":folder.icon
-                })
-            return CustomResponse(
-                data=responce_data,
-                status="success",
-                message=[f"WorkOrderSettings updated successfully"],
-                status_code=status.HTTP_200_OK,
-                content_type="application/json"
-            )
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"Folder not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -147,15 +140,32 @@ class WorkOrderSettingsDetailView(APIView):
             )
     def delete(self, request, id):
         try:
-            workorder_settings = WorkOrderSettings.objects.filter(id=id).update(is_delete=True)
-            return CustomResponse(
-                data=None,
-                status="success",
-                message=[f"WorkOrderSettings deleted successfully"],
-                status_code=status.HTTP_200_OK,
-                content_type="application/json"
-            )
+            folder = Folder.objects.get(id=id)
+            if folder:
+                if not folder.parent_folder:
+                    WorkOrderSettings.objects.filter(id=folder.workorder_settings.id).update(is_delete=True)
+                _delete_folders_recursive(self,folder.id)
+                Services.objects.filter(folder_id=folder.id).update(is_delete=True)
+                Informations.objects.filter(folder_id=folder.id).update(is_delete=True)
+                RequestedItems.objects.filter(folder_id=folder.id).update(is_delete=True)
+                folder.delete()   
+                return CustomResponse(
+                    data=None,
+                    status="success",
+                    message=[f"WorkOrderSettings deleted successfully"],
+                    status_code=status.HTTP_200_OK,
+                    content_type="application/json"
+                )
+            else:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"Folder not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
         except Exception as e:
+            print("error",e)
             return CustomResponse(
                 data=None,
                 status="failed",

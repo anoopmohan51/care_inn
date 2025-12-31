@@ -55,7 +55,7 @@ class FolderDetailsListSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_folders(self, obj):
-        return Folder.objects.filter(folder_id=obj.id).values()
+        return Folder.objects.filter(parent_folder_id=obj.id).values()
     
     def get_services(self, obj):
         return Services.objects.filter(folder_id=obj.id,is_delete=False).values()
@@ -66,3 +66,17 @@ class FolderDetailsListSerializer(serializers.ModelSerializer):
     def get_items(self, obj):
         request_items = RequestedItems.objects.filter(folder_id=obj.id,is_delete=False)
         return ItemSerializer(request_items,many=True).data
+
+class FolderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Folder
+        fields = '__all__'
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        return super().update(instance, validated_data)
