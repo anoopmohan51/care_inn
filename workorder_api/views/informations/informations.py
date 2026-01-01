@@ -106,21 +106,21 @@ class InformationsDetailView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-        def delete(self, request, id):
-            try:
-                information = Informations.objects.filter(id=id).update(is_delete=True)
-                return CustomResponse(
-                    data=None,
-                    status="success",
-                    message=[f"Information deleted successfully"],
-                    status_code=status.HTTP_200_OK,
-                    content_type="application/json"
-                )
-            except Exception as e:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Error in Information deleting"],
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content_type="application/json"
-                )
+    def delete(self, request, id):
+        try:
+            information = Informations.objects.filter(id=id).update(is_delete=True)
+            return CustomResponse(
+                data=None,
+                status="success",
+                message=[f"Information deleted successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Error in Information deleting"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
