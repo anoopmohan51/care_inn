@@ -10,11 +10,12 @@ from django.db import transaction
 class UserPermissionDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self, request,user_id):
+    def get(self, request,role_id):
         try:
-            user_permission = UserPermission.objects.filter(user_id=user_id).annotate(
+            user_permission = RolePermission.objects.filter(role_id=role_id).annotate(
                 permission_name=F('permission__name'),
-            ).values("id","user","permission","create","read","update","delete","permission_name")
+                role_name=F('role__name'),
+            ).values("id","role","permission","create","read","update","delete","permission_name","role_name")
             return CustomResponse(
                 data=user_permission,
                 status="success",
@@ -23,7 +24,6 @@ class UserPermissionDetailView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("eeeeeeee",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -33,22 +33,22 @@ class UserPermissionDetailView(APIView):
             )
 
     def put(self,request,user_id):
-            # try:
+        try:
             data=request.data
             data_list = []
             for record in data:
                 data_list.append(
-                    UserPermission(
+                    RolePermission(
                         id=record["id"],
                         create=record["create"],
                         read=record["read"],
                         update=record["update"],
                         delete=record["delete"],
-                        user_id=user_id
+                        role_id=role_id
                     )
                 )
             with transaction.atomic():
-                d =UserPermission.objects.bulk_update(
+                d =RolePermission.objects.bulk_update(
                     data_list,
                     ["create", "read", "update", "delete"]
                 )

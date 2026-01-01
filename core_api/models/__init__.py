@@ -5,7 +5,7 @@ from .position import Position
 from .usergroups import UserGroup
 from .permission_category import PermissionCategory
 from .permission import Permission
-from .user_permission import UserPermission
+from .role_permission import RolePermission
 
 __all__ = [
     'AppUsers', 

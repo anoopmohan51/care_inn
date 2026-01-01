@@ -5,6 +5,7 @@ from ...serializers import UserSerializer
 from ...response_utils.custom_response import CustomResponse
 from django.contrib.auth import get_user_model,authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from core_api.models.role_permission import RolePermission
 
 class UserLoginView(generics.CreateAPIView):
     def post(self, request):
@@ -14,12 +15,14 @@ class UserLoginView(generics.CreateAPIView):
             password = data.get('password')
             user = authenticate(request=request,username=email,password=password)
             user_data = UserSerializer(user).data
+            role_permission = RolePermission.objects.filter(role=user.role).values('permission__name','create','view','edit','delete')
             if user:
                 refresh = RefreshToken.for_user(user)
                 user_dict={
                     "user":user_data,
                     "access_token":str(refresh.access_token),
-                    "refresh_token":str(refresh)
+                    "refresh_token":str(refresh),
+                    "permissions":role_permission
                 }
                 return CustomResponse(
                     data=user_dict,

@@ -10,8 +10,8 @@ class Permission(models.Model):
         related_name="permission"
     )
     create = models.BooleanField(default=True)
-    read = models.BooleanField(default=True)
-    update = models.BooleanField(default=True)
+    view = models.BooleanField(default=True)
+    edit = models.BooleanField(default=True)
     delete = models.BooleanField(default=True)
 
     class Meta:
