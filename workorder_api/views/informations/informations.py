@@ -66,18 +66,15 @@ class InformationsDetailView(APIView):
 
     def get(self, request, id):
         try:
-            fields=['id','title','information','icon','folder','workorder_settings','tenant','created_user','updated_user','is_delete','created_at','updated_at']
-            responce_data = Informations.objects.filter(id=id).values(*fields).first()
-            serializer = InformationSerializer(responce_data,data=responce_data,context={'request': request})
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return CustomResponse(
-                    data=serializer.data,
-                    status="success",
-                    message=[f"Information details fetched successfully"],
-                    status_code=status.HTTP_200_OK,
-                    content_type="application/json"
-                )
+            responce_data = Informations.objects.get(pk=id)
+            serializer = InformationSerializer(responce_data)
+            return CustomResponse(
+                data=serializer.data,
+                status="success",
+                message=[f"Information details fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
