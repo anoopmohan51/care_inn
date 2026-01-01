@@ -44,10 +44,10 @@ class Services(models.Model):
     )
     user=models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='service_user')
     user_group=models.ForeignKey(UserGroup, on_delete=models.PROTECT,null=True,related_name='service_user_group')
-    icon=models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
+    static_file = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
     workorder_settings = models.ForeignKey(WorkOrderSettings, on_delete=models.PROTECT,null=True)
     folder = models.ForeignKey(Folder, on_delete=models.PROTECT,null=True)
-   
+    icon = models.CharField(max_length=100,null=True)
 
     class Meta:
         db_table = 'workorder_api_services'

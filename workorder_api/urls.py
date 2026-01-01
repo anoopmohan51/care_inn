@@ -1,5 +1,4 @@
 from django.urls import path
-# from workorder_api.views.workorder_attributes.workorder_attributes import *
 from workorder_api.views.service_view.service_view import *
 from workorder_api.views.room_views.room_views import *
 from workorder_api.views.workorder_temp.workorder_temp import *

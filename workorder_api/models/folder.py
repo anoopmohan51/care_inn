@@ -9,7 +9,8 @@ class Folder(models.Model):
     workorder_settings = models.ForeignKey(WorkOrderSettings, on_delete=models.PROTECT,null=True)
     parent_folder = models.ForeignKey('self', on_delete=models.PROTECT,null=True)
     position = models.IntegerField(default=0,null=True)
-    icon = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
+    static_file = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
+    icon = models.CharField(max_length=100,null=True)
 
     class Meta:
         db_table = 'workorder_api_folder'
