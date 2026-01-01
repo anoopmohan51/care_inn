@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from core_api.response_utils.custom_response import CustomResponse
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F,Q
+from django.db.models import F,Q,Count
 from rest_framework import status
 from core_api.models.usergroups import UserGroup,UserGroupUsers
 from core_api.serializers.usergroup_serializer import UserGroupSerializer
