@@ -106,7 +106,7 @@ class RequestedItemsDetailView(APIView):
             )
     def delete(self, request, id):
         try:
-            ItemDetails.objects.filter(item_id=id).update(is_delete=True)
+            ItemDetails.objects.filter(item_id=id).delete()
             RequestedItems.objects.filter(id=id).update(is_delete=True)
             return CustomResponse(
                 data=None,
