@@ -17,7 +17,7 @@ def get_workorder_status_count(tenant_id,start_date,end_date):
             WHERE
                 is_delete = FALSE AND
                 tenant_id = %s AND 
-                created_at BETWEEN %s AND %s
+                created_at :: date BETWEEN %s AND %s
         """, [tenant_id, start_date, end_date]
         )
         return dictfetchall(cursor)
