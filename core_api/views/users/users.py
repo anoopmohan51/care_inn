@@ -197,7 +197,7 @@ class UserResetPasswordView(generics.UpdateAPIView):
 class UserFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    @has_permission("User", "view")
+    # @has_permission("User", "view")
     def post(self, request):
         try:
             field_lookup = {
