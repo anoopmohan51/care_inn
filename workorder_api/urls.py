@@ -10,6 +10,10 @@ from workorder_api.views.workorder_follower.workorder_follower import *
 from workorder_api.views.workorder_settings.workorder_settings import *
 from workorder_api.views.informations.informations import *
 from workorder_api.views.requested_items.requested_items import *
+from workorder_api.views.workorder_dashboard.workorder_dashboard import *
+from workorder_api.views.workorder_dashboard.workorder_status_dashboard import *
+from workorder_api.views.workorder_dashboard.workorder_per_day import *
+from workorder_api.views.workorder_dashboard.workorder_type_graph import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -38,7 +42,10 @@ urlpatterns = [
     path('informations/<int:id>',InformationsDetailView.as_view()),
     path('request-items',RequestedItemsCreateView.as_view()),
     path('request-items/<int:id>',RequestedItemsDetailView.as_view()),
-
+    path('workorder-type-count',WorkOrderTypeDashboardCountView.as_view()),
+    path('workorder-status-count',WorkOrderStatusDashboardCountView.as_view()),
+    path('workorder-count-per-day',WorkOrderPerDayView.as_view()),
+    path('workorder-type-count-weekdays',WorkOrderTypeGraphView.as_view()),
 
 
 ]
