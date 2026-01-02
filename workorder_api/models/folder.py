@@ -11,6 +11,7 @@ class Folder(models.Model):
     position = models.IntegerField(default=0,null=True)
     static_file = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
     icon = models.CharField(max_length=100,null=True)
+    color = models.CharField(max_length=50,null=True)
 
     class Meta:
         db_table = 'workorder_api_folder'
