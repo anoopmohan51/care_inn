@@ -14,6 +14,7 @@ from workorder_api.views.workorder_dashboard.workorder_dashboard import *
 from workorder_api.views.workorder_dashboard.workorder_status_dashboard import *
 from workorder_api.views.workorder_dashboard.workorder_per_day import *
 from workorder_api.views.workorder_dashboard.workorder_type_graph import *
+from workorder_api.views.workorder_dashboard.workorder_time import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -46,6 +47,7 @@ urlpatterns = [
     path('workorder-status-count',WorkOrderStatusDashboardCountView.as_view()),
     path('workorder-count-per-day',WorkOrderPerDayView.as_view()),
     path('workorder-type-count-weekdays',WorkOrderTypeGraphView.as_view()),
+    path('workorder-time/summary',WorkOrderTimeView.as_view()),
 
 
 ]

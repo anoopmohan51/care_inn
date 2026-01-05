@@ -91,7 +91,6 @@ class WorkOrderSettingsDetailView(APIView):
                     content_type="application/json"
                 )
         except Exception as e:
-            print("error",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -165,7 +164,6 @@ class WorkOrderSettingsDetailView(APIView):
                     content_type="application/json"
                 )
         except Exception as e:
-            print("error",e)
             return CustomResponse(
                 data=None,
                 status="failed",
