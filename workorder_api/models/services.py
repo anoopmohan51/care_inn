@@ -16,7 +16,8 @@ class Services(models.Model):
     service_type_choices = [
         ("COMPLAINT", "COMPLAINT"),
         ("REQUEST", "REQUEST"),
-        ("SPECIAL_REQUEST", "SPECIAL_REQUEST")
+        ("SPECIAL_REQUEST", "SPECIAL_REQUEST"),
+        ("MAINTENANCE", "MAINTENANCE"),
     ]
     PRIORITY_CHOICES = [
         ('LOW','LOW'),

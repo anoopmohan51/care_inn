@@ -62,12 +62,10 @@ class TokenRefreshView(generics.CreateAPIView):
                     content_type="application/json"
                 )
             token = RefreshToken(refresh_token)
-            new_access = token.access_token
-            new_refresh = token.rotate()
             return CustomResponse(
                 data={
-                    "access_token":str(new_access),
-                    "refresh_token":str(new_refresh)
+                    "access_token":str(token.access_token),
+                    "refresh_token":str(token)
                 },
                 status="sucess",
                 message=["Token generated"],

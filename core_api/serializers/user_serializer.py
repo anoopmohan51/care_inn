@@ -4,6 +4,11 @@ from django.contrib.auth import get_user_model
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
+    role_name = serializers.SerializerMethodField('get_role_name')
+
+    def get_role_name(self, obj):
+        return obj.role.name
+    
     class Meta:
         model = get_user_model()
         fields = '__all__'
