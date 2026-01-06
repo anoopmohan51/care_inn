@@ -71,7 +71,7 @@ class WorkOrderSettingsDetailView(APIView):
 
     def get(self, request, id):
         try:
-            folder = Folder.objects.get(id=id,is_delete=False)
+            folder = Folder.objects.get(id=id)
             serializer = FolderDetailsListSerializer(folder)
             responce_data = serializer.data
             return CustomResponse(
@@ -82,7 +82,6 @@ class WorkOrderSettingsDetailView(APIView):
                 content_type="application/json"
             )
         except Folder.DoesNotExist:
-            print("not exists:::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -91,7 +90,6 @@ class WorkOrderSettingsDetailView(APIView):
                 content_type="application/json"
             )   
         except Exception as e:
-            print("error:::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
