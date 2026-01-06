@@ -64,20 +64,20 @@ class RequestedItemsDetailView(APIView):
     def get(self, request, id):
         try:
             responce_data = RequestedItems.objects.get(id=id,is_delete=False)
-            if not responce_data:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Requested items not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content_type="application/json"
-                )
             serializer = ItemSerializer(responce_data)
             return CustomResponse(
                 data=serializer.data,
                 status="success",
                 message=[f"Requested items details fetched successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except RequestedItems.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Requested items not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -104,6 +104,14 @@ class RequestedItemsDetailView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
+        except RequestedItems.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Requested items not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -121,6 +129,14 @@ class RequestedItemsDetailView(APIView):
                 status="success",
                 message=[f"Requested items deleted successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except RequestedItems.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Requested items not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:

@@ -52,20 +52,20 @@ class WorkorderDeleteView(APIView):
     def get(self, request,pk):
         try:
             workorders = WorkOrder.objects.get(id=pk,is_delete=False)
-            if not workorders:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Work order not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content_type="application/json"
-                )
             serializer = WorkOrderSerializer(workorders)
             return CustomResponse(
                 data=serializer.data,
                 status="success",
                 message=["Work orders fetched successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except WorkOrder.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Work order not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -99,6 +99,14 @@ class WorkorderDeleteView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except WorkOrder.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Work order not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -130,6 +138,14 @@ class WorkorderDeleteView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except WorkOrder.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Work order not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,

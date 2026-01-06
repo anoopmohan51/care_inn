@@ -67,20 +67,20 @@ class InformationsDetailView(APIView):
     def get(self, request, id):
         try:
             responce_data = Informations.objects.get(pk=id,is_delete=False)
-            if not responce_data:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Information not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content_type="application/json"
-                )
             serializer = InformationSerializer(responce_data)
             return CustomResponse(
                 data=serializer.data,
                 status="success",
                 message=[f"Information details fetched successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Informations.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Information not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -104,6 +104,14 @@ class InformationsDetailView(APIView):
                 status="success",
                 message=[f"Information updated successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Informations.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Information not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:

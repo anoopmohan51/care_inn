@@ -72,24 +72,23 @@ class WorkOrderSettingsDetailView(APIView):
     def get(self, request, id):
         try:
             folder = Folder.objects.get(id=id,is_delete=False)
-            if folder:
-                serializer = FolderDetailsListSerializer(folder)
-                responce_data = serializer.data
-                return CustomResponse(
-                    data=responce_data,
-                    status="success",
-                    message=[f"WorkOrderSettings details fetched successfully"],
-                    status_code=status.HTTP_200_OK,
-                    content_type="application/json"
-                )
-            else:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Folder not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content_type="application/json"
-                )
+            serializer = FolderDetailsListSerializer(folder)
+            responce_data = serializer.data
+            return CustomResponse(
+                data=responce_data,
+                status="success",
+                message=[f"WorkOrderSettings details fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Folder.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Folder not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )   
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -102,33 +101,32 @@ class WorkOrderSettingsDetailView(APIView):
         try:
             request_data = request.data
             folder = Folder.objects.get(id=id,is_delete=False)
-            if folder:
-                serializer = FolderSerializer(folder, data=request_data, context={'request': request})
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    return CustomResponse(
-                        data=serializer.data,
-                        status="success",
-                        message=[f"WorkOrderSettings updated successfully"],
-                        status_code=status.HTTP_200_OK,
-                        content_type="application/json"
-                    )
-                else:
-                    return CustomResponse(
-                        data=serializer.errors,
-                        status="failed",
-                        message=[f"Error in WorkOrderSettings updating"],
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        content_type="application/json"
-                    )
-            else:
+            serializer = FolderSerializer(folder, data=request_data, context={'request': request})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
                 return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Folder not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
+                    data=serializer.data,
+                    status="success",
+                    message=[f"WorkOrderSettings updated successfully"],
+                    status_code=status.HTTP_200_OK,
                     content_type="application/json"
                 )
+            else:
+                return CustomResponse(
+                    data=serializer.errors,
+                    status="failed",
+                    message=[f"Error in WorkOrderSettings updating"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
+        except Folder.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Folder not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -140,29 +138,28 @@ class WorkOrderSettingsDetailView(APIView):
     def delete(self, request, id):
         try:
             folder = Folder.objects.get(id=id)
-            if folder:
-                if not folder.parent_folder:
-                    WorkOrderSettings.objects.filter(id=folder.workorder_settings.id).update(is_delete=True)
-                _delete_folders_recursive(self,folder.id)
-                Services.objects.filter(folder_id=folder.id).update(is_delete=True)
-                Informations.objects.filter(folder_id=folder.id).update(is_delete=True)
-                RequestedItems.objects.filter(folder_id=folder.id).update(is_delete=True)
-                folder.delete()   
-                return CustomResponse(
-                    data=None,
-                    status="success",
-                    message=[f"WorkOrderSettings deleted successfully"],
-                    status_code=status.HTTP_200_OK,
-                    content_type="application/json"
-                )
-            else:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Folder not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content_type="application/json"
-                )
+            if not folder.parent_folder:
+                WorkOrderSettings.objects.filter(id=folder.workorder_settings.id).update(is_delete=True)
+            _delete_folders_recursive(self,folder.id)
+            Services.objects.filter(folder_id=folder.id).update(is_delete=True)
+            Informations.objects.filter(folder_id=folder.id).update(is_delete=True)
+            RequestedItems.objects.filter(folder_id=folder.id).update(is_delete=True)
+            folder.delete()   
+            return CustomResponse(
+                data=None,
+                status="success",
+                message=[f"WorkOrderSettings deleted successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Folder.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Folder not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
