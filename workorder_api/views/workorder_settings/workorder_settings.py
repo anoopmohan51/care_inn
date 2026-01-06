@@ -25,7 +25,7 @@ class WorkOrderSettingsCreateView(APIView):
             folder = request_data.get('folder',None)
             folder_data = None
             data = None
-            response_data['parent_folder'] = folder
+            request_data['parent_folder'] = folder
             if request_data.get('type') == 'FOLDER':
                 with transaction.atomic():
                     if not folder:
