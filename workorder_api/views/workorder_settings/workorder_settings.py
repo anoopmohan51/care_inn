@@ -100,7 +100,7 @@ class WorkOrderSettingsDetailView(APIView):
     def put(self, request, id):
         try:
             request_data = request.data
-            folder = Folder.objects.get(id=id,is_delete=False)
+            folder = Folder.objects.get(id=id)
             serializer = FolderSerializer(folder, data=request_data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
