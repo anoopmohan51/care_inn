@@ -124,12 +124,23 @@ class InformationsDetailView(APIView):
             )
     def delete(self, request, id):
         try:
+            information = Informations.objects.get(id=id,is_delete=False)
+            if not information.folder and information.workorder_settings:
+                WorkOrderSettings.objects.filter(id=information.workorder_settings.id).update(is_delete=True)
             information = Informations.objects.filter(id=id).update(is_delete=True)
             return CustomResponse(
                 data=None,
                 status="success",
                 message=[f"Information deleted successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Informations.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Information not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:

@@ -12,6 +12,7 @@ class WorkOrderTimeline(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     assigned_to = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True)
     is_delete = models.BooleanField(default=False)
+    duration = models.IntegerField(null=True)
 
     class Meta:
         db_table = 'workorder_timeline'

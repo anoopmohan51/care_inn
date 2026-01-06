@@ -8,6 +8,7 @@ from core_api.permission.permission import has_permission
 from django.db import transaction
 from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer
 from workorder_api.serializers.item_serializer import ItemSerializer
+from workorder_api.models.workorder_settings import WorkOrderSettings
 
 class RequestedItemsCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -123,6 +124,9 @@ class RequestedItemsDetailView(APIView):
     def delete(self, request, id):
         try:
             ItemDetails.objects.filter(item_id=id).delete()
+            requested_items = RequestedItems.objects.get(id=id,is_delete=False)
+            if not requested_items.folder:
+                WorkOrderSettings.objects.filter(id=requested_items.workorder_settings.id).update(is_delete=True)
             RequestedItems.objects.filter(id=id).update(is_delete=True)
             return CustomResponse(
                 data=None,

@@ -175,6 +175,8 @@ class ServiceUpdateView(generics.GenericAPIView):
     def delete(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
+            if not service.folder and service.workorder_settings:
+                WorkOrderSettings.objects.filter(id=service.workorder_settings.id).update(is_delete=True)
             service.is_delete = True
             service.save()
             return CustomResponse(

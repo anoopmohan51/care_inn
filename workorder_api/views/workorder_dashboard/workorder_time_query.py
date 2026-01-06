@@ -6,7 +6,7 @@ def get_workorder_time_query(tenant_id,start_date,end_date):
         cursor.execute(
             """SELECT
     COALESCE(
-        AVG(first_response_time),
+        EXTRACT(EPOCH FROM AVG(first_response_time)) / 3600,
         INTERVAL '0'
     ) AS avg_initial_response_time,
 
@@ -55,4 +55,4 @@ WHERE
     first_response_time IS NOT NULL
     AND resolution_time_minutes IS NOT NULL;""", [tenant_id, start_date, end_date]
         )
-        return dictfetchall(cursor)  # Move this inside the with block
+        return dictfetchall(cursor)
