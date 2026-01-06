@@ -64,6 +64,14 @@ class RequestedItemsDetailView(APIView):
     def get(self, request, id):
         try:
             responce_data = RequestedItems.objects.get(id=id,is_delete=False)
+            if not responce_data:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"Requested items not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
             serializer = ItemSerializer(responce_data)
             return CustomResponse(
                 data=serializer.data,

@@ -45,6 +45,14 @@ class UserGroupDetialsView(APIView):
     def get(self, request,pk):
         try:
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
+            if not user_group:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"User group not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
             serializer = UserGroupSerializer(user_group)
             data = serializer.data
             data['users'] = UserGroupUsersService().get_user_group_users_list(user_group.id)

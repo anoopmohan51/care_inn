@@ -95,6 +95,14 @@ class StaticFilesDetailView(APIView):
     def get(self, request, pk):
         try:
             workorder_attribute_icon = StaticFiles.objects.get(id=pk)
+            if not workorder_attribute_icon:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"File not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
             file_path = workorder_attribute_icon.file_path
             full_file_path = Path(settings.BASE_DIR) / 'media' / file_path
             if full_file_path.exists():

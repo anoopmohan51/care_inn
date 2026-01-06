@@ -53,6 +53,14 @@ class UserUpdateView(generics.UpdateAPIView):
     def get(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
+            if not user:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"User not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
             serializer = UserSerializer(user)
             return CustomResponse(
                 data=serializer.data,
@@ -73,6 +81,14 @@ class UserUpdateView(generics.UpdateAPIView):
     def put(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
+            if not user:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"User not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
             serializer = UserSerializer(user, data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()

@@ -51,6 +51,14 @@ class RoomUpdateView(APIView):
     def get(self, request,pk):
         try:
             room = Rooms.objects.get(id=pk,is_delete=False)
+            if not room:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"Room not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
             serializer = RoomSerializer(room)
             return CustomResponse(
                 data=serializer.data,

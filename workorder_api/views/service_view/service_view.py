@@ -68,6 +68,14 @@ class ServiceUpdateView(generics.GenericAPIView):
     def get(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
+            if not service:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"Service not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
             serializer = ServiceSerializer(service)
             return CustomResponse(
                 data=serializer.data,
