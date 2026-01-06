@@ -23,7 +23,6 @@ class WorkOrderTimelineCreateView(APIView):
                     content_type="application/json"
                 )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -31,6 +30,52 @@ class WorkOrderTimelineCreateView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+
+class WorkOrderTimelineUpdateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request,pk):
+        try:
+            workorder_timeline = WorkOrderTimeline.objects.get(id=pk)
+            serializer = WorkOrderTimelineSerializer(workorder_timeline)
+            return CustomResponse(
+                data=serializer.data,
+                status="success",
+                message=["Work order timeline fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work order timeline fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+    def put(self, request,pk):
+        try:
+            data = request.data
+            workorder_timeline = WorkOrderTimeline.objects.get(id=pk)
+            serializer = WorkOrderTimelineSerializer(workorder_timeline, data=data, context={'request': request})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return CustomResponse(
+                    data=serializer.data,
+                    status="success",
+                    message=["Work order timeline updated successfully"],
+                    status_code=status.HTTP_200_OK,
+                    content_type="application/json"
+                )
+        except Exception as e:
+            return CustomResponse(
+                data=None,  
+                status="failed",
+                message=["Error in Work order timeline updating"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )   
 
 class WorkOrderTimelineListView(APIView):
     authentication_classes = [JWTAuthentication]

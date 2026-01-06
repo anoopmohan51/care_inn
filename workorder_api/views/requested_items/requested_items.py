@@ -63,7 +63,7 @@ class RequestedItemsDetailView(APIView):
 
     def get(self, request, id):
         try:
-            responce_data = RequestedItems.objects.get(id=id)
+            responce_data = RequestedItems.objects.get(id=id,is_delete=False)
             serializer = ItemSerializer(responce_data)
             return CustomResponse(
                 data=serializer.data,

@@ -66,7 +66,7 @@ class InformationsDetailView(APIView):
 
     def get(self, request, id):
         try:
-            responce_data = Informations.objects.get(pk=id)
+            responce_data = Informations.objects.get(pk=id,is_delete=False)
             serializer = InformationSerializer(responce_data)
             return CustomResponse(
                 data=serializer.data,
