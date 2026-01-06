@@ -37,11 +37,13 @@ class GlobalFilter(
     def _get_result(self,*args,**kwargs):
         fields = self.get_fields_for_result(args,kwargs)
         filter_args, sort_args = self.get_query()
+        limit = self.get_limit()
+        offset = self.get_offset()
         queryset = self.model.objects.annotate(*args, **kwargs).filter(filter_args).values(*fields).distinct()
         count = self.get_count(queryset)
         if sort_args:
             queryset = queryset.order_by(*sort_args)
-        return queryset, count
+        return queryset[offset:offset+limit], count
     
     def get_serialized_result(self,serializer: ModelSerializer):
         filter_args, sort_args = self.get_query()
