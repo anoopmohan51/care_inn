@@ -20,9 +20,9 @@ class ServiceCreateView(generics.CreateAPIView):
     def post(self, request):
         try:
             data=request.data
-            folder_id = data.get('folder_id',None)
+            folder_id = data.get('folder',None)
             workorder_settings = data.get('workorder_settings',None)
-            if not folder_id:
+            if not folder:
                 workorder_settings_data={
                     'type': 'SERVICE'
                 }
