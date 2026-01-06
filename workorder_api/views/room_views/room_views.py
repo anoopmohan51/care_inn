@@ -34,6 +34,14 @@ class RoomCreateView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except Rooms.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Room not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -51,14 +59,6 @@ class RoomUpdateView(APIView):
     def get(self, request,pk):
         try:
             room = Rooms.objects.get(id=pk,is_delete=False)
-            if not room:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"Room not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content_type="application/json"
-                )
             serializer = RoomSerializer(room)
             return CustomResponse(
                 data=serializer.data,
@@ -66,7 +66,15 @@ class RoomUpdateView(APIView):
                 message=["Room fetched successfully"],
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
-            )   
+            )
+        except Rooms.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Room not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,

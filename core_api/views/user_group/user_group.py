@@ -45,14 +45,6 @@ class UserGroupDetialsView(APIView):
     def get(self, request,pk):
         try:
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
-            if not user_group:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=[f"User group not found"],
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content_type="application/json"
-                )
             serializer = UserGroupSerializer(user_group)
             data = serializer.data
             data['users'] = UserGroupUsersService().get_user_group_users_list(user_group.id)
@@ -62,6 +54,14 @@ class UserGroupDetialsView(APIView):
                 status="success",
                 message=["User group details fetched successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -94,6 +94,14 @@ class UserGroupDetialsView(APIView):
                 status="failed",
                 message=["Error in User group updating"],
                 status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -129,6 +137,14 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -150,6 +166,14 @@ class UserGroupDetialsView(APIView):
                 status="success",
                 message=["User group deleted successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
