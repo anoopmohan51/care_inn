@@ -147,11 +147,14 @@ class WorkOrderFollowerListView(APIView):
 
     def get(self, request, workorder_id):
         try:
+            limit = request.query_params.get('limit',10)
+            offset = request.query_params.get('offset',0)
             workorder_followers = WorkOrderFollowers.objects.filter(workorder=workorder_id).annotate(
                 follower_name=Concat(F('follower__first_name'),Value(' '),F('follower__last_name'))
             ).order_by('created_at')
+            sliced_data = workorder_followers[offset:offset+limit]
             return CustomResponse(
-                data=workorder_followers,
+                data=sliced_data,
                 status="success",
                 message=["Work order followers fetched successfully"],
                 status_code=status.HTTP_200_OK,
