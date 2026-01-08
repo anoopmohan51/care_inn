@@ -28,3 +28,16 @@ class WorkOrderSerializer(serializers.ModelSerializer):
             return super().update(instance, validated_data)
         finally:
             clear_activity_user()
+
+class WorkOrderNursingStationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkOrder
+        fields = '__all__'
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        return super().update(instance, validated_data)

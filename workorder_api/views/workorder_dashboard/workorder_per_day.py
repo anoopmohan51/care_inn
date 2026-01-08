@@ -13,16 +13,9 @@ class WorkOrderPerDayView(APIView):
 
     def get(self, request):
         try:
-            filter_type = request.query_params.get('filter_type','last_7_days')
+            days = request.query_params.get('filter_type',10)
             tenant = request.user.tenant.id
-            today = datetime.now().date()
-
-            if filter_type == 'last_7_days':
-                start_date = today - timedelta(days=7)
-            elif filter_type == 'last_30_days':
-                start_date = today - timedelta(days=30)
-            end_date = today
-            workorder_per_day = get_workorder_count_per_day(tenant,start_date,end_date)
+            workorder_per_day = get_workorder_count_per_day(tenant,days)
             return CustomResponse(
                 data=workorder_per_day,
                 status="success",
