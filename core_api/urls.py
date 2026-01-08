@@ -4,8 +4,8 @@ from .views.login.user_login import *
 from .views.tenant.tenant import *
 from .views.user_group.user_group import *
 from .views.role.role import *
-# from .views.user_permission.user_permission import *
 from .views.external_api_key.external_api_key import *
+from .views.role.role_permission import *
 urlpatterns = [
     path('user',UserCreateView.as_view()),
     path('user/<int:pk>',UserUpdateView.as_view()),
@@ -21,7 +21,7 @@ urlpatterns = [
     path('role/<int:pk>',RoleDetailsView.as_view()),
     path('role/filter',RoleFilterView.as_view()),
     path('refresh-token',TokenRefreshView.as_view()),
-    # path('user-permission/<int:user_id>',UserPermissionDetailView.as_view()),
     path('generate-external-api-key',ExternalApiKeyCreateView.as_view()),
+    path('role-permission/bulk-update',RolePermissionBulkUpdateView.as_view()),
 
 ]
