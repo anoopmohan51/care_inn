@@ -20,7 +20,7 @@ class ServiceCreateView(generics.CreateAPIView):
     def post(self, request):
         try:
             data=request.data
-            folder_id = data.get('folder',None)
+            folder = data.get('folder',None)
             workorder_settings = data.get('workorder_settings',None)
             if not folder:
                 workorder_settings_data={
@@ -52,6 +52,7 @@ class ServiceCreateView(generics.CreateAPIView):
                     content_type="application/json"
                 )
         except Exception as e:
+            print(e)
             return CustomResponse(
                 data=None,
                 status="failed",
