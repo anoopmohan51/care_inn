@@ -22,7 +22,7 @@ class WorkOrderActivity(models.Model):
         ('SLA_START_TIME','SLA_START_TIME'),
         ('SMS','SMS'),
         ('STATUS','STATUS'),
-        ('TIME_START','TIME_START'),
+        ('TIMER_START','TIMER_START'),
         ('TIMER_END','TIMER_END'),
         ('WAITING','WAITING'),
         ('SLA','SLA'),

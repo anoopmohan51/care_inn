@@ -125,7 +125,7 @@ class RequestedItemsDetailView(APIView):
         try:
             ItemDetails.objects.filter(item_id=id).delete()
             requested_items = RequestedItems.objects.get(id=id,is_delete=False)
-            if not requested_items.folder:
+            if not requested_items.folder and requested_items.workorder_settings:
                 WorkOrderSettings.objects.filter(id=requested_items.workorder_settings.id).update(is_delete=True)
             RequestedItems.objects.filter(id=id).update(is_delete=True)
             return CustomResponse(

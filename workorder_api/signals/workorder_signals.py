@@ -129,23 +129,41 @@ def workorder_post_save(sender, instance, created, **kwargs):
                         'initiated_by': created_user,
                         'workorder': instance
                     })
-                if instance.status!=original.status:
-                    if original.status=='IN_PROGRESS':
+                elif instance.status!=original.status:
+                    if instance.status==WorkOrder.WORKORDER_STATUS_IN_PROGRESS:
                         changes.append({
                             'activity': 'TIMER_START',
-                            'from_value': original.status,
+                            'from_value': None,
                             'to_value': None,
                             'initiated_by': created_user,
                             'workorder': instance
                         })
-                    elif instance.status=='PAUSED':
+                    elif instance.status==WorkOrder.WORKORDER_STATUS_PAUSED:
                         changes.append({
-                            'activity': 'TIMER_STOP',
-                            'from_value': original.status,
+                            'activity': 'TIMER_END',
+                            'from_value': None,
                             'to_value': None,
                             'initiated_by': created_user,
                             'workorder': instance
                         })
+                    else:
+                        if instance.status==WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED and \
+                            original.status==WorkOrder.WORKORDER_STATUS_CLOSED:
+                            changes.append({
+                                'activity': 'STATUS',
+                                'from_value':original.status,
+                                'to_value': 'OPEN',
+                                'initiated_by': created_user,
+                                'workorder': instance
+                            })
+                        else:
+                            changes.append({
+                                'activity': 'STATUS',
+                                'from_value': original.status,
+                                'to_value': instance.status,
+                                'initiated_by': created_user,
+                                'workorder': instance
+                            })
                 # Only create activity if there are actual changes
                 if changes:
                     WorkOrderActivityService.log_creation(changes)
