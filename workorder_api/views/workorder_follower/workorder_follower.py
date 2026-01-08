@@ -1,0 +1,170 @@
+from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+from workorder_api.models import WorkOrderFollowers
+from workorder_api.serializers.workorder_follower_serializer import WorkOrderFollowerSerializer
+from core_api.response_utils.custom_response import CustomResponse
+from django.db.models import F,Value
+from rest_framework import status
+from django.db.models.functions import Concat
+
+
+class WorkOrderFollowerCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            data = request.data
+            serializer = WorkOrderFollowerSerializer(data=data, context={'request': request})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return CustomResponse(
+                    data=serializer.data,
+                    status="success",
+                    message=["Work order follower created successfully"],
+                    status_code=status.HTTP_201_CREATED,
+                    content_type="application/json"
+                )
+            else:
+                return CustomResponse(
+                    data=serializer.errors,
+                    status="failed",
+                    message=["Error in Work order follower creation"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work order follower creation"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+
+class WorkOrderFollowerDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+            workorder_follower = WorkOrderFollowers.objects.get(id=id)
+            serializer = WorkOrderFollowerSerializer(workorder_follower)
+            return CustomResponse(
+                data=serializer.data,
+                status="success",
+                message=["Work order follower fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except WorkOrderFollowers.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Work order follower not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work order follower fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )   
+    
+    def put(self, request, id):
+        try:
+            workorder_follower = WorkOrderFollowers.objects.get(id=id)
+            serializer = WorkOrderFollowerSerializer(workorder_follower, data=request.data, context={'request': request})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return CustomResponse(
+                    data=serializer.data,
+                    status="success",
+                    message=["Work order follower updated successfully"],
+                    status_code=status.HTTP_200_OK,
+                    content_type="application/json"
+                )
+            else:
+                return CustomResponse(
+                    data=serializer.errors,
+                    status="failed",   
+                    message=["Error in Work order follower updating"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
+        except WorkOrderFollowers.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Work order follower not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work order follower updating"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+
+    def delete(self, request, id):
+        try:
+            workorder_follower = WorkOrderFollowers.objects.get(id=id)
+            workorder_follower.delete()
+            return CustomResponse(
+                data=None,
+                status="success",
+                message=["Work order follower deleted successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except WorkOrderFollowers.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Work order follower not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work order follower deleting"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
+
+class WorkOrderFollowerListView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, workorder_id):
+        try:
+            limit = request.query_params.get('limit',10)
+            offset = request.query_params.get('offset',0)
+            workorder_followers = WorkOrderFollowers.objects.filter(workorder=workorder_id).annotate(
+                follower_name=Concat(F('follower__first_name'),Value(' '),F('follower__last_name'))
+            ).order_by('created_at')
+            sliced_data = workorder_followers[offset:offset+limit]
+            return CustomResponse(
+                data=sliced_data,
+                status="success",
+                message=["Work order followers fetched successfully"],
+                status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Exception as e: 
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work order follower fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )

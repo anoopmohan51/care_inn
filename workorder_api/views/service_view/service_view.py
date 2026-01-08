@@ -8,13 +8,31 @@ from rest_framework.permissions import IsAuthenticated
 from core_api.filters.global_filter import GlobalFilter
 from django.db.models import F,Q
 from rest_framework.views import APIView
+from core_api.permission.permission import has_permission
+from workorder_api.models.workorder_settings import WorkOrderSettings
+from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer
 
 class ServiceCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # @has_permission("Service", "create")
     def post(self, request):
         try:
             data=request.data
+            folder_id = data.get('folder',None)
+            workorder_settings = data.get('workorder_settings',None)
+            if not folder:
+                workorder_settings_data={
+                    'type': 'SERVICE'
+                }
+                workorder_settings_serializer =  WorkOrderSettingsSerializer(data=workorder_settings_data, context={'request': request})
+                if workorder_settings_serializer.is_valid(raise_exception=True):
+                    workorder_settings_serializer.save()
+                    workorder_settings_id = workorder_settings_serializer.data.get('id')
+                    data.update({
+                        'workorder_settings_id': workorder_settings_id
+                    })
             serializer = ServiceSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -46,6 +64,7 @@ class ServiceUpdateView(generics.GenericAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    # @has_permission("Service", "read")
     def get(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
@@ -57,6 +76,14 @@ class ServiceUpdateView(generics.GenericAPIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
+        except Services.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Service not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -66,6 +93,7 @@ class ServiceUpdateView(generics.GenericAPIView):
                 content_type="application/json"
             )
 
+    # @has_permission("Service", "update")
     def put(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
@@ -87,6 +115,14 @@ class ServiceUpdateView(generics.GenericAPIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except Services.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Service not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -96,6 +132,7 @@ class ServiceUpdateView(generics.GenericAPIView):
                 content_type="application/json"
             )
 
+    # @has_permission("Service", "update")
     def patch(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
@@ -117,6 +154,14 @@ class ServiceUpdateView(generics.GenericAPIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except Services.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Service not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -126,9 +171,12 @@ class ServiceUpdateView(generics.GenericAPIView):
                 content_type="application/json"
             )
 
+    # @has_permission("Service", "delete")
     def delete(self, request,pk):
         try:
             service = Services.objects.get(id=pk,is_delete=False)
+            if not service.folder and service.workorder_settings:
+                WorkOrderSettings.objects.filter(id=service.workorder_settings.id).update(is_delete=True)
             service.is_delete = True
             service.save()
             return CustomResponse(
@@ -136,6 +184,14 @@ class ServiceUpdateView(generics.GenericAPIView):
                 status="success",
                 message=["Service deleted successfully"],
                 status_code=status.HTTP_204_NO_CONTENT,
+                content_type="application/json"
+            )
+        except Services.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Service not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -150,6 +206,8 @@ class ServiceUpdateView(generics.GenericAPIView):
 class ServiceFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # @has_permission("Service", "read")
     def post(self, request):
         try:
             field_lookup = {
@@ -177,7 +235,6 @@ class ServiceFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",

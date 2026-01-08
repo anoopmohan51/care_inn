@@ -1,10 +1,8 @@
 from django.db import models
 from core_api.models.tenant import Tenant
 from core_api.models.appusers import AppUsers
-from core_api.models.service_type import ServiceType
-from core_api.models.priority import Priority
+from workorder_api.models.services import Services
 from workorder_api.models.rooms import Rooms
-from workorder_api.models.workorder_attributes import WorkOrderAttributes
 from core_api.models.usergroups import UserGroup
 
 class WorkOrderTemp(models.Model):
@@ -38,18 +36,26 @@ class WorkOrderTemp(models.Model):
         (WORKORDER_TYPE_SERVICE, "SERVICE"),
         (WORKORDER_TYPE_REQUEST, "REQUEST"),
     ]
+    SOURCE_CHOICES = [
+        ('SYSTEM','SYSTEM'),
+        ('USER','USER'),
+    ]
+    PRIORITY_CHOICES = [
+        ('LOW','LOW'),
+        ('MEDIUM','MEDIUM'),
+        ('HIGH','HIGH'),
+    ]
     workorder_type = models.CharField(max_length=255,choices=WORKORDER_TYPE_CHOICES,null=True)
-    workorder_attribute=models.ForeignKey(WorkOrderAttributes, on_delete=models.PROTECT,null=True)
     room=models.ForeignKey(Rooms, on_delete=models.PROTECT,null=True)
     assignee_type=models.CharField(max_length=255,choices=ASSIGNEE_CHOICES,null=True)
     user=models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True)
     user_group=models.ForeignKey(UserGroup, on_delete=models.PROTECT,null=True)
     tenant=models.ForeignKey(Tenant, on_delete=models.PROTECT,null=True)
     description=models.TextField(null=True)
-    priority=models.ForeignKey(Priority, on_delete=models.PROTECT,null=True)
+    priority=models.CharField(max_length=255,choices=PRIORITY_CHOICES,null=True)
     when_to_start=models.CharField(max_length=255,choices=WHEN_TO_START_CHOICES,null=True)
     sla_minutes=models.CharField(max_length=255,null=True)
-    patient_id=models.CharField(max_length=60,null=True)
+    mrd_id=models.CharField(max_length=60,null=True)
     status=models.CharField(max_length=50,choices=WORKORDER_STATUS_CHOICES,null=True)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
@@ -57,6 +63,10 @@ class WorkOrderTemp(models.Model):
     updated_user=models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='workorder_temp_updated_user')
     is_delete=models.BooleanField(default=False)
     unique_id=models.CharField(max_length=30,null=True)
+    source = models.CharField(max_length=20,null=True,choices=SOURCE_CHOICES,default='USER')
+    start_date=models.DateTimeField(auto_now_add=True)
+    end_date=models.DateTimeField(null=True)
+    service = models.ForeignKey(Services, on_delete=models.PROTECT,null=True)
 
     class Meta:
         db_table = 'workorder_temp'

@@ -1,10 +1,16 @@
 from django.db.models import F,Value
 from django.db.models.functions import Concat
+from django.db.models.fields.related import ManyToOneRel, OneToOneRel
 
 class FieldHandlerMixin:
 
     def get_model_fields(self,model):
-        fields = [f.name for f in model._meta.get_fields()]
+        fields = []
+        for f in model._meta.get_fields():
+            if not isinstance(f, (ManyToOneRel, OneToOneRel)):
+                if hasattr(f, 'column') or hasattr(f, 'attname'):
+                    fields.append(f.name)
+
         for column in getattr(self, "exclude", []) or []:
             if column in fields:
                 fields.remove(column)

@@ -27,22 +27,25 @@ SECRET_KEY = 'x%12sgvvl$sm4x5-n7e+w!%h1fs56s5#mi_fh_k2wt3c1jttrw'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.contenttypes",
+    "django.contrib.auth",
+    "django.contrib.admin",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     'core_api',
-    'workorder_api',
+    'workorder_api.apps.WorkorderApiConfig',
+    'staticfiles_api',
 ]
 
 # Add REST Framework JWT settings
@@ -77,6 +80,7 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -86,7 +90,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'care_inn.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -162,3 +165,4 @@ STATIC_URL = '/static/'
 # Media files (User uploads)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

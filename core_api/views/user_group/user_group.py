@@ -3,15 +3,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from core_api.response_utils.custom_response import CustomResponse
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F,Q
+from django.db.models import F,Q,Count
 from rest_framework import status
 from core_api.models.usergroups import UserGroup,UserGroupUsers
 from core_api.serializers.usergroup_serializer import UserGroupSerializer
 from ..user_group.usergroup_utils.user_group_utils import UserGroupUsersService
+from core_api.permission.permission import has_permission
 
 class UserGroupCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("Usergroup", "create")
     def post(self, request):
         try:
             data=request.data
@@ -39,7 +41,7 @@ class UserGroupCreateView(APIView):
 class UserGroupDetialsView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-
+    # @has_permission("Usergroup", "read")
     def get(self, request,pk):
         try:
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
@@ -54,6 +56,14 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -62,6 +72,7 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+    # @has_permission("Usergroup", "update")
     def put(self,request,pk):
         try:
             data=request.data
@@ -85,8 +96,15 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -94,6 +112,8 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+    
+    # @has_permission("UsUsergrouper", "update")
     def patch(self,request,pk):
         try:
             data=request.data
@@ -117,6 +137,14 @@ class UserGroupDetialsView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -124,7 +152,9 @@ class UserGroupDetialsView(APIView):
                 message=["Error in User group updating"],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
-            )   
+            )
+
+    # @has_permission("Usergroup", "delete")   
     def delete(self,request,pk):
         try:
             user_group = UserGroup.objects.get(id=pk,is_delete=False)
@@ -136,6 +166,14 @@ class UserGroupDetialsView(APIView):
                 status="success",
                 message=["User group deleted successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except UserGroup.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User group not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -150,6 +188,7 @@ class UserGroupDetialsView(APIView):
 class UserGroupFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("Usergroup", "read")
     def post(self, request):
         try:
             field_lookup = {
@@ -169,6 +208,7 @@ class UserGroupFilterView(APIView):
             )
             queryset, count = global_filter._get_result(
                 created_user_name = F('created_user__first_name'),
+                members_count = Count('user_group_users')
             )
             return CustomResponse(
                 data=queryset,
@@ -188,6 +228,8 @@ class UserGroupFilterView(APIView):
 class UserGroupUsersDeleteView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # @has_permission("Usergroup", "update")
     def delete(self,request,pk):
         try:
             UserGroupUsers.objects.filter(id=pk).delete()

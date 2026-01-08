@@ -9,11 +9,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
+from django.conf import settings
+from core_api.permission.permission import has_permission
 
 
 class UserCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "create")
     def post(self, request):
         try:
             data=request.data
@@ -35,7 +38,6 @@ class UserCreateView(generics.CreateAPIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -47,6 +49,7 @@ class UserCreateView(generics.CreateAPIView):
 class UserUpdateView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "read")
     def get(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -58,6 +61,14 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
+        except AppUsers.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -66,7 +77,7 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-    
+    # @has_permission("User", "update")
     def put(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -87,6 +98,14 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+        except AppUsers.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -95,7 +114,7 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-    
+    # @has_permission("User", "update")
     def patch(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -116,8 +135,15 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+        except AppUsers.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
-            print(""""e""""",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -125,7 +151,7 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-    
+    # @has_permission("User", "delete")
     def delete(self, request,pk):
         try:
             user = AppUsers.objects.get(id=pk,is_delete=False)
@@ -136,6 +162,14 @@ class UserUpdateView(generics.UpdateAPIView):
                 status="success",
                 message=["User deleted successfully"],
                 status_code=status.HTTP_204_NO_CONTENT,
+                content_type="application/json"
+            )
+        except AppUsers.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"User not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -150,6 +184,7 @@ class UserUpdateView(generics.UpdateAPIView):
 class UserResetPasswordView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "update")
     def post(self, request,pk):
         try:
             data = request.data
@@ -194,6 +229,7 @@ class UserResetPasswordView(generics.UpdateAPIView):
 class UserFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("User", "view")
     def post(self, request):
         try:
             field_lookup = {

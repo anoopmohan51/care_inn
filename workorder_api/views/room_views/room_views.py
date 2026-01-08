@@ -7,9 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from core_api.filters.global_filter import GlobalFilter
 from django.db.models import F,Q
+from core_api.permission.permission import has_permission
+
 class RoomCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("Room", "create")
     def post(self, request):
         try:
             data=request.data
@@ -31,6 +34,14 @@ class RoomCreateView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except Rooms.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Room not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -43,6 +54,8 @@ class RoomCreateView(APIView):
 class RoomUpdateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # @has_permission("Room", "read")
     def get(self, request,pk):
         try:
             room = Rooms.objects.get(id=pk,is_delete=False)
@@ -53,7 +66,15 @@ class RoomUpdateView(APIView):
                 message=["Room fetched successfully"],
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
-            )   
+            )
+        except Rooms.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Room not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -62,6 +83,8 @@ class RoomUpdateView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+    
+    # @has_permission("Room", "update")
     def put(self, request,pk):
         try:
             data=request.data
@@ -85,7 +108,6 @@ class RoomUpdateView(APIView):
                     content_type="application/json"
                 )
         except Exception as e:
-            print("error:::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -93,6 +115,7 @@ class RoomUpdateView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
+    # @has_permission("Room", "update")
     def patch(self, request,pk):
         try:
             data=request.data
@@ -123,7 +146,8 @@ class RoomUpdateView(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-    
+
+    # @has_permission("Room", "delete")
     def delete(self, request,pk):
         try:
             room = Rooms.objects.get(id=pk,is_delete=False)
@@ -148,6 +172,7 @@ class RoomUpdateView(APIView):
 class RoomFilterView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    # @has_permission("Room", "read")
     def post(self, request):
         try:
             field_lookup = {

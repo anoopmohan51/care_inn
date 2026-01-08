@@ -9,6 +9,7 @@ from core_api.filters.global_filter import GlobalFilter
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 from core_api.custom_error_message import get_message
+from core_api.permission_utils.role_permission_utils import _create_update_role_permission
 
 class RoleCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -16,6 +17,7 @@ class RoleCreateView(APIView):
     def post(self, request):
         try:
             data=request.data
+            permission_data=data.pop('permissions')
             if Role.objects.filter(name=data['name'],is_delete=False).exists():
                 return CustomResponse(
                     data=None,
@@ -27,8 +29,11 @@ class RoleCreateView(APIView):
             serializer = RoleSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                role_data = serializer.data
+                role_data['permissions'] = _create_update_role_permission(serializer.data.get('id'),permission_data)
+
                 return CustomResponse(
-                    data=serializer.data,
+                    data=role_data,
                     status="success",
                     message=["Role created successfully"],
                     status_code=status.HTTP_201_CREATED,
@@ -75,6 +80,14 @@ class RoleDetailsView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
+        except Role.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Role not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None,
@@ -86,6 +99,7 @@ class RoleDetailsView(APIView):
     def put(self, request,pk):
         try:
             data=request.data
+            permission_data=data.pop('permissions')
             if Role.objects.exclude(id=pk).filter(name=data['name'],is_delete=False).exists():
                 return CustomResponse(
                     data=None,
@@ -98,8 +112,10 @@ class RoleDetailsView(APIView):
             serializer = RoleSerializer(role, data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                role_data = serializer.data
+                role_data['permissions'] = _create_update_role_permission(serializer.data.get('id'),permission_data)
                 return CustomResponse(
-                    data=serializer.data,
+                    data=role_data,
                     status="success",
                     message=["Role updated successfully"],
                     status_code=status.HTTP_200_OK,
@@ -113,6 +129,14 @@ class RoleDetailsView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except Role.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Role not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
         except Exception as e:
             return CustomResponse(
                 data=None, 
@@ -131,6 +155,14 @@ class RoleDetailsView(APIView):
                 status="success",
                 message=["Role deleted successfully"],
                 status_code=status.HTTP_200_OK,
+                content_type="application/json"
+            )
+        except Role.DoesNotExist:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Role not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
                 content_type="application/json"
             )
         except Exception as e:
@@ -171,7 +203,6 @@ class RoleFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error:::::::::::",e.args[0])
             return CustomResponse(
                 data=None,
                 status="failed",
