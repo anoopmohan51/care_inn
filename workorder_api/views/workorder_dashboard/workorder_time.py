@@ -10,7 +10,7 @@ class WorkOrderTimeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # try:
+        try:
             data = request.data
             tenant = request.user.tenant.id
             start_date = data.get('start_date')
@@ -31,12 +31,11 @@ class WorkOrderTimeView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        # except Exception as e:
-        #     print("error",e)
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=["Error in Work order time fetching"],
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content_type="application/json"
-        #     )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work order time fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )

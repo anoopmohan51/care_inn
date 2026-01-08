@@ -30,10 +30,10 @@ class WorkOrderTemp(models.Model):
         (WORKORDER_STATUS_PAUSED, "PAUSED"),
         (WORKORDER_STATUS_CLOSED, "CLOSED")
     ]
-    WORKORDER_TYPE_SERVICE = "SERVICE"
+    WORKORDER_TYPE_COMPLAINT = "COMPLAINT"
     WORKORDER_TYPE_REQUEST = "REQUEST"
     WORKORDER_TYPE_CHOICES = [
-        (WORKORDER_TYPE_SERVICE, "SERVICE"),
+        (WORKORDER_TYPE_COMPLAINT, "COMPLAINT"),
         (WORKORDER_TYPE_REQUEST, "REQUEST"),
     ]
     SOURCE_CHOICES = [
@@ -67,6 +67,7 @@ class WorkOrderTemp(models.Model):
     start_date=models.DateTimeField(auto_now_add=True)
     end_date=models.DateTimeField(null=True)
     service = models.ForeignKey(Services, on_delete=models.PROTECT,null=True)
+    is_approved=models.BooleanField(default=False)
 
     class Meta:
         db_table = 'workorder_temp'
