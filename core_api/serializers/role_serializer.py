@@ -3,7 +3,7 @@ from core_api.models.role import Role
 from core_api.serializers.role_permission_serializer import RolePermissionSerializer
 from core_api.models.permission import Permission
 
-class RoleSerializer(serializers.ModelSerializer):
+class RoleListSerializer(serializers.ModelSerializer):
     permission = serializers.SerializerMethodField()
     def get_permission(self, obj):
         role_permissions = RolePermissionSerializer(obj.role_permissions.all(), many=True).data
@@ -23,6 +23,18 @@ class RoleSerializer(serializers.ModelSerializer):
                 } for record in permission_data
             ]
             return data
+    class Meta:
+        model = Role
+        fields = '__all__'
+    def create(self, validated_data):
+        request = self.context.get('request')
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        return super().update(instance, validated_data)
+
+class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'

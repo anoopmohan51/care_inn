@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from core_api.serializers.role_serializer import RoleSerializer
+from core_api.serializers.role_serializer import RoleSerializer,RoleListSerializer
 from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from core_api.models.role import Role
@@ -11,6 +11,7 @@ from rest_framework.exceptions import ValidationError
 from core_api.custom_error_message import get_message
 from core_api.permission_utils.role_permission_utils import _create_update_role_permission
 from core_api.filters.constants import FILTER_CONDITION_LOOKUP
+from core_api.models.role_permission import RolePermission
 
 class RoleCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -18,7 +19,7 @@ class RoleCreateView(APIView):
     def post(self, request):
         try:
             data=request.data
-            permission_data=data.pop('permissions')
+            permission_data=data.pop('permission')
             if Role.objects.filter(name=data['name'],is_delete=False).exists():
                 return CustomResponse(
                     data=None,
@@ -31,8 +32,7 @@ class RoleCreateView(APIView):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 role_data = serializer.data
-                role_data['permissions'] = _create_update_role_permission(serializer.data.get('id'),permission_data)
-
+                role_data['permission'] = _create_update_role_permission(serializer.data.get('id'),permission_data)
                 return CustomResponse(
                     data=role_data,
                     status="success",
@@ -73,7 +73,7 @@ class RoleDetailsView(APIView):
     def get(self, request,pk):
         try:
             role = Role.objects.get(id=pk,is_delete=False)
-            serializer = RoleSerializer(role)
+            serializer = RoleListSerializer(role)
             return CustomResponse(
                 data=serializer.data,
                 status="success",
@@ -100,7 +100,7 @@ class RoleDetailsView(APIView):
     def put(self, request,pk):
         try:
             data=request.data
-            permission_data=data.pop('permissions')
+            permission_data=data.pop('permission')
             if Role.objects.exclude(id=pk).filter(name=data['name'],is_delete=False).exists():
                 return CustomResponse(
                     data=None,
@@ -114,7 +114,7 @@ class RoleDetailsView(APIView):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 role_data = serializer.data
-                role_data['permissions'] = _create_update_role_permission(serializer.data.get('id'),permission_data)
+                role_data['permission'] = _create_update_role_permission(serializer.data.get('id'),permission_data)
                 return CustomResponse(
                     data=role_data,
                     status="success",
@@ -151,6 +151,7 @@ class RoleDetailsView(APIView):
             role = Role.objects.get(id=pk,is_delete=False)
             role.is_delete = True
             role.save()
+            RolePermission.objects.filter(role_id=pk).delete()
             return CustomResponse(
                 data=None,
                 status="success",
@@ -210,7 +211,7 @@ class RoleFilterView(APIView):
             else:
                 sort_query = "-created_at"
             queryset = Role.objects.exclude(name__exact="SUPERADMIN").filter(filter_query).order_by(sort_query)
-            serializer = RoleSerializer(queryset[offset:offset+limit], many=True)
+            serializer = RoleListSerializer(queryset[offset:offset+limit], many=True)
             return CustomResponse(
                 data=serializer.data,
                 status="success",

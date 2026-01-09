@@ -3,6 +3,8 @@ from core_api.serializers.role_permission_serializer import RolePermissionSerial
 from core_api.models.permission import Permission
 from django.db import transaction
 from django.core import serializers
+from core_api.serializers.role_serializer import RoleListSerializer
+from core_api.models.role import Role
 
 def _create_update_role_permission(role_id,permission_data):
     permission_names = [record['name'] for record in permission_data]
@@ -47,49 +49,32 @@ def _create_update_role_permission(role_id,permission_data):
 def _bulk_update_role_permission(permission_data):
     if not permission_data:
         return []
-    
     to_create = []
     to_update = []
-    update_ids = [r.get('id') for r in permission_data if r.get('id')]
-    
+    role_ids = [record.get('id') or record.get('role') for record in permission_data]
     for record in permission_data:
-        if not record.get('id'):
-            to_create.append(RolePermission(
-                role_id=record.get('role_id') or record.get('role'),
-                permission_id=record.get('permission_id') or record.get('permission'),
-                create=record.get('create', False),
-                view=record.get('view', False),
-                edit=record.get('edit', False),
-                delete=record.get('delete', False)
-            ))
-    
-    if update_ids:
-        existing = RolePermission.objects.select_related('permission', 'role').filter(
-            id__in=update_ids
-        )
-        instance_map = {inst.id: inst for inst in existing}
-        
-        for record in permission_data:
-            record_id = record.get('id')
-            if record_id and record_id in instance_map:
-                inst = instance_map[record_id]
-                inst.create = record.get('create', inst.create)
-                inst.view = record.get('view', inst.view)
-                inst.edit = record.get('edit', inst.edit)
-                inst.delete = record.get('delete', inst.delete)
-                to_update.append(inst)
-    
+        permissions = record.get('permission')
+        for permission in permissions:
+            if not permission.get('id'):
+                to_create.append(RolePermission(
+                    role_id=record.get('role_id') or record.get('role'),
+                    permission_id=permission.get('permission_id') or permission.get('permission'),
+                    create=permission.get('create', False),
+                    view=permission.get('view', False),
+                    edit=permission.get('edit', False),
+                    delete=permission.get('delete', False)
+                ))
+            else:
+                to_update.append(RolePermission(
+                    id=permission.get('id'),
+                    create=permission.get('create', False),
+                    view=permission.get('view', False),
+                    edit=permission.get('edit', False),
+                    delete=permission.get('delete', False)
+                ))
     with transaction.atomic():
-        created = RolePermission.objects.bulk_create(to_create) if to_create else []
-        RolePermission.objects.bulk_update(to_update, ['create', 'view', 'edit', 'delete']) if to_update else None
-    
-    all_instances = list(to_update)
-    if created:
-        created_ids = [obj.id for obj in created if hasattr(obj, 'id') and obj.id]
-        if created_ids:
-            all_instances.extend(
-                RolePermission.objects.select_related('permission', 'role').filter(id__in=created_ids)
-            )
-    
-    return RolePermissionSerializer(all_instances, many=True).data
-        
+        created = RolePermission.objects.bulk_create(to_create)
+        updated = RolePermission.objects.bulk_update(to_update,['create','view','edit','delete'])
+    roles = Role.objects.filter(id__in=role_ids,is_delete=False)
+    role_data = RoleListSerializer(roles,many=True).data
+    return role_data
