@@ -21,7 +21,6 @@ class WorkOrderTypeGraphView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(e)
             return CustomResponse(
                 data=None,
                 status="failed",
