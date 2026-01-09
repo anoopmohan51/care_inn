@@ -7,6 +7,7 @@ from .views.role.role import *
 from .views.external_api_key.external_api_key import *
 from .views.role.role_permission import *
 from .views.role_permission.permission import *
+from .views.user_group.list_users import *
 urlpatterns = [
     path('user',UserCreateView.as_view()),
     path('user/<int:pk>',UserUpdateView.as_view()),
@@ -25,5 +26,6 @@ urlpatterns = [
     path('generate-external-api-key',ExternalApiKeyCreateView.as_view()),
     path('role-permission/bulk-update',RolePermissionBulkUpdateView.as_view()),
     path('list-permission',PermissionListView.as_view()),
+    path('list-users',ListUsersView.as_view()),
 
 ]
