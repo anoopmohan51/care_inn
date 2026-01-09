@@ -16,6 +16,8 @@ class RequestedItems(models.Model):
     is_delete = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    color = models.CharField(max_length=50,null=True)
+    position = models.IntegerField(default=0,null=True)
 
     class Meta:
         db_table = 'workorder_api_requested_items'

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'core_api',
     'workorder_api.apps.WorkorderApiConfig',
     'staticfiles_api',
+    'patient_app_api',
 ]
 
 # Add REST Framework JWT settings

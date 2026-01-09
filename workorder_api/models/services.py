@@ -47,6 +47,8 @@ class Services(models.Model):
     workorder_settings = models.ForeignKey(WorkOrderSettings, on_delete=models.PROTECT,null=True)
     folder = models.ForeignKey(Folder, on_delete=models.PROTECT,null=True)
     icon = models.CharField(max_length=100,null=True)
+    color = models.CharField(max_length=50,null=True)
+    position = models.IntegerField(default=0,null=True)
 
     class Meta:
         db_table = 'workorder_api_services'
