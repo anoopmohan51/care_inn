@@ -14,6 +14,7 @@ from.delete_folder import _delete_folders_recursive
 from workorder_api.models.services import Services
 from workorder_api.models.informations import Informations
 from workorder_api.models.requested_items import RequestedItems
+from staticfiles_api.views.static_files.tempfile_to_permanant import tempfile_to_permanant
 
 class WorkOrderSettingsCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -42,6 +43,8 @@ class WorkOrderSettingsCreateView(APIView):
                     serializer = FolderSerializer(data=request_data, context={'request': request})
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
+                        if request_data.get('static_file'):
+                            tempfile_to_permanant(list(request_data.get('static_file')))
                     return CustomResponse(
                         data=serializer.data,
                         status="success",
@@ -199,7 +202,6 @@ class WorkOrderSettingsFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error::::::::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",

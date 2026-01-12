@@ -20,5 +20,6 @@ __all__ = [
     'WorkOrderActivity',
     'Folder',
     'Informations',
-    'RequestedItems'
+    'RequestedItems',
+    'WorkOrderImages',
 ]

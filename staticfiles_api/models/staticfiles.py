@@ -8,6 +8,7 @@ class StaticFiles(models.Model):
     file_path=models.CharField(max_length=255)
     created_at=models.DateTimeField(auto_now_add=True)
     file_type=models.CharField(max_length=30)
+    is_temp = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'staticfiles'

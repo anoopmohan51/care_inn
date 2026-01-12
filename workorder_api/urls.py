@@ -1,7 +1,6 @@
 from django.urls import path
 from workorder_api.views.service_view.service_view import *
 from workorder_api.views.room_views.room_views import *
-from workorder_api.views.workorder_temp.workorder_temp import *
 from workorder_api.views.workorder.workorder import *
 from workorder_api.views.workorder_comments.workorder_comments import *
 from workorder_api.views.workorder_timeline.workorder_timeline import *
@@ -16,6 +15,7 @@ from workorder_api.views.workorder_dashboard.workorder_per_day import *
 from workorder_api.views.workorder_dashboard.workorder_type_graph import *
 from workorder_api.views.workorder_dashboard.workorder_time import *
 from workorder_api.views.workorder_summary.workorder_summary import *
+from workorder_api.views.workorder_image_upload.workorder_image_upload import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -24,7 +24,6 @@ urlpatterns = [
     path('room',RoomCreateView.as_view()),
     path('room/<int:pk>',RoomUpdateView.as_view()),
     path('room/filter',RoomFilterView.as_view()),
-    path('patient-request/workorder',WorkOrderNursingStationRequestCreateView.as_view()),
     path('workorder',WorkOrderCreateView.as_view()),
     path('workorder/<int:pk>',WorkorderDeleteView.as_view()),
     path('workorder/filter',WorkorderFilterView.as_view()),
@@ -32,7 +31,6 @@ urlpatterns = [
     path('workorder-comments/<int:workorder_id>',WorkOrderCommentsListView.as_view()),
     path('workorder-timeline/<int:workorder_id>',WorkOrderTimelineListView.as_view()),
     path('workorder-activity/<int:workorder_id>',WorkOrderActivityListView.as_view()),
-    path('nursing-station/approve/workorder',WorkorderNursingStationView.as_view()),
     path('workorder-followers',WorkOrderFollowerCreateView.as_view()),
     path('workorder-followers/<int:id>',WorkOrderFollowerDetailView.as_view()),
     path('workorder-followers/<int:workorder_id>',WorkOrderFollowerListView.as_view()),
@@ -49,6 +47,8 @@ urlpatterns = [
     path('workorder-type-count-weekdays',WorkOrderTypeGraphView.as_view()),
     path('workorder-time/summary',WorkOrderTimeView.as_view()),
     path('workorder-summary/<int:workorder_id>',WorkorderSummaryView.as_view()),
+    path('workorder-image-upload',WorkOrderImageUploadView.as_view()),
+    path('workorder-image-delete/<uuid:pk>',WorkOrderImageDeleteView.as_view()),
 
 
 ]

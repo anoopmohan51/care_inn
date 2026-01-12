@@ -36,7 +36,7 @@ class StaticFilesCreateView(APIView):
                 timestamp_folder = timestamp
                 
                 # Create upload directory path
-                upload_subdir = 'static_files'
+                upload_subdir = 'temp_files'
                 upload_dir = Path(settings.MEDIA_ROOT) / upload_subdir / timestamp_folder
                 
                 # Create directory if it doesn't exist
@@ -63,7 +63,8 @@ class StaticFilesCreateView(APIView):
                     name=unique_filename,
                     uploaded_file_name=file.name,
                     file_path=relative_path,
-                    file_type=file_type
+                    file_type=file_type,
+                    is_temp=True
                 )
                 
                 saved_files.append({
@@ -94,8 +95,8 @@ class StaticFilesCreateView(APIView):
 class StaticFilesDetailView(APIView):
     def get(self, request, pk):
         try:
-            workorder_attribute_icon = StaticFiles.objects.get(id=pk)
-            if not workorder_attribute_icon:
+            static_file = StaticFiles.objects.get(id=pk)
+            if not static_file:
                 return CustomResponse(
                     data=None,
                     status="failed",
@@ -103,8 +104,11 @@ class StaticFilesDetailView(APIView):
                     status_code=status.HTTP_404_NOT_FOUND,
                     content_type="application/json"
                 )
-            file_path = workorder_attribute_icon.file_path
-            full_file_path = Path(settings.BASE_DIR) / 'media' / file_path
+            file_path = static_file.file_path
+            if static_file.is_temp:
+                full_file_path = Path(settings.BASE_DIR) / 'temp_files' / file_path
+            else:
+                full_file_path = Path(settings.BASE_DIR) / 'uploads' / file_path
             if full_file_path.exists():
                 with open(full_file_path, 'rb') as f:
                     file_data = f.read()
@@ -112,7 +116,7 @@ class StaticFilesDetailView(APIView):
                 file_data = None
             return HttpResponse(
                 file_data, 
-                content_type=workorder_attribute_icon.file_type
+                content_type=static_file.file_type
             )
         except Exception as e:
             return CustomResponse(

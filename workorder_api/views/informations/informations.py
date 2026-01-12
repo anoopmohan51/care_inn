@@ -8,6 +8,7 @@ from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from workorder_api.serializers.information_serializer import InformationSerializer
+from staticfiles_api.views.static_files.tempfile_to_permanant import tempfile_to_permanant
 
 
 class InformationsCreateView(APIView):
@@ -34,6 +35,8 @@ class InformationsCreateView(APIView):
                     serializer = InformationSerializer(data=request_data, context={'request': request})
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
+                        if request_data.get('static_file'):
+                            tempfile_to_permanant(list(request_data.get('static_file')))
 
                     return CustomResponse(
                         data=serializer.data,

@@ -73,3 +73,8 @@ class WorkOrder(models.Model):
 
     class Meta:
         db_table = 'workorder'
+
+
+class WorkOrderImages(models.Model):
+    workorder = models.ForeignKey(WorkOrder, on_delete=models.PROTECT,null=True)
+    image = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)

@@ -2,8 +2,13 @@ from rest_framework import serializers
 from workorder_api.models import WorkOrder
 from workorder_api.activity_context.activity_context import set_activity_user, clear_activity_user
 from django.contrib.auth import get_user_model
+from workorder_api.models.workorder import WorkOrderImages
 
 class WorkOrderSerializer(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField('get_images')
+
+    def get_images(self, obj):
+        return WorkOrderImages.objects.filter(workorder=obj.id).values()
     class Meta:
         model = WorkOrder
         fields = '__all__'

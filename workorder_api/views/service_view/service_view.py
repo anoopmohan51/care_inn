@@ -11,6 +11,9 @@ from rest_framework.views import APIView
 from core_api.permission.permission import has_permission
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer
+from core_api.models.external_api_key import ExternalApiKey
+from staticfiles_api.views.static_files.tempfile_to_permanant import tempfile_to_permanant
+
 
 class ServiceCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -36,6 +39,8 @@ class ServiceCreateView(generics.CreateAPIView):
             serializer = ServiceSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                if data.get('static_file'):
+                    tempfile_to_permanant(list(data.get('static_file')))
                 return CustomResponse(
                     data=serializer.data,
                     status="success",
