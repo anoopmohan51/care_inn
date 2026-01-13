@@ -9,7 +9,7 @@ class PaginationMixin:
     
     def get_limit(self):
         try:
-            return self._positive_int(self.request.query_params.get('limit', -1), strict=True, cutoff=1000)
+            return self._positive_int(self.request.query_params.get('limit', 10), strict=True, cutoff=1000)
         except (ValueError, TypeError):
             return -1
 
