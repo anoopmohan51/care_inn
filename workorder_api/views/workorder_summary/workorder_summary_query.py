@@ -53,6 +53,7 @@ def _get_workorder_summary(tenant_id,workorder_id):
                     ON timeline_sum.workorder_id = w.id
 
                 WHERE w.id = %s
+                AND w.tenant_id = tenant_id
                 AND w.is_delete = FALSE""",
             [workorder_id,tenant_id]
         )
