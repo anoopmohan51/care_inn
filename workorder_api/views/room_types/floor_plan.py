@@ -10,14 +10,14 @@ def _create_update_floor_plan(room_type_id,floor_plan_data):
     to_update = []
     floor_plan_ids = [record.get('id') for record in floor_plan_data if record.get('id')]
     
-    for record in floor_plan:
+    for record in floor_plan_data:
         if record.get('id'):
             to_update.append(
                 FloorPlan(
                     id=record.get('id'),
                     name=record.get('name'),
                     code=record.get('code'),
-                    room_type_id=room_type_id
+                    room_types_id=room_type_id
                 )
             )
         else:
@@ -25,7 +25,7 @@ def _create_update_floor_plan(room_type_id,floor_plan_data):
                 FloorPlan(
                     name=record.get('name'),
                     code=record.get('code'),
-                    room_type_id=room_type_id
+                    room_types_id=room_type_id
                 )
             )
     with transaction.atomic():

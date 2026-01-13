@@ -8,7 +8,9 @@ from rest_framework import status
 from core_api.permission.permission import has_permission
 from core_api.filters.global_filter import GlobalFilter
 from django.db.models import F,Q,Value
-from django.db.functions import Concat
+from django.db.models.functions import Concat
+from workorder_api.views.room_types.floor_plan import _create_update_floor_plan
+from workorder_api.serializers.floor_plan_serializer import FloorPlanSerializer
 
 
 class RoomTypesCreateView(APIView):
@@ -24,6 +26,7 @@ class RoomTypesCreateView(APIView):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 responce_data = serializer.data
+                responce_data['floor_plan'] = _create_update_floor_plan(serializer.data.get('id'),floor_plan)
                 return CustomResponse(
                     data=responce_data,
                     status="success",
@@ -64,8 +67,11 @@ class RoomTypesDetailsView(APIView):
                     content_type="application/json"
                 )
             serializer = RoomTypeSerializer(room_type)
+            responce_data = serializer.data
+            floor_plan = FloorPlan.objects.filter(room_types_id=pk)
+            responce_data['floor_plan'] = FloorPlanSerializer(floor_plan,many=True).data
             return CustomResponse(
-                data=serializer.data,
+                data=responce_data,
                 status="success",
                 message=["Room type details fetched successfully"],
                 status_code=status.HTTP_200_OK,
@@ -87,8 +93,10 @@ class RoomTypesDetailsView(APIView):
             serializer = RoomTypeSerializer(room_type, data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                responce_data = serializer.data
+                responce_data['floor_plan'] = _create_update_floor_plan(serializer.data.get('id'),data.get('floor_plan',[]))
                 return CustomResponse(
-                    data=serializer.data,
+                    data=responce_data,
                     status="success",
                     message=["Room type updated successfully"],
                     status_code=status.HTTP_200_OK,
@@ -114,6 +122,7 @@ class RoomTypesDetailsView(APIView):
     def delete(self, request, pk):
         try:
             room_type = RoomTypes.objects.get(id=pk,is_delete=False)
+            FloorPlan.objects.filter(room_types_id=pk).delete()
             if not room_type:
                 return CustomResponse(
                     data=None,

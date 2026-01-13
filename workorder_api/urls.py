@@ -16,6 +16,7 @@ from workorder_api.views.workorder_dashboard.workorder_type_graph import *
 from workorder_api.views.workorder_dashboard.workorder_time import *
 from workorder_api.views.workorder_summary.workorder_summary import *
 from workorder_api.views.workorder_image_upload.workorder_image_upload import *
+from workorder_api.views.room_types.room_types import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -50,6 +51,9 @@ urlpatterns = [
     path('workorder-summary/<int:workorder_id>',WorkorderSummaryView.as_view()),
     path('workorder-image-upload',WorkOrderImageUploadView.as_view()),
     path('workorder-image-delete/<uuid:static_file_id>',WorkOrderImageDeleteView.as_view()),
+    path('room-types',RoomTypesCreateView.as_view()),
+    path('room-types/<int:pk>',RoomTypesDetailsView.as_view()),
+    path('room-types/filter',RoomTypesFilterView.as_view()),
 
 
 ]
