@@ -56,9 +56,10 @@ class WorkOrderImageDeleteView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, pk):
+    def delete(self, request, static_file_id):
         try:
-            workorder_image = WorkOrderImages.objects.get(id=pk)
+            workorder_image = WorkOrderImages.objects.get(image_id=static_file_id)
+            workorder_image.image.delete()
             workorder_image.delete()
             return CustomResponse(
                 data=None,
