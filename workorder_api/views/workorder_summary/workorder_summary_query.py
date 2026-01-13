@@ -9,18 +9,34 @@ def _get_workorder_summary(tenant_id,workorder_id):
 
                     COALESCE(close_activity.closed_at, w.end_date) AS closed_date,
 
-                    EXTRACT(EPOCH FROM (begin_activity.first_begin - w.created_at)) / 3600 
+                    -- ⏱ Initial response time (hours)
+                    EXTRACT(EPOCH FROM (begin_activity.first_begin - w.created_at)) / 3600
                         AS initial_response_time_hours,
 
+                    -- ⏱ Resolution time (hours)
                     EXTRACT(EPOCH FROM (
                         COALESCE(close_activity.closed_at, w.end_date) - w.created_at
                     )) / 3600 AS resolution_time_hours,
 
+                    -- 🕒 Timeline working time
                     COALESCE(timeline_sum.total_duration, 0) AS total_working_time_minutes,
-                    COALESCE(timeline_sum.total_duration / 60.0, 0) AS total_working_time_hours
+                    COALESCE(timeline_sum.total_duration / 60.0, 0) AS total_working_time_hours,
+
+                    -- 👤 Created user
+                    cu.id AS created_user_id,
+                    CONCAT(cu.first_name, ' ', cu.last_name) AS created_user_name,
+
+                    -- 👤 Closed user (from initiated_by_id)
+                    clu.id AS closed_user_id,
+                    CONCAT(clu.first_name, ' ', clu.last_name) AS closed_user_name
 
                 FROM workorder w
 
+                -- 🔹 Created user (from workorder)
+                LEFT JOIN core_api_appusers cu
+                    ON cu.id = w.created_user_id
+
+                -- 🔹 First BEGIN activity
                 LEFT JOIN (
                     SELECT 
                         workorder_id,
@@ -28,20 +44,27 @@ def _get_workorder_summary(tenant_id,workorder_id):
                     FROM workorder_activity
                     WHERE activity = 'BEGIN'
                     GROUP BY workorder_id
-                ) begin_activity 
+                ) begin_activity
                     ON begin_activity.workorder_id = w.id
 
+                -- 🔹 Latest CLOSED status + initiated_by_id
                 LEFT JOIN (
-                    SELECT 
+                    SELECT DISTINCT ON (workorder_id)
                         workorder_id,
-                        MAX(created_at) AS closed_at
+                        created_at AS closed_at,
+                        initiated_by_id
                     FROM workorder_activity
                     WHERE activity = 'STATUS'
                     AND to_value = 'CLOSED'
-                    GROUP BY workorder_id
-                ) close_activity 
+                    ORDER BY workorder_id, created_at DESC
+                ) close_activity
                     ON close_activity.workorder_id = w.id
 
+                -- 🔹 Closed user details
+                LEFT JOIN core_api_appusers clu
+                    ON clu.id = close_activity.initiated_by_id
+
+                -- 🔹 Timeline total duration
                 LEFT JOIN (
                     SELECT 
                         workorder_id,
@@ -49,12 +72,12 @@ def _get_workorder_summary(tenant_id,workorder_id):
                     FROM workorder_timeline
                     WHERE is_delete = FALSE
                     GROUP BY workorder_id
-                ) timeline_sum 
+                ) timeline_sum
                     ON timeline_sum.workorder_id = w.id
 
                 WHERE w.id = %s
                 AND w.tenant_id = %s
-                AND w.is_delete = FALSE""",
-            [workorder_id,tenant_id]
+                AND w.is_delete = FALSE;
+                """,[workorder_id,tenant_id]
         )
         return dictfetchall(cursor)
