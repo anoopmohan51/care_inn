@@ -11,7 +11,7 @@ class PaginationMixin:
         try:
             return self._positive_int(self.request.query_params.get('limit', 10), strict=True, cutoff=1000)
         except (ValueError, TypeError):
-            return -1
+            return 10
 
     def get_offset(self):
         try:
