@@ -29,6 +29,7 @@ urlpatterns = [
     path('workorder/filter',WorkorderFilterView.as_view()),
     path('workorder-comments',WorkOrderCommentsCreateView.as_view()),
     path('workorder-comments/<int:workorder_id>',WorkOrderCommentsListView.as_view()),
+    path('workorder-timeline',WorkOrderTimelineCreateView.as_view()),
     path('workorder-timeline/<int:workorder_id>',WorkOrderTimelineListView.as_view()),
     path('workorder-activity/<int:workorder_id>',WorkOrderActivityListView.as_view()),
     path('workorder-followers',WorkOrderFollowerCreateView.as_view()),

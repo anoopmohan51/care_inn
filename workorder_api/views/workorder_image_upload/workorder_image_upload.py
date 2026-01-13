@@ -60,7 +60,7 @@ class WorkOrderImageDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, static_file_id):
-        # try:
+        try:
             workorder_image = WorkOrderImages.objects.get(image=static_file_id)
             static_file = StaticFiles.objects.get(id=static_file_id)
             file_path_relative = static_file.file_path
@@ -81,11 +81,11 @@ class WorkOrderImageDeleteView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        # except Exception as e:
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=[str(e)],
-        #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        #         content_type="application/json"
-        #     )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[str(e)],
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json"
+            )
