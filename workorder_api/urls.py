@@ -48,7 +48,7 @@ urlpatterns = [
     path('workorder-time/summary',WorkOrderTimeView.as_view()),
     path('workorder-summary/<int:workorder_id>',WorkorderSummaryView.as_view()),
     path('workorder-image-upload',WorkOrderImageUploadView.as_view()),
-    path('workorder-image-delete/<uuid:pk>',WorkOrderImageDeleteView.as_view()),
+    path('workorder-image-delete/<uuid:static_file_id>',WorkOrderImageDeleteView.as_view()),
 
 
 ]

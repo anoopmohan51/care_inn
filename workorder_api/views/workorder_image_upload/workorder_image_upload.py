@@ -7,6 +7,9 @@ from rest_framework import status
 from staticfiles_api.models import StaticFiles
 from staticfiles_api.views.static_files.tempfile_to_permanant import tempfile_to_permanant
 from workorder_api.serializers.workorder_image_upload_serializer import WorkOrderImageUploadSerializer
+from pathlib import Path
+import os
+from django.conf import settings
 
 class WorkOrderImageUploadView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -57,10 +60,20 @@ class WorkOrderImageDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, static_file_id):
-        try:
-            workorder_image = WorkOrderImages.objects.get(image_id=static_file_id)
-            workorder_image.image.delete()
+        # try:
+            workorder_image = WorkOrderImages.objects.get(image=static_file_id)
+            static_file = StaticFiles.objects.get(id=static_file_id)
+            file_path_relative = static_file.file_path
+            if file_path_relative:
+                full_file_path = Path(settings.BASE_DIR) / 'uploads' / file_path_relative
+                if full_file_path.exists():
+                    try:
+                        os.remove(full_file_path)
+                    except OSError as e:
+                        pass
             workorder_image.delete()
+            static_file.delete()
+            
             return CustomResponse(
                 data=None,
                 status="success",
@@ -68,11 +81,11 @@ class WorkOrderImageDeleteView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=[str(e)],
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content_type="application/json"
-            )
+        # except Exception as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=[str(e)],
+        #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #         content_type="application/json"
+        #     )
