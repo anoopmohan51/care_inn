@@ -94,7 +94,7 @@ class StaticFilesCreateView(APIView):
 
 class StaticFilesDetailView(APIView):
     def get(self, request, pk):
-        # try:
+        try:
             static_file = StaticFiles.objects.get(id=pk)
             if not static_file:
                 return CustomResponse(
@@ -104,32 +104,24 @@ class StaticFilesDetailView(APIView):
                     status_code=status.HTTP_404_NOT_FOUND,
                     content_type="application/json"
                 )
-            file_path = static_file.file_path
-            print("file path::::::::::",file_path)
-            full_file_path = Path(settings.BASE_DIR) / 'media' / file_path
-            # if static_file.is_temp:
-            #     full_file_path = Path(settings.BASE_DIR) / 'temp_files' / file_path
-            # else:
-            #     full_file_path = Path(settings.BASE_DIR) / 'uploads' / file_path
+            full_file_path = Path(settings.BASE_DIR) / 'media' / static_file.file_path
             if full_file_path.exists():
-                print("file exists::::::::::",full_file_path)
                 with open(full_file_path, 'rb') as f:
                     file_data = f.read()
             else:
-                print("file not exists::::::::::",full_file_path)
                 file_data = None
             return HttpResponse(
                 file_data, 
                 content_type=static_file.file_type
             )
-        # except Exception as e:
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=[f"Error in Files detail fetching"],
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content_type="application/json"
-        #     )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Error in Files detail fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
     def delete(self, request, pk):
         try:
             static_file = StaticFiles.objects.get(id=pk)
