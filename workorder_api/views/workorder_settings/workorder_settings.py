@@ -179,7 +179,7 @@ class WorkOrderSettingsFilterView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # try:
+        try:
             field_lookup = {
                 "id": "id",
                 "name": "name",
@@ -202,11 +202,11 @@ class WorkOrderSettingsFilterView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        # except Exception as e:
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=[f"Error in WorkOrderSettings filter fetching"],
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content_type="application/json"
-        #     )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Error in WorkOrderSettings filter fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
