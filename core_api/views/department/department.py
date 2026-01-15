@@ -31,7 +31,10 @@ class DepartmentFilterView(APIView):
             )
             queryset, count = global_filter._get_result()
             return CustomResponse(
-                data=queryset,
+                data={
+                    "count": count,
+                    "data": queryset
+                },
                 status="success",
                 message=["Departments filter fetched successfully"],
                 status_code=status.HTTP_200_OK,
