@@ -94,7 +94,7 @@ class StaticFilesCreateView(APIView):
 
 class StaticFilesDetailView(APIView):
     def get(self, request, pk):
-        try:
+        # try:
             static_file = StaticFiles.objects.get(id=pk)
             if not static_file:
                 return CustomResponse(
@@ -118,14 +118,14 @@ class StaticFilesDetailView(APIView):
                 file_data, 
                 content_type=static_file.file_type
             )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=[f"Error in Files detail fetching"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except Exception as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=[f"Error in Files detail fetching"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
     def delete(self, request, pk):
         try:
             static_file = StaticFiles.objects.get(id=pk)
