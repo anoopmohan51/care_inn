@@ -105,6 +105,7 @@ class StaticFilesDetailView(APIView):
                     content_type="application/json"
                 )
             file_path = static_file.file_path
+            print("file path::::::::::",file_path)
             if static_file.is_temp:
                 full_file_path = Path(settings.BASE_DIR) / 'temp_files' / file_path
             else:
