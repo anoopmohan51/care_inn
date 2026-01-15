@@ -11,7 +11,8 @@ from workorder_api.models import WorkOrderTemp
 from django.db.models import Q
 from core_api.permission.permission import has_permission
 from django.db.models.functions import Concat
-from datetime import datetime
+from datetime import datetime,timedelta
+from workorder_api.models import Services
 
 class WorkOrderCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -20,9 +21,28 @@ class WorkOrderCreateView(APIView):
     def post(self, request):
         try:
             data = request.data
-            data.update({
-                'start_date': datetime.now(),
-            })
+            if data.get('when_to_start') == WorkOrder.WHEN_TO_START_NOW:
+                data.update({
+                    'start_date': datetime.now() + timedelta(minutes=1),
+                })
+            else:
+                data.update({
+                    'start_date': data.get('start_date')
+                })
+            if data.get('service'):
+                service = Services.objects.get(id=data.get('service'))
+                if service.sla_minutes:
+                    data.update({
+                        'sla_minutes': service.sla_minutes,
+                    })
+                else:
+                    data.update({
+                        'sla_minutes': None,
+                    })
+            else:
+                data.update({
+                    'sla_minutes': None,
+                })
             serializer = WorkOrderSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -42,6 +62,7 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json" 
                 )
         except Exception as e:
+            print("Error in Work order creation::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
