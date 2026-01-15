@@ -5,6 +5,7 @@ from staticfiles_api.models.staticfiles import StaticFiles
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from workorder_api.models.folder import Folder
 from core_api.models.usergroups import UserGroup
+from core_api.models.department import Department
 
 class Services(models.Model):
     ASSIGNEE_USER = "USER"
@@ -49,6 +50,6 @@ class Services(models.Model):
     icon = models.CharField(max_length=100,null=True)
     color = models.CharField(max_length=50,null=True)
     position = models.IntegerField(default=0,null=True)
-
+    department = models.ForeignKey(Department, on_delete=models.PROTECT,null=True)
     class Meta:
         db_table = 'workorder_api_services'

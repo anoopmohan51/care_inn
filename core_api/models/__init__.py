@@ -7,6 +7,7 @@ from .permission_category import PermissionCategory
 from .permission import Permission
 from .role_permission import RolePermission
 from .external_api_key import ExternalApiKey
+from .department import Department
 
 __all__ = [
     'AppUsers', 
@@ -17,5 +18,6 @@ __all__ = [
     'PermissionCategory',
     'Permission',
     'UserPermission',
-    'ExternalApiKey'
+    'ExternalApiKey',
+    'Department',
 ]

@@ -11,6 +11,7 @@ from workorder_api.models import WorkOrderTemp
 from django.db.models import Q
 from core_api.permission.permission import has_permission
 from django.db.models.functions import Concat
+from datetime import datetime
 
 class WorkOrderCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -19,6 +20,9 @@ class WorkOrderCreateView(APIView):
     def post(self, request):
         try:
             data = request.data
+            data.update({
+                'start_date': datetime.now(),
+            })
             serializer = WorkOrderSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -38,7 +42,6 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json" 
                 )
         except Exception as e:
-            print("error:::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",

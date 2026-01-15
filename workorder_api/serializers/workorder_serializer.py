@@ -12,6 +12,10 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField('get_images')
     service_name = serializers.SerializerMethodField('get_service_name')
     assignee_name = serializers.SerializerMethodField('get_assignee_name')
+    department_name = serializers.SerializerMethodField('get_department_name')
+
+    def get_department_name(self, obj):
+        return obj.service.department.name if obj.service and obj.service.department else None
 
     def get_assignee_name(self, obj):
         if obj.assignee_type == 'USER':
