@@ -35,6 +35,34 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     folder_id = serializers.SerializerMethodField('get_folder_id')
     workorder_settings_id = serializers.SerializerMethodField('get_workorder_settings_id')
     name = serializers.SerializerMethodField('get_name')
+    service_id = serializers.SerializerMethodField('get_service_id')
+    item_id = serializers.SerializerMethodField('get_item_id')
+    information_id = serializers.SerializerMethodField('get_information_id')
+    request_id = serializers.SerializerMethodField('get_request_id')
+
+    def get_information_id(self, obj):
+        if obj.type == 'INFORMATION':
+            information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return information.id if information else None
+        return None
+
+    def get_request_id(self, obj):
+        if obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return request.id if request else None
+        return None
+
+    def get_item_id(self, obj):
+        if obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return request.id if request else None
+        return None
+
+    def get_service_id(self, obj):
+        if obj.type == 'SERVICE':
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return service.id if service else None
+        return None
 
     def get_name(self, obj):
         if obj.type == 'FOLDER':
