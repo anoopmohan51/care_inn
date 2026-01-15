@@ -8,6 +8,8 @@ from workorder_api.serializers.item_serializer import ItemSerializer
 from core_api.models.appusers import AppUsers
 from django.db.models import F,Value
 from django.db.models.functions import Concat
+from staticfiles_api.models.staticfiles import StaticFiles
+
 
 class WorkOrderSettingsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,7 +78,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
         user = AppUsers.objects.filter(id=obj.created_user.id,is_delete=False).annotate(
             name = Concat(F('first_name'), Value(' '), F('last_name'))
         ).values('name').first()
-        return user.get('name')
+        return user.get('name') if user else None
     class Meta:
         model = WorkOrderSettings
         fields = '__all__'
