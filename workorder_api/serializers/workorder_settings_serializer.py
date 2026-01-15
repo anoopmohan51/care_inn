@@ -59,7 +59,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     
     def get_folder_id(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.id if folder else None
         return None
     def get_static_file(self, obj):
