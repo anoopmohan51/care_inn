@@ -4,6 +4,7 @@ from workorder_api.models.services import Services
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from core_api.models.appusers import AppUsers
 from core_api.models.tenant import Tenant
+from staticfiles_api.models.staticfiles import StaticFiles
 
 class RequestedItems(models.Model):
     folder = models.ForeignKey(Folder, on_delete=models.PROTECT,null=True)
@@ -18,6 +19,8 @@ class RequestedItems(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     color = models.CharField(max_length=50,null=True)
     position = models.IntegerField(default=0,null=True)
+    icon = models.CharField(max_length=100,null=True)
+    static_file = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
 
     class Meta:
         db_table = 'workorder_api_requested_items'
