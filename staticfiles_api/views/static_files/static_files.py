@@ -110,9 +110,11 @@ class StaticFilesDetailView(APIView):
             else:
                 full_file_path = Path(settings.BASE_DIR) / 'uploads' / file_path
             if full_file_path.exists():
+                print("file exists::::::::::",full_file_path)
                 with open(full_file_path, 'rb') as f:
                     file_data = f.read()
             else:
+                print("file not exists::::::::::",full_file_path)
                 file_data = None
             return HttpResponse(
                 file_data, 
