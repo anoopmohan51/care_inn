@@ -63,13 +63,13 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     def get_static_file(self, obj):
         if obj.type == 'FOLDER':
             folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
-            return folder.static_file if folder else None
+            return folder.static_file.id if folder and folder.static_file else None
         elif obj.type == 'SERVICE':
             service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
-            return service.static_file if service else None
+            return service.static_file.id if service and service.static_file else None
         elif obj.type == 'REQUEST':
             request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
-            return request.static_file if request else None
+            return request.static_file.id if request and request.static_file else None
         return None
     
     def get_created_user_name(self, obj):
