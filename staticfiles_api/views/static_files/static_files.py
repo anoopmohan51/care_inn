@@ -106,10 +106,11 @@ class StaticFilesDetailView(APIView):
                 )
             file_path = static_file.file_path
             print("file path::::::::::",file_path)
-            if static_file.is_temp:
-                full_file_path = Path(settings.BASE_DIR) / 'temp_files' / file_path
-            else:
-                full_file_path = Path(settings.BASE_DIR) / 'uploads' / file_path
+            full_file_path = Path(settings.BASE_DIR) / 'media' / file_path
+            # if static_file.is_temp:
+            #     full_file_path = Path(settings.BASE_DIR) / 'temp_files' / file_path
+            # else:
+            #     full_file_path = Path(settings.BASE_DIR) / 'uploads' / file_path
             if full_file_path.exists():
                 print("file exists::::::::::",full_file_path)
                 with open(full_file_path, 'rb') as f:
