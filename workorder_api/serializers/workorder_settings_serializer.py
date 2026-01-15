@@ -33,16 +33,39 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     icon = serializers.SerializerMethodField('get_icon')
     static_file = serializers.SerializerMethodField('get_static_file')
     folder_id = serializers.SerializerMethodField('get_folder_id')
+    workorder_settings_id = serializers.SerializerMethodField('get_workorder_settings_id')
+    name = serializers.SerializerMethodField('get_name')
+
+    def get_name(self, obj):
+        if obj.type == 'FOLDER':
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
+            return folder.name if folder else None
+        elif obj.type == 'SERVICE':
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return service.name if service else None
+        elif obj.type == 'INFORMATION':
+            information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return information.information if information else None
+        elif obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return request.name if request else None
+        return None
+
+    def get_workorder_settings_id(self, obj):
+        return obj.id
     
     def get_color(self, obj):
         if obj.type == 'FOLDER':
             folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.color if folder else None
         elif obj.type == 'SERVICE':
-            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return service.color if service else None
+        elif obj.type == 'INFORMATION':
+            information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return information.color if information else None
         elif obj.type == 'REQUEST':
-            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return request.color if request else None
         return None
     
@@ -51,10 +74,13 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
             folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.icon if folder else None
         elif obj.type == 'SERVICE':
-            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return service.icon if service else None
+        elif obj.type == 'INFORMATION':
+            information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return information.icon if information else None
         elif obj.type == 'REQUEST':
-            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return request.icon if request else None 
         return None
     
@@ -69,10 +95,13 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
             folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.static_file.id if folder and folder.static_file else None
         elif obj.type == 'SERVICE':
-            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return service.static_file.id if service and service.static_file else None
+        elif obj.type == 'INFORMATION':
+            information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return information.static_file.id if information and information.static_file else None
         elif obj.type == 'REQUEST':
-            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return request.static_file.id if request and request.static_file else None
         return None
     
