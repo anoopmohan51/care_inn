@@ -33,7 +33,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     folder_id = serializers.SerializerMethodField('get_folder_id')
     def get_color(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
             return folder.color if folder else None
         elif obj.type == 'SERVICE':
             service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
@@ -45,7 +45,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     
     def get_icon(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
             return folder.icon if folder else None
         elif obj.type == 'SERVICE':
             service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
@@ -57,12 +57,12 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     
     def get_folder_id(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
             return folder.id if folder else None
         return None
     def get_static_file(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
             return folder.static_file if folder else None
         elif obj.type == 'SERVICE':
             service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
