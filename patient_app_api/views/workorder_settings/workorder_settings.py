@@ -12,6 +12,7 @@ from django.db.models import Q,F,Value
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from core_api.models.external_api_key import ExternalApiKey
 from django.db.models.functions import Concat
+from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsListSerializer
 
 class WorkorderSettingsDetailsView(APIView):
     permission_classes = [AllowAny,HasValidApiKey]
@@ -66,18 +67,18 @@ class WorkorderSettingsFilterView(APIView):
                 base_filter=Q(tenant=external_api_key.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter._get_result(
-                created_user_name =Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
-            )
+            queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSettingsListSerializer)
             return CustomResponse(
-                data=queryset,
+                data={
+                    "data": queryset,
+                    "count": count
+                },
                 status="success",
                 message=[f"WorkOrderSettings filter fetched successfully"],
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
         except Exception as e:
-            print("error:::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",

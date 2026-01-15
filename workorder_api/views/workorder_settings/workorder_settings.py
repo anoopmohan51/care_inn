@@ -3,7 +3,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from workorder_api.models.folder import Folder
-from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer,FolderDetailsListSerializer,FolderSerializer
+from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer,FolderDetailsListSerializer,FolderSerializer,WorkOrderSettingsListSerializer
 from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from core_api.permission.permission import has_permission
@@ -194,9 +194,7 @@ class WorkOrderSettingsFilterView(APIView):
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter._get_result(
-                created_user_name = Concat('created_user__first_name', Value(' '), 'created_user__last_name'),
-            )
+            queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSettingsListSerializer)
             return CustomResponse(
                 data=queryset,
                 status="success",

@@ -5,6 +5,9 @@ from workorder_api.models.services import Services
 from workorder_api.models.informations import Informations
 from workorder_api.models.requested_items import RequestedItems
 from workorder_api.serializers.item_serializer import ItemSerializer
+from core_api.models.appusers import AppUsers
+from django.db.models import F,Value
+from django.db.models.functions import Concat
 
 class WorkOrderSettingsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,26 +26,62 @@ class WorkOrderSettingsSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
-    folders = serializers.SerializerMethodField('get_folders')
-    services = serializers.SerializerMethodField('get_services')
-    informations = serializers.SerializerMethodField('get_informations')
-    items = serializers.SerializerMethodField('get_items')
+    created_user_name = serializers.SerializerMethodField('get_created_user_name')
+    color = serializers.SerializerMethodField('get_color')
+    icon = serializers.SerializerMethodField('get_icon')
+    static_file = serializers.SerializerMethodField('get_static_file')
+    folder_id = serializers.SerializerMethodField('get_folder_id')
+    def get_color(self, obj):
+        if obj.type == 'FOLDER':
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return folder.color if folder else None
+        elif obj.type == 'SERVICE':
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return service.color if service else None
+        elif obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return request.color if request else None
+        return None
+    
+    def get_icon(self, obj):
+        if obj.type == 'FOLDER':
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return folder.icon if folder else None
+        elif obj.type == 'SERVICE':
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return service.icon if service else None
+        elif obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return request.icon if request else None 
+        return None
+    
+    def get_folder_id(self, obj):
+        if obj.type == 'FOLDER':
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return folder.id if folder else None
+        return None
+    def get_static_file(self, obj):
+        if obj.type == 'FOLDER':
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return folder.static_file if folder else None
+        elif obj.type == 'SERVICE':
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return service.static_file if service else None
+        elif obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
+            return request.static_file if request else None
+        return None
+    
+    def get_created_user_name(self, obj):
+        user = AppUsers.objects.filter(id=obj.created_user.id,is_delete=False).annotate(
+            name = Concat(F('first_name'), Value(' '), F('last_name'))
+        ).values('name').first()
+        return user.get('name')
     class Meta:
         model = WorkOrderSettings
         fields = '__all__'
     
-    def get_folders(self, obj):
-        return Folder.objects.filter(workorder_settings_id=obj.id).values()
     
-    def get_services(self, obj):
-        return Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).values()
-    
-    def get_informations(self, obj):
-        return Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False).values().first()
-    
-    def get_items(self, obj):
-        request_items = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False)
-        return ItemSerializer(request_items,many=True).data
 
 class FolderDetailsListSerializer(serializers.ModelSerializer):
     folders = serializers.SerializerMethodField('get_folders')
