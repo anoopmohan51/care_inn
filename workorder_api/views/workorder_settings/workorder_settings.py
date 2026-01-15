@@ -3,18 +3,19 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from workorder_api.models.workorder_settings import WorkOrderSettings
 from workorder_api.models.folder import Folder
-from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer,WorkOrderSettingsListSerializer,FolderDetailsListSerializer,FolderSerializer
+from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsSerializer,FolderDetailsListSerializer,FolderSerializer
 from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from core_api.permission.permission import has_permission
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q,Value
 from core_api.filters.global_filter import GlobalFilter
 from.delete_folder import _delete_folders_recursive
 from workorder_api.models.services import Services
 from workorder_api.models.informations import Informations
 from workorder_api.models.requested_items import RequestedItems
 from staticfiles_api.views.static_files.tempfile_to_permanant import tempfile_to_permanant
+from django.db.models.functions import Concat
 
 class WorkOrderSettingsCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -193,7 +194,9 @@ class WorkOrderSettingsFilterView(APIView):
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSettingsListSerializer)
+            queryset, count = global_filter._get_result(
+                created_user_name = Concat('created_user__first_name', Value(' '), 'created_user__last_name'),
+            )
             return CustomResponse(
                 data=queryset,
                 status="success",

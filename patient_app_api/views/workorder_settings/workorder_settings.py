@@ -8,10 +8,10 @@ from workorder_api.serializers.workorder_settings_serializer import FolderDetail
 from rest_framework.permissions import AllowAny
 from core_api.permission.external_api_permission import HasValidApiKey
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import Q
+from django.db.models import Q,F,Value
 from workorder_api.models.workorder_settings import WorkOrderSettings
-from workorder_api.serializers.workorder_settings_serializer import WorkOrderSettingsListSerializer
 from core_api.models.external_api_key import ExternalApiKey
+from django.db.models.functions import Concat
 
 class WorkorderSettingsDetailsView(APIView):
     permission_classes = [AllowAny,HasValidApiKey]
@@ -66,7 +66,9 @@ class WorkorderSettingsFilterView(APIView):
                 base_filter=Q(tenant=external_api_key.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSettingsListSerializer)
+            queryset, count = global_filter._get_result(
+                created_user_name =Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
+            )
             return CustomResponse(
                 data=queryset,
                 status="success",
