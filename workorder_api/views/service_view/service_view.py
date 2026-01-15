@@ -21,7 +21,7 @@ class ServiceCreateView(generics.CreateAPIView):
 
     # @has_permission("Service", "create")
     def post(self, request):
-        # try:
+        try:
             data=request.data
             folder = data.get('folder',None)
             workorder_settings = data.get('workorder_settings',None)
@@ -56,15 +56,14 @@ class ServiceCreateView(generics.CreateAPIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
-        # except Exception as e:
-        #     print("error::::::::::",e)
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=["Error in Service creation"],
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content_type="application/json"
-        #     )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Service creation"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
 
 class ServiceUpdateView(generics.GenericAPIView):
     authentication_classes = [JWTAuthentication]

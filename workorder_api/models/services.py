@@ -26,7 +26,7 @@ class Services(models.Model):
         ('HIGH','HIGH'),
     ]
     name = models.CharField(max_length=255)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True,blank=True)
     service_type = models.CharField(max_length=20,choices=service_type_choices,null=True)
     priority = models.CharField(max_length=20,choices=PRIORITY_CHOICES,null=True)
     sla = models.CharField(max_length=10,null=True)
