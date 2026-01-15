@@ -33,9 +33,10 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     icon = serializers.SerializerMethodField('get_icon')
     static_file = serializers.SerializerMethodField('get_static_file')
     folder_id = serializers.SerializerMethodField('get_folder_id')
+    
     def get_color(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.color if folder else None
         elif obj.type == 'SERVICE':
             service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
@@ -47,7 +48,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     
     def get_icon(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.icon if folder else None
         elif obj.type == 'SERVICE':
             service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
@@ -62,9 +63,10 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
             folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.id if folder else None
         return None
+    
     def get_static_file(self, obj):
         if obj.type == 'FOLDER':
-            folder = Folder.objects.filter(workorder_settings_id=obj.id).first()
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
             return folder.static_file.id if folder and folder.static_file else None
         elif obj.type == 'SERVICE':
             service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False).first()
@@ -79,6 +81,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
             name = Concat(F('first_name'), Value(' '), F('last_name'))
         ).values('name').first()
         return user.get('name') if user else None
+    
     class Meta:
         model = WorkOrderSettings
         fields = '__all__'
