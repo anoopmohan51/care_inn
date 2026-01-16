@@ -19,7 +19,7 @@ class Informations(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     icon = models.CharField(max_length=100,null=True)
     color = models.CharField(max_length=50,null=True)
-    # position = models.IntegerField(default=0,null=True)
+    position = models.IntegerField(default=0,null=True)
 
 
     class Meta:
