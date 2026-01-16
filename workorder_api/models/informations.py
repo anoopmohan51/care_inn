@@ -11,7 +11,6 @@ class Informations(models.Model):
     information = models.TextField(null=True)
     workorder_settings = models.ForeignKey(WorkOrderSettings, on_delete=models.PROTECT,null=True)
     static_file = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
-    icon = models.CharField(max_length=100,null=True)
     tenant = models.ForeignKey(Tenant, on_delete=models.PROTECT,null=True)
     created_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='informations_created_user')
     updated_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='informations_updated_user')
@@ -19,6 +18,8 @@ class Informations(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     icon = models.CharField(max_length=100,null=True)
+    color = models.CharField(max_length=50,null=True)
+    # position = models.IntegerField(default=0,null=True)
 
 
     class Meta:
