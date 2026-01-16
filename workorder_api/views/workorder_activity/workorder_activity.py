@@ -18,7 +18,7 @@ class WorkOrderActivityListView(APIView):
     def get(self, request, workorder_id):
         try:
             field_lookup = {
-                workorder_id: "workorder_id",
+                "workorder_id": "workorder_id",
             }
             global_filter = GlobalFilter(
                 request,

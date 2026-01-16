@@ -13,6 +13,11 @@ from core_api.permission.permission import has_permission
 from django.db.models.functions import Concat
 from datetime import datetime,timedelta
 from workorder_api.models import Services
+import string
+import random
+
+def id_generator(size=4, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 class WorkOrderCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -21,6 +26,13 @@ class WorkOrderCreateView(APIView):
     def post(self, request):
         try:
             data = request.data
+            now = datetime.datetime.now()
+            year = '{:02d}'.format(now.year)
+            month = '{:02d}'.format(now.month)
+            data.update({
+                "unique_id":"WO-" + year + month + id_generator(),
+                "tenant":request.user.tenant.id,
+            })
             if data.get('when_to_start') == WorkOrder.WHEN_TO_START_NOW:
                 data.update({
                     'start_date': datetime.now() + timedelta(minutes=1),
@@ -32,9 +44,10 @@ class WorkOrderCreateView(APIView):
             if data.get('service'):
                 service = Services.objects.get(id=data.get('service'))
                 if service.sla:
+                    sla_minutes = int(service.sla)
                     data.update({
-                        'sla_minutes': service.sla,
-                        'end_date': datetime.now() + timedelta(minutes=service.sla),
+                        'sla_minutes': sla_minutes,
+                        'end_date': datetime.now() + timedelta(minutes=sla_minutes),
                     })
                 else:
                     data.update({
@@ -65,7 +78,6 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json" 
                 )
         except Exception as e:
-            print("Error in Work order creation::::::::::",str(e))
             return CustomResponse(
                 data=None,
                 status="failed",

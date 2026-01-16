@@ -36,10 +36,10 @@ class WorkOrderActivitySerializer(serializers.ModelSerializer):
                 user_group = UserGroup.objects.filter(id=obj.from_value.split('-')[1],is_delete=False).values('name').first()
                 name = user_group.get('name')
             elif obj.from_value.startswith('USER-'):
-                user = AppUsers.objects.filter(id=obj.from_value.split('-')[1],is_delete=False).annotate(
+                user = AppUsers.objects.filter(email=obj.from_value.split('-')[1],is_delete=False).annotate(
                     name = Concat(F('first_name'), Value(' '), F('last_name'))
                 ).values('name').first()
-                name = name.get('name')
+                name = user.get('name')
             else:
                 name = obj.from_value
             return name
@@ -51,10 +51,10 @@ class WorkOrderActivitySerializer(serializers.ModelSerializer):
                 user_group = UserGroup.objects.filter(id=obj.to_value.split('-')[1],is_delete=False).values('name').first()
                 name = user_group.get('name')
             elif obj.to_value.startswith('USER-'):
-                user = AppUsers.objects.filter(id=obj.to_value.split('-')[1],is_delete=False).annotate(
+                user = AppUsers.objects.filter(email=obj.to_value.split('-')[1],is_delete=False).annotate(
                     name = Concat(F('first_name'), Value(' '), F('last_name'))
                 ).values('name').first()
-                name = name.get('name')
+                name = user.get('name')
             else:
                 name = obj.to_value
             return name
