@@ -11,6 +11,7 @@ from .informations import Informations
 from .requested_items import RequestedItems
 from .room_types import RoomTypes,FloorPlan
 from .workorder_settings import WorkOrderSettings
+from .sector import Sector
 __all__ = [
     'Services', 
     'Rooms',
@@ -27,4 +28,5 @@ __all__ = [
     'RoomTypes',
     'WorkOrderSettings',
     'FloorPlan',
+    'Sector',
 ]

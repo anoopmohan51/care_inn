@@ -1,6 +1,7 @@
 from django.db import models
 from core_api.models.tenant import Tenant
 from core_api.models.appusers import AppUsers
+from workorder_api.models.sector import Sector
 
 class Rooms(models.Model):
     room_number = models.CharField(max_length=255)
@@ -11,4 +12,5 @@ class Rooms(models.Model):
     updated_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='rooms_updated_user')
     tenant = models.ForeignKey(Tenant, on_delete=models.PROTECT,null=True)
     is_delete = models.BooleanField(default=False)
+    sector = models.ForeignKey(Sector, on_delete=models.PROTECT,null=True,related_name='rooms_sector')
     
