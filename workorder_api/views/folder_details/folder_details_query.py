@@ -25,6 +25,7 @@ def _get_folder_details(folder_id,limit,offset):
                     NULL::integer as tenant_id,
                     null::integer AS created_user_id,
                     null::integer AS updated_user_id
+                    f.position ::integer,
                 FROM workorder_api_folder f
                 WHERE f.parent_folder_id = %s
 
@@ -50,6 +51,7 @@ def _get_folder_details(folder_id,limit,offset):
                     s.tenant_id,
                     s.created_user_id,
                     s.updated_user_id
+                    s.position ::integer,
                 FROM workorder_api_services s
                 WHERE s.folder_id = %s
 
@@ -75,6 +77,7 @@ def _get_folder_details(folder_id,limit,offset):
                     r.tenant_id,
                     r.created_user_id,
                     r.updated_user_id
+                    r.position ::integer,
                 FROM workorder_api_requested_items r
                 WHERE r.folder_id = %s
 
@@ -100,8 +103,10 @@ def _get_folder_details(folder_id,limit,offset):
                     i.tenant_id,
                     i.created_user_id,
                     i.updated_user_id
+                    i.position ::integer,
                 FROM workorder_api_informations i
-                WHERE i.folder_id = %s;
+                WHERE i.folder_id = %s
+                ORDER BY position ASC
                 LIMIT %s OFFSET %s
 
                 """,[folder_id,folder_id,folder_id,folder_id,limit,offset]
