@@ -4,11 +4,11 @@ def _get_folder_details(tenant_id,folder_id):
     with connection.cursor() as cursor:
         cursor.execute(
             """
-                SELECT
+                 SELECT
                     jsonb_build_object(
                         'id', f.id,
                         'name', f.name,
-                        'folder_id', f.folder_id,
+                        'folder_id', f.id,
                         'workorder_settings_id', f.workorder_settings_id,
                         'folder_details',
                         COALESCE(
@@ -20,27 +20,26 @@ def _get_folder_details(tenant_id,folder_id):
                                         'id', sf.id,
                                         'name', sf.name,
                                         'type', 'FOLDER',
-                                        'folder_id', sf.folder_id,
+                                        'folder_id', sf.parent_folder_id,
                                         'workorder_settings_id', sf.workorder_settings_id,
                                         'icon', sf.icon,
                                         'color', sf.color,
-                                        'static_files', sf.static_files
+                                        'static_files', sf.static_file_id
                                     ) AS details
                                     FROM workorder_api_folder sf
-                                    WHERE sf.folder_id = f.id
+                                    WHERE sf.parent_folder_id = f.id
 
                                     UNION ALL
 
                                     -- Informations
                                     SELECT jsonb_build_object(
                                         'id', i.id,
-                                        'name', i.name,
+                                        'name', i.information ,
                                         'type', 'INFORMATION',
                                         'folder_id', i.folder_id,
                                         'workorder_settings_id', i.workorder_settings_id,
                                         'icon', i.icon,
-                                        'color', i.color,
-                                        'static_files', i.static_files
+                                        'static_files', i.static_file_id
                                     )
                                     FROM workorder_api_informations i
                                     WHERE i.folder_id = f.id
@@ -56,9 +55,9 @@ def _get_folder_details(tenant_id,folder_id):
                                         'workorder_settings_id', r.workorder_settings_id,
                                         'icon', r.icon,
                                         'color', r.color,
-                                        'static_files', r.static_files
+                                        'static_files', r.static_file_id
                                     )
-                                    FROM workorder_api_requested_item r
+                                    FROM workorder_api_requested_items r
                                     WHERE r.folder_id = f.id
 
                                     UNION ALL
@@ -72,7 +71,7 @@ def _get_folder_details(tenant_id,folder_id):
                                         'workorder_settings_id', s.workorder_settings_id,
                                         'icon', s.icon,
                                         'color', s.color,
-                                        'static_files', s.static_files
+                                        'static_files', s.static_file_id
                                     )
                                     FROM workorder_api_services s
                                     WHERE s.folder_id = f.id
