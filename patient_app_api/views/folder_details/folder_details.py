@@ -5,6 +5,7 @@ from rest_framework import status
 from workorder_api.views.folder_details.folder_details_query import _get_folder_details
 from workorder_api.serializers.workorder_settings_serializer import FolderSerializer
 from rest_framework.permissions import AllowAny
+from workorder_api.models.folder import Folder
 
 class FolderDetailsView(APIView):
     permission_classes = [AllowAny,HasValidApiKey]
