@@ -39,7 +39,7 @@ class WorkOrderActivitySerializer(serializers.ModelSerializer):
                 user = AppUsers.objects.filter(email=obj.from_value.split('-')[1],is_delete=False).annotate(
                     name = Concat(F('first_name'), Value(' '), F('last_name'))
                 ).values('name').first()
-                name = name.get('name')
+                name = user.get('name')
             else:
                 name = obj.from_value
             return name
@@ -54,8 +54,7 @@ class WorkOrderActivitySerializer(serializers.ModelSerializer):
                 user = AppUsers.objects.filter(email=obj.to_value.split('-')[1],is_delete=False).annotate(
                     name = Concat(F('first_name'), Value(' '), F('last_name'))
                 ).values('name').first()
-                print("user::::::::::",user)
-                name = name.get('name')
+                name = user.get('name')
             else:
                 name = obj.to_value
             return name
