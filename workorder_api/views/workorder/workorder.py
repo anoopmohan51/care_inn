@@ -33,8 +33,8 @@ class WorkOrderCreateView(APIView):
                 service = Services.objects.get(id=data.get('service'))
                 if service.sla_minutes:
                     data.update({
-                        'sla_minutes': service.sla_minutes,
-                        'end_date': datetime.now() + timedelta(minutes=service.sla_minutes),
+                        'sla_minutes': service.sla,
+                        'end_date': datetime.now() + timedelta(minutes=service.sla),
                     })
                 else:
                     data.update({
@@ -65,7 +65,6 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json" 
                 )
         except Exception as e:
-            print("Error in Work order creation::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
