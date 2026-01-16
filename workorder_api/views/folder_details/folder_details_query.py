@@ -6,59 +6,102 @@ def _get_folder_details(folder_id,limit,offset):
         cursor.execute(
             """
                 SELECT
-                    f.id,
-                    f.color,
-                    f.icon,
-                    f.static_file_id,
-                    f.id AS folder_id,
+                    f.id::integer,
+                    NULL::text AS created_user_name,
+                    f.color::text,
+                    f.icon::text,
+                    f.static_file_id::uuid,
+                    f.id::integer AS folder_id,
                     f.workorder_settings_id,
-                    f.name,
-                    'FOLDER' AS type
+                    f.name::text,
+                    'FOLDER'::text AS type,
+                    NULL::integer AS service_id,
+                    NULL::integer AS item_id,
+                    NULL::integer AS information_id,
+                    NULL::integer AS request_id,
+                    FALSE::boolean AS is_delete,
+                    NULL::timestamp AS created_at,
+                    NULL::timestamp AS updated_at,
+                    NULL::integer as tenant_id,
+                    null::integer AS created_user_id,
+                    null::integer AS updated_user_id
                 FROM workorder_api_folder f
                 WHERE f.parent_folder_id = %s
 
                 UNION ALL
 
                 SELECT
-                    s.id,
-                    s.color,
-                    s.icon,
-                    s.static_file_id ,
-                    s.folder_id,
+                    s.id::integer,
+                    NULL::text,
+                    s.color::text,
+                    s.icon::text,
+                    s.static_file_id::uuid,
+                    s.folder_id::integer,
                     s.workorder_settings_id,
-                    s.name,
-                    'SERVICE' AS type
+                    s.name::text,
+                    'SERVICE'::text,
+                    s.id::integer,
+                    NULL::integer,
+                    NULL::integer,
+                    NULL::integer,
+                    s.is_delete::boolean,
+                    s.created_at::timestamp,
+                    s.updated_at::timestamp,
+                    s.tenant_id,
+                    s.created_user_id,
+                    s.updated_user_id
                 FROM workorder_api_services s
                 WHERE s.folder_id = %s
 
                 UNION ALL
 
                 SELECT
-                    r.id,
-                    r.color,
-                    r.icon,
-                    null as static_file,
-                    r.folder_id,
+                    r.id::integer,
+                    NULL::text,
+                    r.color::text,
+                    r.icon::text,
+                    NULL::uuid AS static_file_id,
+                    r.folder_id::integer,
                     r.workorder_settings_id,
-                    r.name,
-                    'REQUEST' AS type
+                    r.name::text,
+                    'REQUEST'::text,
+                    NULL::integer,
+                    NULL::integer,
+                    NULL::integer,
+                    r.id::integer,
+                    r.is_delete::boolean,
+                    r.created_at::timestamp,
+                    r.updated_at::timestamp,
+                    r.tenant_id,
+                    r.created_user_id,
+                    r.updated_user_id
                 FROM workorder_api_requested_items r
                 WHERE r.folder_id = %s
 
                 UNION ALL
 
                 SELECT
-                    i.id,
-                    null as color,
-                    i.icon,
-                    i.static_file_id ,
-                    i.folder_id,
-                    workorder_settings_id,
-                    i.information ,
-                    'INFORMATION' AS type
+                    i.id::integer,
+                    NULL::text,
+                    NULL::text,
+                    i.icon::text,
+                    i.static_file_id::uuid,
+                    i.folder_id::integer,
+                    i.workorder_settings_id,
+                    i.information::text,
+                    'INFORMATION'::text,
+                    NULL::integer,
+                    NULL::integer,
+                    i.id::integer,
+                    NULL::integer,
+                    i.is_delete::boolean,
+                    i.created_at::timestamp,
+                    i.updated_at::timestamp,
+                    i.tenant_id,
+                    i.created_user_id,
+                    i.updated_user_id
                 FROM workorder_api_informations i
-                WHERE i.folder_id = %s
-
+                WHERE i.folder_id = %s;
                 LIMIT %s OFFSET %s
 
                 """,[folder_id,folder_id,folder_id,folder_id,limit,offset]

@@ -1,15 +1,13 @@
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+from core_api.permission.external_api_permission import HasValidApiKey
 from core_api.response_utils.custom_response import CustomResponse
-from workorder_api.models.folder import Folder
 from rest_framework import status
 from workorder_api.views.folder_details.folder_details_query import _get_folder_details
 from workorder_api.serializers.workorder_settings_serializer import FolderSerializer
+from rest_framework.permissions import AllowAny
 
 class FolderDetailsView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny,HasValidApiKey]
 
     def get(self, request, id):
         try:
@@ -24,7 +22,7 @@ class FolderDetailsView(APIView):
                     status_code=status.HTTP_404_NOT_FOUND,
                     content_type="application/json"
                 )
-            serializer= FolderSerializer(folder)
+            serializer = FolderSerializer(folder)
             responce_data = serializer.data
             responce_data['type'] = 'FOLDER'
             responce_data['items'] = _get_folder_details(id,limit,offset)
