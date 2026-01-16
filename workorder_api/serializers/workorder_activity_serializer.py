@@ -54,6 +54,7 @@ class WorkOrderActivitySerializer(serializers.ModelSerializer):
                 user = AppUsers.objects.filter(email=obj.to_value.split('-')[1],is_delete=False).annotate(
                     name = Concat(F('first_name'), Value(' '), F('last_name'))
                 ).values('name').first()
+                print("user::::::::::",user)
                 name = name.get('name')
             else:
                 name = obj.to_value
