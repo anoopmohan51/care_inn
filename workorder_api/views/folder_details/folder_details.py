@@ -36,7 +36,6 @@ class FolderDetailsView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("Error in Folder details fetching::::::::::",str(e))
             return CustomResponse(
                 data=None,
                 status="failed",
