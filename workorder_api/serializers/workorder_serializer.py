@@ -43,6 +43,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         user = get_user_model().objects.get(id=request.user.id,is_delete=False)
+        validated_data['status'] = WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED
         set_activity_user(user)
         try:
             return super().create(validated_data)
