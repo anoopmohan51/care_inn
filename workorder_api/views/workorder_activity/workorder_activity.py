@@ -36,6 +36,7 @@ class WorkOrderActivityListView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print("Error in Work order activity list fetching::::::::::",str(e))
             return CustomResponse(
                 data=None,
                 status="failed",
