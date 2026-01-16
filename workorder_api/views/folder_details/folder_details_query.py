@@ -1,6 +1,7 @@
 from django.db import connection
 from workorder_api.views.workorder_dashboard.workorder_count_per_day import dictfetchall
 def _get_folder_details(tenant_id,folder_id):
+
     with connection.cursor() as cursor:
         cursor.execute(
             """
@@ -14,7 +15,7 @@ def _get_folder_details(tenant_id,folder_id):
                     f.name,
                     'FOLDER' AS type
                 FROM workorder_api_folder f
-                WHERE f.parent_folder_id = {folder_id}
+                WHERE f.parent_folder_id = %s
 
                 UNION ALL
 
@@ -28,7 +29,7 @@ def _get_folder_details(tenant_id,folder_id):
                     s.name,
                     'SERVICE' AS type
                 FROM workorder_api_services s
-                WHERE s.folder_id = {folder_id}
+                WHERE s.folder_id = %s
 
                 UNION ALL
 
@@ -42,7 +43,7 @@ def _get_folder_details(tenant_id,folder_id):
                     r.name,
                     'REQUEST' AS type
                 FROM workorder_api_requested_items r
-                WHERE r.folder_id = {folder_id}
+                WHERE r.folder_id = %s
 
                 UNION ALL
 
@@ -56,8 +57,8 @@ def _get_folder_details(tenant_id,folder_id):
                     i.information ,
                     'INFORMATION' AS type
                 FROM workorder_api_informations i
-                WHERE i.folder_id = {folder_id}
+                WHERE i.folder_id = %s
 
-                """,folder_id
+                """,[folder_id,folder_id,folder_id,folder_id]
         )
         return dictfetchall(cursor)
