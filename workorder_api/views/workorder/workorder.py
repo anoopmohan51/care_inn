@@ -34,14 +34,17 @@ class WorkOrderCreateView(APIView):
                 if service.sla_minutes:
                     data.update({
                         'sla_minutes': service.sla_minutes,
+                        'end_date': datetime.now() + timedelta(minutes=service.sla_minutes),
                     })
                 else:
                     data.update({
                         'sla_minutes': None,
+                        'end_date': None,
                     })
             else:
                 data.update({
                     'sla_minutes': None,
+                    'end_date': None,
                 })
             serializer = WorkOrderSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
@@ -62,7 +65,6 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json" 
                 )
         except Exception as e:
-            print("Error in Work order creation::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
