@@ -17,6 +17,7 @@ from workorder_api.views.workorder_dashboard.workorder_time import *
 from workorder_api.views.workorder_summary.workorder_summary import *
 from workorder_api.views.workorder_image_upload.workorder_image_upload import *
 from workorder_api.views.room_types.room_types import *
+from workorder_api.views.folder_details.folder_details import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -54,6 +55,7 @@ urlpatterns = [
     path('room-types',RoomTypesCreateView.as_view()),
     path('room-types/<int:pk>',RoomTypesDetailsView.as_view()),
     path('room-types/filter',RoomTypesFilterView.as_view()),
+    path('folder-details/<int:id>',FolderDetailsView.as_view()),
 
 
 ]
