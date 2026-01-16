@@ -1,6 +1,6 @@
 from django.db import connection
 from workorder_api.views.workorder_dashboard.workorder_count_per_day import dictfetchall
-def _get_folder_details(tenant_id,folder_id):
+def _get_folder_details(folder_id,limit,offset):
 
     with connection.cursor() as cursor:
         cursor.execute(
@@ -59,6 +59,8 @@ def _get_folder_details(tenant_id,folder_id):
                 FROM workorder_api_informations i
                 WHERE i.folder_id = %s
 
-                """,[folder_id,folder_id,folder_id,folder_id]
+                LIMIT %s OFFSET %s
+
+                """,[folder_id,folder_id,folder_id,folder_id,limit,offset]
         )
         return dictfetchall(cursor)

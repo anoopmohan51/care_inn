@@ -13,8 +13,9 @@ class FolderDetailsView(APIView):
 
     def get(self, request, id):
         try:
+            limit = request.query_params.get('limit', 10)
+            offset = request.query_params.get('offset', 0)
             folder = Folder.objects.get(id=id)
-            print("folder::::::::::",folder)
             if not folder:
                 return CustomResponse(
                     data=None,
@@ -24,12 +25,9 @@ class FolderDetailsView(APIView):
                     content_type="application/json"
                 )
             serializer= FolderSerializer(folder)
-            print("serializer::::::::::",serializer.data)
             responce_data = serializer.data
-            print("responce_data::::::::::",responce_data)
-
             responce_data['type'] = 'FOLDER'
-            responce_data['folder_details'] = _get_folder_details(request.user.tenant.id,id)
+            responce_data['items'] = _get_folder_details(id,limit,offset)
             return CustomResponse(
                 data=responce_data,
                 status="success",
