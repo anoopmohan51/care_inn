@@ -5,6 +5,7 @@ from core_api.response_utils.custom_response import CustomResponse
 from workorder_api.models.folder import Folder
 from rest_framework import status
 from workorder_api.views.folder_details.folder_details_query import _get_folder_details
+from workorder_api.serializers.workorder_settings_serializer import FolderSerializer
 
 class FolderDetailsView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -12,9 +13,21 @@ class FolderDetailsView(APIView):
 
     def get(self, request, id):
         try:
-            data = _get_folder_details(request.user.tenant.id,id)
+            folder = Folder.objects.get(id=id)
+            if not folder:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[f"Folder not found"],
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content_type="application/json"
+                )
+            serializer= FolderSerializer(folder)
+            responce_data = serializer.data
+            response_data['type'] = 'FOLDER'
+            response_data['folder_details'] = _get_folder_details(request.user.tenant.id,id)
             return CustomResponse(
-                data=data,
+                data=responce_data,
                 status="success",
                 message=[f"Folder details fetched successfully"],
                 status_code=status.HTTP_200_OK,
