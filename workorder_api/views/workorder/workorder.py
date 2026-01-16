@@ -65,6 +65,7 @@ class WorkOrderCreateView(APIView):
                     content_type="application/json" 
                 )
         except Exception as e:
+            print("Error in Work order creation::::::::::",str(e))
             return CustomResponse(
                 data=None,
                 status="failed",
