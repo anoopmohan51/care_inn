@@ -32,6 +32,8 @@ class WorkOrderCreateView(APIView):
             if data.get('service'):
                 service = Services.objects.get(id=data.get('service'))
                 if service.sla:
+                    print("service.sla::::::::::",service.sla)
+                    print("sla_minutes_type::::::::::",type(service.sla))
                     data.update({
                         'sla_minutes': service.sla,
                         'end_date': datetime.now() + timedelta(minutes=service.sla),
