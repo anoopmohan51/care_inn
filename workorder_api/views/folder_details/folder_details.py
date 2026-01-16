@@ -28,8 +28,8 @@ class FolderDetailsView(APIView):
             responce_data = serializer.data
             print("responce_data::::::::::",responce_data)
 
-            response_data['type'] = 'FOLDER'
-            response_data['folder_details'] = _get_folder_details(request.user.tenant.id,id)
+            responce_data['type'] = 'FOLDER'
+            responce_data['folder_details'] = _get_folder_details(request.user.tenant.id,id)
             return CustomResponse(
                 data=responce_data,
                 status="success",
