@@ -14,6 +14,7 @@ class FolderDetailsView(APIView):
     def get(self, request, id):
         try:
             folder = Folder.objects.get(id=id)
+            print("folder::::::::::",folder)
             if not folder:
                 return CustomResponse(
                     data=None,
@@ -23,7 +24,10 @@ class FolderDetailsView(APIView):
                     content_type="application/json"
                 )
             serializer= FolderSerializer(folder)
+            print("serializer::::::::::",serializer.data)
             responce_data = serializer.data
+            print("responce_data::::::::::",responce_data)
+
             response_data['type'] = 'FOLDER'
             response_data['folder_details'] = _get_folder_details(request.user.tenant.id,id)
             return CustomResponse(
