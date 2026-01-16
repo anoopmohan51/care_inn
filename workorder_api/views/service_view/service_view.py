@@ -34,7 +34,7 @@ class ServiceCreateView(generics.CreateAPIView):
                     workorder_settings_serializer.save()
                     workorder_settings_id = workorder_settings_serializer.data.get('id')
                     data.update({
-                        'workorder_settings_id': workorder_settings_id
+                        'workorder_settings': workorder_settings_id
                     })
             serializer = ServiceSerializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
