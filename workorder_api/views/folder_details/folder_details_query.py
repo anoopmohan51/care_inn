@@ -78,8 +78,8 @@ def _get_folder_details(tenant_id,folder_id):
                         )
                     ) AS result
                 FROM workorder_api_folder f
-                WHERE f.id = %s and f.tenant_id = %s;
-                """, [folder_id,tenant_id]
+                WHERE f.id = %s;
+                """, [folder_id]
         )
         print(cursor.fetchall())
         # return dictfetchall(cursor)
