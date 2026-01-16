@@ -14,7 +14,7 @@ def _get_folder_details(tenant_id,folder_id):
                     f.name,
                     'FOLDER' AS type
                 FROM workorder_api_folder f
-                WHERE f.parent_folder_id = %s
+                WHERE f.parent_folder_id = {folder_id}
 
                 UNION ALL
 
@@ -28,7 +28,7 @@ def _get_folder_details(tenant_id,folder_id):
                     s.name,
                     'SERVICE' AS type
                 FROM workorder_api_services s
-                WHERE s.folder_id = %s
+                WHERE s.folder_id = {folder_id}
 
                 UNION ALL
 
@@ -42,7 +42,7 @@ def _get_folder_details(tenant_id,folder_id):
                     r.name,
                     'REQUEST' AS type
                 FROM workorder_api_requested_items r
-                WHERE r.folder_id = %s
+                WHERE r.folder_id = {folder_id}
 
                 UNION ALL
 
@@ -56,8 +56,8 @@ def _get_folder_details(tenant_id,folder_id):
                     i.information ,
                     'INFORMATION' AS type
                 FROM workorder_api_informations i
-                WHERE i.folder_id = %s
+                WHERE i.folder_id = {folder_id}
 
-                """, [folder_id]
+                """,folder_id
         )
         return dictfetchall(cursor)
