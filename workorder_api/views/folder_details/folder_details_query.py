@@ -81,5 +81,4 @@ def _get_folder_details(tenant_id,folder_id):
                 WHERE f.id = %s;
                 """, [folder_id]
         )
-        print(cursor.fetchall())
-        # return dictfetchall(cursor)
+        return cursor.fetchall()
