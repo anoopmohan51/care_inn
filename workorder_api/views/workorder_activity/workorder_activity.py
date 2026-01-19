@@ -20,6 +20,7 @@ class WorkOrderActivityListView(APIView):
             field_lookup = {
                 "workorder_id": "workorder_id",
             }
+            print("field:::::::::::::::::::::",workorder_id)
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
@@ -36,6 +37,7 @@ class WorkOrderActivityListView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print("error in Work order activity list fetching",e)
             return CustomResponse(
                 data=None,
                 status="failed",
