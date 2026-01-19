@@ -16,6 +16,7 @@ class WorkOrderEscalations(models.Model):
     created_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='workorder_escalations_created_user')
     updated_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='workorder_escalations_updated_user')
     is_delete = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'workorder_api_escalations'

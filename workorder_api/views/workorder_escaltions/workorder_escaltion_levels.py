@@ -6,11 +6,10 @@ from .workorder_recipients import _create_update_escalation_recipients
 
 
 def _create_update_escalation_levels(request,data:list,workorder_escalation_id:int):
-    # try:
+    try:
         with transaction.atomic():
             ids_list = []
             for record in data:
-                print("record::::::::::::",record)
                 if "id" in record:
                     update_data = {
                         "level": record.get('level'),
@@ -40,5 +39,5 @@ def _create_update_escalation_levels(request,data:list,workorder_escalation_id:i
                         _create_update_escalation_recipients(request,record.get('recipients'),serializer.data.get('id'))
                         ids_list.append(serializer.data.get('id'))
             WorkorderEscaltionLevels.objects.filter(escalation=workorder_escalation_id).exclude(id__in=ids_list).delete()
-    # except Exception as e:
-    #     print(e)
+    except Exception as e:
+        print(e)

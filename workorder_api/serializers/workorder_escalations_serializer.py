@@ -6,8 +6,32 @@ from django.db.models import Value, F
 from django.db.models.functions import Concat
 class WorkOrderEscalationsSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField('get_services')
-    
     levels = serializers.SerializerMethodField('get_levels')
+    created_by = serializers.SerializerMethodField('get_created_by')
+    updated_by = serializers.SerializerMethodField('get_updated_by')
+    identifier_name = serializers.SerializerMethodField('get_identifier_name')
+
+    def get_identifier_name(self, obj):
+        return obj.identifier.name if obj.identifier else None
+    
+    def get_created_by(self, obj):
+        if obj.created_user:
+            user = AppUsers.objects.filter(id=obj.created_user.id).annotate(
+                name = Concat(F('first_name'),Value(' '),F('last_name'))
+            ).values('name').first()
+            name = user.get('name')
+        else:
+            name = None
+        return name
+    def get_updated_by(self, obj):
+        if obj.updated_user:
+            user = AppUsers.objects.filter(id=obj.updated_user.id).annotate(
+                name = Concat(F('first_name'),Value(' '),F('last_name'))
+            ).values('name').first()
+            name = user.get('name')
+        else:
+            name = None
+        return name
 
     def get_services(self, obj):
         services = WorkorderEscalationServices.objects.filter(workorder_escalation=obj)
