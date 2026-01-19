@@ -12,6 +12,8 @@ from .requested_items import RequestedItems
 from .room_types import RoomTypes,FloorPlan
 from .workorder_settings import WorkOrderSettings
 from .sector import Sector
+from .workorder_identifier import WorkOrderIdentifier
+from .workorder_escalations import WorkOrderEscalations,WorkorderEscalationServices,WorkorderEscalationRecipients
 __all__ = [
     'Services', 
     'Rooms',
@@ -29,4 +31,8 @@ __all__ = [
     'WorkOrderSettings',
     'FloorPlan',
     'Sector',
+    'WorkOrderIdentifier',
+    'WorkOrderEscalations',
+    'WorkorderEscalationServices',
+    'WorkorderEscalationRecipients',
 ]

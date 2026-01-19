@@ -19,6 +19,8 @@ from workorder_api.views.workorder_image_upload.workorder_image_upload import *
 from workorder_api.views.room_types.room_types import *
 from workorder_api.views.folder_details.folder_details import *
 from workorder_api.views.sector.sector import *
+from workorder_api.views.workorder_escaltions.workorder_escaltions import *
+from workorder_api.views.workorder_identifier.workorder_identifier import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -61,6 +63,11 @@ urlpatterns = [
     path('sector',SectorCreateView.as_view()),
     path('sector/<int:pk>',SectorDetailsAPIView.as_view()),
     path('sector/filter',SectorFilterAPIView.as_view()),
+
+    path('escalations',WorkOrderEscalationsCreateView.as_view()),
+    path('escalations/<int:pk>',WorkorderEscalationsDetailsView.as_view()),
+    path('escalations/filter',WorkorderEscalationsFilterView.as_view()),
+    path('workorder-identifier/filter',WorkOrderIdentifierFilterView.as_view()),
 
 
 ]
