@@ -48,6 +48,7 @@ class WorkOrderActivitySerializer(serializers.ModelSerializer):
         name = None
         if obj.to_value:
             if obj.to_value.startswith('TEAM-'):
+                print("team:::::::::::::::::::::",obj.to_value.split('-')[1])
                 user_group = UserGroup.objects.filter(id=obj.to_value.split('-')[1],is_delete=False).values('name').first()
                 name = user_group.get('name')
             elif obj.to_value.startswith('USER-'):
