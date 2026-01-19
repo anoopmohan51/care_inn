@@ -56,6 +56,9 @@ class WorkOrderEscalationsSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class WorkorderEscalationServicesSerializer(serializers.ModelSerializer):
+    service_name = serializers.SerializerMethodField('get_service_name')
+    def get_service_name(self, obj):
+        return obj.service.name if obj.service else None
     class Meta:
         model = WorkorderEscalationServices
         fields = '__all__'
