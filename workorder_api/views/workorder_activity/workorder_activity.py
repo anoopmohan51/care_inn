@@ -16,11 +16,10 @@ class WorkOrderActivityListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, workorder_id):
-        try:
+        # try:
             field_lookup = {
                 "workorder_id": "workorder_id",
             }
-            print("field:::::::::::::::::::::",workorder_id)
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
@@ -36,12 +35,12 @@ class WorkOrderActivityListView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        except Exception as e:
-            print("error in Work order activity list fetching",e)
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in Work order activity list fetching"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except Exception as e:
+        #     print("error in Work order activity list fetching",e)
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Error in Work order activity list fetching"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
