@@ -132,7 +132,7 @@ class WorkorderNursingStationView(APIView):
                         serializer = WorkOrderNursingStationSerializer(data=workorder_data,context={'request': request})
                         if serializer.is_valid(raise_exception=True):
                             serializer.save()                           
-                            WorkOrderTemp.objects.filter(id=data.get('id')).update(is_approved=True,is_delete=True)
+                            WorkOrderTemp.objects.filter(id=data.get('id')).update(is_approved=True)
                             return CustomResponse(
                                 data=serializer.data,
                                 status="success",
