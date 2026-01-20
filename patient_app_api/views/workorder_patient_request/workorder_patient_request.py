@@ -15,6 +15,7 @@ from core_api.models.external_api_key import ExternalApiKey
 from django.db import transaction
 from workorder_api.models.services import Services
 from datetime import datetime,timedelta
+from workorder_api.models.workorder import WorkOrder
 
 
 def id_generator(size=4, chars=string.ascii_uppercase + string.digits):
@@ -93,9 +94,9 @@ class WorkorderNursingStationView(APIView):
     def post(self, request):
         try:
             data=request.data
-            status = data.get('status',None)
+            workorder_status = data.get('status',None)
             workorder_id = data.get('id',None)
-            if not workorder_id or not status:
+            if not workorder_id or not workorder_status:
                 return CustomResponse(
                     data=None,
                     status="failed",
@@ -127,14 +128,25 @@ class WorkorderNursingStationView(APIView):
                     'status': WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED
                 })
             with transaction.atomic():
-                serializer = WorkOrderNursingStationSerializer(data=workorder_data,context={'request': request})
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    WorkOrderTemp.objects.filter(id=data.get('id')).update(is_approved=True)
+                if status == "APPROVED":
+                        serializer = WorkOrderNursingStationSerializer(data=workorder_data,context={'request': request})
+                        if serializer.is_valid(raise_exception=True):
+                            serializer.save()                           
+                            WorkOrderTemp.objects.filter(id=data.get('id')).update(is_approved=True,is_delete=True)
+                            return CustomResponse(
+                                data=serializer.data,
+                                status="success",
+                                message=["Workorder rejected successfully"],
+                                status_code=status.HTTP_201_CREATED,
+                                content_type="application/json"
+                            )
+                else:
+                    temp = WorkOrderTemp.objects.get(id=data.get('id'))
+                    serializer = WorkOrderTempSerializer(temp)
                     return CustomResponse(
                         data=serializer.data,
                         status="success",
-                        message=["Work order created successfully"],
+                        message=["Workorder rejected successfully"],
                         status_code=status.HTTP_201_CREATED,
                         content_type="application/json"
                     )
