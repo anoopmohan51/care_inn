@@ -21,6 +21,7 @@ from workorder_api.views.folder_details.folder_details import *
 from workorder_api.views.sector.sector import *
 from workorder_api.views.workorder_escaltions.workorder_escaltions import *
 from workorder_api.views.workorder_identifier.workorder_identifier import *
+from workorder_api.views.position_change.position_chnage import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -68,6 +69,8 @@ urlpatterns = [
     path('escalations/<int:pk>',WorkorderEscalationsDetailsView.as_view()),
     path('escalations/filter',WorkorderEscalationsFilterView.as_view()),
     path('workorder-identifier/filter',WorkOrderIdentifierFilterView.as_view()),
+
+    path('position-change',WorkorderPositionChangeView.as_view()),
 
 
 ]

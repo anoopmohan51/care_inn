@@ -73,7 +73,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
             return service.name if service else None
         elif obj.type == 'INFORMATION':
             information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
-            return information.information if information else None
+            return information.title if information else None
         elif obj.type == 'REQUEST':
             request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return request.name if request else None
