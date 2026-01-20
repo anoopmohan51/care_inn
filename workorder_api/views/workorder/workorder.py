@@ -35,7 +35,7 @@ class WorkOrderCreateView(APIView):
             })
             if data.get('when_to_start') == WorkOrder.WHEN_TO_START_NOW:
                 data.update({
-                    'start_date': datetime.now() + timedelta(minutes=1),
+                    'start_date': datetime.datetime.now() + timedelta(minutes=1),
                 })
             else:
                 data.update({
@@ -47,7 +47,7 @@ class WorkOrderCreateView(APIView):
                     sla_minutes = int(service.sla)
                     data.update({
                         'sla_minutes': sla_minutes,
-                        'end_date': datetime.now() + timedelta(minutes=sla_minutes),
+                        'end_date': datetime.datetime.now() + timedelta(minutes=sla_minutes),
                     })
                 else:
                     data.update({
