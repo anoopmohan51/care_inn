@@ -210,7 +210,11 @@ class WorkorderFilterView(APIView):
                 "updated_at": "updated_at",
                 "status": "status",
                 "service": "service",
-                "created_user": "created_user"
+                "created_user": "created_user",
+                "unique_id": "unique_id",
+                "mrd_id": "mrd_id",
+                "room": "room__number",
+                "service_name": "service__name",
             }
             global_filter = GlobalFilter(
                 request,

@@ -7,13 +7,14 @@ from rest_framework import status
 from core_api.filters.global_filter import GlobalFilter
 import string
 import random
-import datetime
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from workorder_api.serializers.workorder_serializer import WorkOrderNursingStationSerializer
 from core_api.permission.external_api_permission import HasValidApiKey
 from rest_framework.permissions import AllowAny
 from core_api.models.external_api_key import ExternalApiKey
 from django.db import transaction
+from workorder_api.models.services import Services
+from datetime import datetime,timedelta
 
 
 def id_generator(size=4, chars=string.ascii_uppercase + string.digits):
@@ -26,20 +27,55 @@ class WorkOrderNursingStationRequestCreateView(APIView):
             api_key = request.headers.get('X-API-KEY')
             external_api_key = ExternalApiKey.objects.get(key=api_key,is_active=True)
             data=request.data
-            now = datetime.datetime.now()
+            service = Services.objects.get(id=data.get('service'),is_delete=False)
+            if not service:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=["Service not found"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
+            now = datetime.now()
             year = '{:02d}'.format(now.year)
             month = '{:02d}'.format(now.month)
-            data.update({
-                "unique_id":"WO-" + year + month + id_generator(),
-                "tenant":external_api_key.tenant.id if external_api_key else None,
-            })
-            serializer = WorkOrderTempSerializer(data=data, context={'request': request})
+            if service.sla:
+                sla_minutes = int(service.sla)
+                end_date = datetime.now() + timedelta(minutes=sla_minutes)
+            else:
+                sla_minutes = None
+                end_date = None
+            workorder_data = {
+                'workorder_type': service.service_type,
+                'room': data.get('room',None),
+                'assignee_type': service.assignee_type,
+                'user': service.user.id if service.user else None,
+                'user_group': service.user_group.id if service.user_group else None,
+                'tenant': external_api_key.tenant.id if external_api_key else None,
+                'description':data.get('description',None),
+                'priority': service.priority if service.priority else None,
+                'when_to_start':WorkOrderTemp.WHEN_TO_START_NOW,
+                'sla_minutes': sla_minutes,
+                'mrd_id': data.get('mrd_id'),
+                'status': 'UNASSIGNED',
+                'created_at':datetime.now(),
+                'updated_at': None,
+                'created_user': None,
+                'updated_user': None,
+                'is_delete': False,
+                'unique_id': "WO-" + year + month + id_generator(),
+                'start_date': datetime.now()+timedelta(minutes=1),
+                'end_date': end_date,
+                'service': service.id,
+                'is_approved': False,
+            }
+            serializer = WorkOrderTempSerializer(data=workorder_data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return CustomResponse(
                     data=serializer.data,
                     status="success",
-                    message=["Work order template created successfully"],
+                    message=["Workorder request created successfully"],
                     status_code=status.HTTP_201_CREATED,
                     content_type="application/json"
                 )
@@ -57,12 +93,13 @@ class WorkorderNursingStationView(APIView):
     def post(self, request):
         try:
             data=request.data
+            status = data.get('status',None)
             workorder_id = data.get('id',None)
-            if not workorder_id:
+            if not workorder_id or not status:
                 return CustomResponse(
                     data=None,
                     status="failed",
-                    message=["Work order id is required"],
+                    message=["Work order id and status are required"],
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
@@ -85,9 +122,10 @@ class WorkorderNursingStationView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
-            workorder_data.update({
-                'status': data.get('status')
-            })
+            if status == "APPROVED":
+                workorder_data.update({
+                    'status': WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED
+                })
             with transaction.atomic():
                 serializer = WorkOrderNursingStationSerializer(data=workorder_data,context={'request': request})
                 if serializer.is_valid(raise_exception=True):
