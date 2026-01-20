@@ -47,7 +47,7 @@ class WorkorderPositionChangeView(APIView):
                         )
                     if record_type == 'INFORMATION':
                         information_id = record.get('information_id')
-                        if information_id:
+                        if not information_id:
                             return CustomResponse(
                                 data=None,
                                 status="failed",
@@ -60,7 +60,7 @@ class WorkorderPositionChangeView(APIView):
                         ).update(position=position)
                     elif record_type == 'REQUESTED_ITEM':
                         item_id = record.get('item_id')
-                        if item_id:
+                        if not item_id:
                             return CustomResponse(
                                 data=None,
                                 status="failed",
@@ -73,7 +73,7 @@ class WorkorderPositionChangeView(APIView):
                         ).update(position=position)
                     elif record_type == 'SERVICE':
                         service_id = record.get('service_id')
-                        if service_id:
+                        if not service_id:
                             return CustomResponse(
                                 data=None,
                                 status="failed",
@@ -86,7 +86,7 @@ class WorkorderPositionChangeView(APIView):
                         ).update(position=position)
                     elif record_type == 'FOLDER':
                         folder_id = record.get('folder_id')
-                        if folder_id:
+                        if not folder_id:
                             return CustomResponse(
                                 data=None,
                                 status="failed",
@@ -94,7 +94,7 @@ class WorkorderPositionChangeView(APIView):
                                 status_code=status.HTTP_400_BAD_REQUEST,
                                 content_type="application/json"
                             )
-                        Folder.objects.filter(id=record.get('folder_id')).update(position=position)
+                        Folder.objects.filter(id=folder_id).update(position=position)
                     else:
                         return CustomResponse(
                             data=None,
