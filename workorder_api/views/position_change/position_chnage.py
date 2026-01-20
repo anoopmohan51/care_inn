@@ -58,7 +58,7 @@ class WorkorderPositionChangeView(APIView):
                         Informations.objects.filter(
                             id=information_id,is_delete=False
                         ).update(position=position)
-                    elif record_type == 'REQUESTED_ITEM':
+                    elif record_type == 'REQUEST':
                         item_id = record.get('item_id')
                         if not item_id:
                             return CustomResponse(
