@@ -212,7 +212,7 @@ class WorkorderFilterView(APIView):
                 "created_user": "created_user",
                 "unique_id": "unique_id",
                 "mrd_id": "mrd_id",
-                "room": "room__number",
+                "room_number": "room__room_number",
                 "service_name": "service__name",
             }
             global_filter = GlobalFilter(
