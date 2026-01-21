@@ -39,6 +39,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     item_id = serializers.SerializerMethodField('get_item_id')
     information_id = serializers.SerializerMethodField('get_information_id')
     request_id = serializers.SerializerMethodField('get_request_id')
+    position = serializers.SerializerMethodField('get_position')
 
     def get_information_id(self, obj):
         if obj.type == 'INFORMATION':
@@ -138,6 +139,21 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
             name = Concat(F('first_name'), Value(' '), F('last_name'))
         ).values('name').first()
         return user.get('name') if user else None
+    
+    def get_position(self,obj):
+        if obj.type == 'FOLDER':
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
+            return folder.position if folder else None
+        elif obj.type == 'SERVICE':
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return service.position if service else None
+        elif obj.type == 'INFORMATION':
+            information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return information.position if information else None
+        elif obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return request.position if request else None
+        return None
     
     class Meta:
         model = WorkOrderSettings
