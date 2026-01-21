@@ -8,7 +8,7 @@ from core_api.response_utils.custom_response import CustomResponse
 from rest_framework import status
 from core_api.permission.permission import has_permission
 from django.db import transaction
-from django.db.models import Q,F,Value,Case,When,IntegerField,OuterRef,Subquery
+from django.db.models import Q,Value
 from core_api.filters.global_filter import GlobalFilter
 from.delete_folder import _delete_folders_recursive
 from workorder_api.models.services import Services
@@ -16,7 +16,6 @@ from workorder_api.models.informations import Informations
 from workorder_api.models.requested_items import RequestedItems
 from staticfiles_api.views.static_files.tempfile_to_permanant import tempfile_to_permanant
 from django.db.models.functions import Concat
-
 
 class WorkOrderSettingsCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -187,64 +186,24 @@ class WorkOrderSettingsFilterView(APIView):
                 "icon": "icon",
                 "created_at": "created_at",
                 "updated_at": "updated_at",
-                "position": "position"
             }
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
                 WorkOrderSettings,
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
-                default_sort="position"
+                default_sort="created_at"
             )
-            folder_position_sq = Subquery(
-                Folder.objects.filter(
-                    workorder_settings_id=OuterRef('id'),
-                    parent_folder_id__isnull=True
-                ).values('position')[:1]
-            )
-
-            service_position_sq = Subquery(
-                Services.objects.filter(
-                    workorder_settings_id=OuterRef('id'),
-                    is_delete=False,
-                    folder_id__isnull=True
-                ).values('position')[:1]
-            )
-
-            information_position_sq = Subquery(
-                Informations.objects.filter(
-                    workorder_settings_id=OuterRef('id'),
-                    is_delete=False,
-                    folder_id__isnull=True
-                ).values('position')[:1]
-            )
-            request_position_sq = Subquery(
-                RequestedItems.objects.filter(
-                    workorder_settings_id=OuterRef('id'),
-                    is_delete=False,
-                    folder_id__isnull=True
-                ).values('position')[:1]
-            )
-            queryset, count = global_filter._get_result(
-                 position=Case(
-                    When(type='FOLDER', then=folder_position_sq),
-                    When(type='SERVICE', then=service_position_sq),
-                    When(type='INFORMATION', then=information_position_sq),
-                    When(type='REQUEST', then=request_position_sq),
-                    default=None,
-                    output_field=IntegerField(),
-                 )
-            )
-            serializer = WorkOrderSettingsListSerializer(queryset, many=True)
+            queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSettingsListSerializer)
+            sorder_data = sorted(data, key=lambda x: x['position'], reverse=False)
             return CustomResponse(
-                data=serializer.data,
+                data=sorder_data,
                 status="success",
                 message=[f"WorkOrderSettings filter fetched successfully"],
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
         except Exception as e:
-            print("error::::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
