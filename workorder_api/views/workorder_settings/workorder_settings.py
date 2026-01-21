@@ -186,7 +186,6 @@ class WorkOrderSettingsFilterView(APIView):
                 "icon": "icon",
                 "created_at": "created_at",
                 "updated_at": "updated_at",
-                "_position":"_position"
             }
             global_filter = GlobalFilter(
                 request,
