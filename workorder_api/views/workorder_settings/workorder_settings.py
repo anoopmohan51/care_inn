@@ -192,7 +192,7 @@ class WorkOrderSettingsFilterView(APIView):
                 field_lookup,
                 WorkOrderSettings,
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
-                default_sort="_position"
+                default_sort="created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSettingsListSerializer)
             return CustomResponse(
