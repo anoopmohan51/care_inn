@@ -2,8 +2,8 @@ from rest_framework import serializers
 from workorder_api.models.requested_items import RequestedItems, ItemDetails
 
 class ItemSerializer(serializers.ModelSerializer):
-    items = serializers.SerializerMethodField('')
-    service_name = serializers.SerializerMethodField('')
+    items = serializers.SerializerMethodField('get_items')
+    service_name = serializers.SerializerMethodField('get_service_name')
     def get_items(self, obj):
         return ItemDetails.objects.filter(item_id=obj.id).values()
     
