@@ -39,7 +39,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     item_id = serializers.SerializerMethodField('get_item_id')
     information_id = serializers.SerializerMethodField('get_information_id')
     request_id = serializers.SerializerMethodField('get_request_id')
-    _position = serializers.SerializerMethodField('get_position')
+    position = serializers.SerializerMethodField('get_position')
 
     def get_information_id(self, obj):
         if obj.type == 'INFORMATION':
