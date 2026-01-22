@@ -233,7 +233,7 @@ class ServiceFilterView(APIView):
                 created_user_name = F('created_user__first_name'),
             )
             return CustomResponse(
-                data=queryset,
+                data={"data":queryset,"total_count":count},
                 status="success",
                 message=["Services filter fetched successfully"],
                 status_code=status.HTTP_200_OK,

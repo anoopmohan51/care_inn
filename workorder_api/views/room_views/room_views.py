@@ -6,8 +6,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from core_api.filters.global_filter import GlobalFilter
-from django.db.models import F,Q
+from django.db.models import F,Q,Value
 from core_api.permission.permission import has_permission
+from django.db.models.functions import Concat
 
 class RoomCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -190,10 +191,10 @@ class RoomFilterView(APIView):
                 default_sort="created_at"
             )
             queryset, count = global_filter._get_result(
-                created_user_name = F('created_user__first_name'),
+                created_user_name = Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
             )
             return CustomResponse(
-                data=queryset,
+                data={"data":queryset,"total_count":count},
                 status="success",
                 message=["Rooms filter fetched successfully"],
                 status_code=status.HTTP_200_OK,

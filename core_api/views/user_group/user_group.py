@@ -211,7 +211,7 @@ class UserGroupFilterView(APIView):
                 members_count = Count('user_group_users')
             )
             return CustomResponse(
-                data=queryset,
+                data={"data":queryset,"total_count":count},
                 status="success",
                 message=["User group list fetched successfully"],
                 status_code=status.HTTP_200_OK,
