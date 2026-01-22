@@ -72,7 +72,7 @@ class WorkorderSettingsFilterView(APIView):
             return CustomResponse(
                 data={
                     "data": sorder_data,
-                    "count": count
+                    "total_count": count
                 },
                 status="success",
                 message=[f"WorkOrderSettings filter fetched successfully"],

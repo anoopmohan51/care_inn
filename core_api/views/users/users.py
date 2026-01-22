@@ -249,7 +249,10 @@ class UserFilterView(APIView):
             )
             queryset, count = global_filter._get_result()
             return CustomResponse(
-                data=queryset,
+                data={
+                    "data": queryset,
+                    "total_count": count
+                },
                 status="success",
                 message=["Users filter fetched successfully"],
                 status_code=status.HTTP_200_OK,

@@ -68,7 +68,10 @@ class WorkorderFilterView(APIView):
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderTempSerializer)
             return CustomResponse(
-                data=queryset,
+                data={
+                    "data": queryset,
+                    "total_count": count
+                },
                 status="success",
                 message=[f"Workorder filter fetched successfully"],
                 status_code=status.HTTP_200_OK,

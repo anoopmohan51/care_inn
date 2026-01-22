@@ -231,7 +231,10 @@ class WorkorderFilterView(APIView):
                 room_description = F('room__description')
             )
             return CustomResponse(
-                data=queryset,
+                data={
+                    "data": queryset,
+                    "total_count": count
+                },
                 status="success",
                 message=["Work order list fetched successfully"],
                 status_code=status.HTTP_200_OK,

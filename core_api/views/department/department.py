@@ -32,7 +32,7 @@ class DepartmentFilterView(APIView):
             queryset, count = global_filter._get_result()
             return CustomResponse(
                 data={
-                    "count": count,
+                    "total_count": count,
                     "data": queryset
                 },
                 status="success",

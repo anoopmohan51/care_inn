@@ -213,7 +213,10 @@ class RoleFilterView(APIView):
             queryset = Role.objects.exclude(name__exact="SUPERADMIN").filter(filter_query).order_by(sort_query)
             serializer = RoleListSerializer(queryset[offset:offset+limit], many=True)
             return CustomResponse(
-                data=serializer.data,
+                data={
+                    "data": serializer.data,
+                    "total_count": queryset.count()
+                },
                 status="success",
                 message=["Role list fetched successfully"],
                 status_code=status.HTTP_200_OK,

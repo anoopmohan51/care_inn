@@ -175,7 +175,7 @@ class RoomTypesFilterView(APIView):
             return CustomResponse(
                 data={
                     "data": queryset,
-                    "count": count
+                    "total_count": count
                 },
                 status="success",
                 message=["Room types filter fetched successfully"],

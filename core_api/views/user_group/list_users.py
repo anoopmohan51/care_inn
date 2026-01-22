@@ -24,7 +24,10 @@ class ListUsersView(APIView):
                 )
             users = _get_users(user_group_id,limit,offset)
             return CustomResponse(
-                data=users,
+                data={
+                    "data": users,
+                    "total_count": None
+                },
                 status="success",
                 message=["Users fetched successfully"],
                 status_code=status.HTTP_200_OK,

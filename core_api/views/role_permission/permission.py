@@ -14,7 +14,10 @@ class PermissionListView(APIView):
             offset=int(request.query_params.get('offset',0))
             permission = Permission.objects.all()[offset:offset+limit].values('id','name')
             return CustomResponse(
-                data=permission,
+                data={
+                    "data": permission,
+                    "total_count": Permission.objects.count()
+                },
                 status="success",
                 message=["User permission fetched successfully"],
                 status_code=status.HTTP_200_OK,

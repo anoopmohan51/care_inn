@@ -197,7 +197,10 @@ class WorkOrderSettingsFilterView(APIView):
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderSettingsListSerializer)
             sorder_data = sorted(queryset, key=lambda x: x['position'], reverse=False)
             return CustomResponse(
-                data=sorder_data,
+                data={
+                    "data": sorder_data,
+                    "total_count": count
+                },
                 status="success",
                 message=[f"WorkOrderSettings filter fetched successfully"],
                 status_code=status.HTTP_200_OK,
