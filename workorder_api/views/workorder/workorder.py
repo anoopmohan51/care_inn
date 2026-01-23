@@ -220,7 +220,7 @@ class WorkorderFilterView(APIView):
                 field_lookup,
                 WorkOrder,
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
-                default_sort="created_at"
+                default_sort="-created_at"
             )
             queryset, count = global_filter._get_result(
                 created_user_name = Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
