@@ -16,11 +16,12 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     created_user_name = serializers.SerializerMethodField('get_created_user_name')
 
     def get_created_user_name(self, obj):
-        user = AppUsers.objects.filter(id=obj.created_user.id,is_delete=False).annotate(
-            name = Concat(F('first_name'), Value(' '), F('last_name'))
-        ).values('name').first()
-        return user.get('name') if user else None
-
+        if obj.created_user:
+            user = AppUsers.objects.filter(id=obj.created_user.id,is_delete=False).annotate(
+                name = Concat(F('first_name'), Value(' '), F('last_name'))
+            ).values('name').first()
+            return user.get('name') if user else None
+        return None
     def get_department_name(self, obj):
         return obj.service.department.name if obj.service and obj.service.department else None
 

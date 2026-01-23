@@ -72,6 +72,7 @@ class WorkOrderTimelineCreateView(APIView):
                 )
                 if workorder_serializer.is_valid(raise_exception=True):
                     workorder_serializer.save()
+                    workorder_response_data = workorder_serializer.data
                     if activity in ['TIMER_START','TIMER_END']:
                         timeline_data = _perpare_timeline_data(self,data,activity,user_id)
                         timeline_id = data.get("id")
@@ -93,13 +94,22 @@ class WorkOrderTimelineCreateView(APIView):
                                 )
                         timeline_serializer.is_valid(raise_exception=True)
                         timeline_serializer.save()
-                        data = timeline_serializer.data
+                        timeline_response_data = timeline_serializer.data
+                        workorder_response_data.update(
+                            {'timeline_id':timeline_response_data.get('id')}
+                        )
                     else:
-                        data = None
+                        workorder_response_data.update(
+                            {'timeline_id':None}
+                        )
             else:
-                data=None
+                workorder_serializer = WorkOrderSerializer(workorder)
+                workorder_response_data = workorder_serializer.data
+                workorder_response_data.update(
+                    {'timeline_id':None}
+                )
             return CustomResponse(
-                data=data,
+                data=workorder_response_data,
                 status="success",
                 message=["Workorder updated successfully"],
                 status_code=status.HTTP_201_CREATED,
@@ -163,6 +173,7 @@ def _prepare_workorder_status_for_activity(self,activity):
         "CLOSE": {"status":WorkOrder.WORKORDER_STATUS_CLOSED},
         "OPEN": {"status":WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED},
         "CAPTURE": {"assignee_type":"USER","user":self.request.user.id},
-        "WAIT": {"status":WorkOrder.WORKORDER_STATUS_PAUSED}
+        "WAIT": {"status":WorkOrder.WORKORDER_STATUS_PAUSED},
+        "BEGIN": {"status":WorkOrder.WORKORDER_STATUS_PAUSED},
     }
     return status_maping.get(activity,None)
