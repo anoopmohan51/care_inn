@@ -7,6 +7,7 @@ from core_api.models.appusers import AppUsers
 from core_api.models.usergroups import UserGroup
 from django.db.models.functions import Concat
 from django.db.models import Value,F
+from workorder_api.models.workorder_timeline import WorkOrderTimeline
 
 class WorkOrderSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField('get_images')
@@ -14,6 +15,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     assignee_name = serializers.SerializerMethodField('get_assignee_name')
     department_name = serializers.SerializerMethodField('get_department_name')
     created_user_name = serializers.SerializerMethodField('get_created_user_name')
+    timeline_id = serializers.SerializerMethodField('get_timeline_id')
 
     def get_created_user_name(self, obj):
         if obj.created_user:
@@ -41,6 +43,12 @@ class WorkOrderSerializer(serializers.ModelSerializer):
 
     def get_images(self, obj):
         return WorkOrderImages.objects.filter(workorder=obj.id).values()
+    
+    def get_timeline_id(self, obj):
+        timeline = WorkOrderTimeline.objects.filter(workorder=obj.id,is_delete=False).order_by('-created_at').first()
+        return timeline.id if timeline else None
+        
+
     class Meta:
         model = WorkOrder
         fields = '__all__'
