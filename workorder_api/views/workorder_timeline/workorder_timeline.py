@@ -38,7 +38,7 @@ class WorkOrderTimelineCreateView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
-            if activity in ['WAIT','BEGIN','NOTE']:
+            if activity in ['WAIT','BEGIN','NOTE','CLOSE']:
                 if activity == 'WAIT':
                     activity_data={
                         'activity':'WAITING',
@@ -56,6 +56,13 @@ class WorkOrderTimelineCreateView(APIView):
                 elif activity == 'NOTE':
                     activity_data={
                         'activity':'NOTE',
+                        'workorder_id':workorder_id,
+                        'initiated_by_id':user_id,
+                        'message':message,
+                    }
+                elif activity == 'CLOSE':
+                    activity_data={
+                        'activity':'CLOSE',
                         'workorder_id':workorder_id,
                         'initiated_by_id':user_id,
                         'message':message,
