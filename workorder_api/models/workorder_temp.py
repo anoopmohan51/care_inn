@@ -71,15 +71,3 @@ class WorkOrderTemp(models.Model):
 
     class Meta:
         db_table = 'workorder_temp'
-
-
-
-class WorkOrderTempRequestedItems(models.Model):
-    workorder = models.ForeignKey(WorkOrderTemp, on_delete=models.PROTECT,null=True)
-    name = models.CharField(max_length=255,null=True)
-    quantity = models.IntegerField(null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-
-    class Meta:
-        db_table = 'workorder_temp_requested_items'
