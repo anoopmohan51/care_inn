@@ -43,8 +43,8 @@ def workorder_post_save(sender, instance, created, **kwargs):
                 'initiated_by': created_user
             })
             if instance.user_group or instance.user:
-                print("instance.user_group::::::::::::::::::::::",instance.user_group)
-                print("instance.user::::::::::::::::::::::",instance.user)
+                print("instance.user_group::::::::::::::::::::::",instance.user_group.id)
+                print("instance.user::::::::::::::::::::::",instance.user.id)
                 activity_data.append({
                     'activity': 'ASSIGNED',
                     'to_value': f"TEAM-{instance.user_group.id}" if instance.user_group else f"USER-{instance.user.id}",
