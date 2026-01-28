@@ -88,12 +88,20 @@ class WorkOrderNursingStationRequestCreateView(APIView):
                     status_code=status.HTTP_201_CREATED,
                     content_type="application/json"
                 )
+            else:
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=[serializer.errors],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
         except Exception as e:
             print("error::::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
-                message=["Error in Temp Work order creation"],
+                message=["Error in Work order request"],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
