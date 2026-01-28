@@ -16,6 +16,7 @@ from django.db import transaction
 from workorder_api.models.services import Services
 from datetime import datetime,timedelta
 from workorder_api.models.workorder import WorkOrder
+from workorder_api.models.rooms import Rooms
 
 
 def id_generator(size=4, chars=string.ascii_uppercase + string.digits):
@@ -30,14 +31,7 @@ class WorkOrderNursingStationRequestCreateView(APIView):
             data=request.data
             request_items = data.get('items',[])
             service = Services.objects.get(id=data.get('service'),is_delete=False)
-            if not service:
-                return CustomResponse(
-                    data=None,
-                    status="failed",
-                    message=["Service not found"],
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content_type="application/json"
-                )
+            room = Rooms.objects.filter(room_number=data.get('room'),is_delete=False).first()
             now = datetime.now()
             year = '{:02d}'.format(now.year)
             month = '{:02d}'.format(now.month)
@@ -56,7 +50,7 @@ class WorkOrderNursingStationRequestCreateView(APIView):
                 description = data.get('description',None)
             workorder_data = {
                 'workorder_type': service.service_type,
-                'room': data.get('room',None),
+                'room': room.id if room else None,
                 'assignee_type': service.assignee_type,
                 'user': service.user.id if service.user else None,
                 'user_group': service.user_group.id if service.user_group else None,
@@ -96,8 +90,15 @@ class WorkOrderNursingStationRequestCreateView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
+        except Services.DoesNotExist as e: 
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Service not found"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
         except Exception as e:
-            print("error::::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
