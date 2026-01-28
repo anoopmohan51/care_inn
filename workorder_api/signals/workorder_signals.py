@@ -42,17 +42,17 @@ def workorder_post_save(sender, instance, created, **kwargs):
                 'workorder': instance,
                 'initiated_by': created_user
             })
-            if instance.user_group or instance.user: 
+            if instance.user_group or instance.user:
                 activity_data.append({
                     'activity': 'ASSIGNED',
-                    'to_value': f"TEAM-{instance.user_group}" if instance.user_group else f"USER-{instance.user}",
+                    'to_value': f"TEAM-{instance.user_group.id}" if instance.user_group else f"USER-{instance.user.id}",
                     'initiated_by': created_user,
                     'workorder': instance
                 })
             if instance.priority:
                 activity_data.append({
                     'activity': 'PRIORITY',
-                    'to_value': f"PRIORITY-{instance.priority}",
+                    'to_value': instance.priority,
                     'initiated_by': created_user,
                     'workorder': instance
                 })
