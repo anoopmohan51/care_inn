@@ -10,16 +10,15 @@ def _get_workorder_summary(tenant_id,workorder_id):
                     COALESCE(close_activity.closed_at, w.end_date) AS closed_date,
 
                     --Initial response time (hours)
-                    EXTRACT(EPOCH FROM (begin_activity.first_begin - w.created_at)) / 3600
-                        AS initial_response_time_hours,
-
+                    EXTRACT(EPOCH FROM (begin_activity.first_begin - w.created_at)) AS initial_response_time,
+                    
                     -- Resolution time (hours)
                     EXTRACT(EPOCH FROM (
                         COALESCE(close_activity.closed_at, w.end_date) - w.created_at
-                    )) / 3600 AS resolution_time_hours,
+                    )) AS resolution_time,
 
                     --Total working time (minutes)
-                    COALESCE(timeline_sum.total_duration, 0) AS total_working_time_minutes,
+                    COALESCE(timeline_sum.total_duration, 0) AS total_working_time,
 
                     --Created user name
                     CONCAT(cu.first_name, ' ', cu.last_name) AS created_user_name,
