@@ -94,16 +94,16 @@ def workorder_post_save(sender, instance, created, **kwargs):
                     if instance.assignee_type == 'USER' and original.assignee_type=='TEAM':
                         changes.append({
                             'activity': 'ASSIGNED',
-                            'from_value': f"TEAM-{original.user_group}",
-                            'to_value': f"USER-{instance.user}",
+                            'from_value': f"TEAM-{original.user_group.id}",
+                            'to_value': f"USER-{instance.user.id}",
                             'initiated_by': created_user,
                             'workorder': instance
                         })
                     elif instance.assignee_type == 'TEAM' and original.assignee_type=='USER':
                         changes.append({
                             'activity': 'ASSIGNED',
-                            'from_value': f"USER-{original.user}",
-                            'to_value': f"USER-{instance.user_group}",
+                            'from_value': f"USER-{original.user.id}",
+                            'to_value': f"USER-{instance.user_group.id}",
                             'initiated_by': created_user,
                             'workorder': instance
                         })
