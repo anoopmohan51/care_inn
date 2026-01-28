@@ -20,6 +20,8 @@ class Informations(models.Model):
     icon = models.CharField(max_length=100,null=True)
     color = models.CharField(max_length=50,null=True)
     position = models.IntegerField(default=0,null=True)
+    title_arabic = models.CharField(max_length=255,null=True)
+    information_arabic = models.TextField(null=True)
 
 
     class Meta:
