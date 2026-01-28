@@ -19,7 +19,7 @@ def _get_workorder_summary(tenant_id,workorder_id):
                     )) / 3600 AS resolution_time_hours,
 
                     --Total working time (minutes)
-                    COALESCE(timeline_sum.total_duration/60.0, 0) AS total_working_time_minutes,
+                    COALESCE(timeline_sum.total_duration, 0) AS total_working_time_minutes,
 
                     --Created user name
                     CONCAT(cu.first_name, ' ', cu.last_name) AS created_user_name,
