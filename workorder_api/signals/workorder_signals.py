@@ -54,7 +54,7 @@ def workorder_post_save(sender, instance, created, **kwargs):
             if instance.priority:
                 activity_data.append({
                     'activity': 'PRIORITY',
-                    'to_value': f"PRIORITY-{instance.priority}",
+                    'to_value': instance.priority,
                     'initiated_by': created_user,
                     'workorder': instance
                 })
