@@ -8,6 +8,7 @@ from core_api.models.usergroups import UserGroup
 from django.db.models.functions import Concat
 from django.db.models import Value,F
 from workorder_api.models.workorder_timeline import WorkOrderTimeline
+from django.db.models import Sum
 
 class WorkOrderSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField('get_images')
@@ -16,6 +17,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     department_name = serializers.SerializerMethodField('get_department_name')
     created_user_name = serializers.SerializerMethodField('get_created_user_name')
     timeline_id = serializers.SerializerMethodField('get_timeline_id')
+    total_working_time = serializers.SerializerMethodField('get_total_working_time')
 
     def get_created_user_name(self, obj):
         if obj.created_user:
@@ -47,7 +49,9 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     def get_timeline_id(self, obj):
         timeline = WorkOrderTimeline.objects.filter(workorder=obj.id,is_delete=False).order_by('-created_at').first()
         return timeline.id if timeline else None
-        
+    
+    def get_total_working_time(self, obj):
+        return WorkOrderTimeline.objects.filter(workorder=obj.id,is_delete=False).aggregate(total_duration=Sum('duration'))['total_duration']
 
     class Meta:
         model = WorkOrder

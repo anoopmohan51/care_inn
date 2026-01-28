@@ -7,6 +7,7 @@ from patient_app_api.views.workorder_patient_request.workorder_patient_request i
 from patient_app_api.views.workorder.workorder import *
 from patient_app_api.views.folder_details.folder_details import *
 from patient_app_api.views.workorder_ratings.workorder_ratings import *
+from patient_app_api.views.list_requested_workorder.workorder_list import *
 
 urlpatterns = [
     path('workorder-settings/<int:id>',WorkorderSettingsDetailsView.as_view()),
@@ -21,5 +22,7 @@ urlpatterns = [
     path('workorder/<int:id>',WorkorderDetailsView.as_view()),
     path('folder-details/<int:id>',FolderDetailsView.as_view()),
     path('workorder-ratings',WorkOrderRatingView.as_view()),
+    path('workorder-list-approval',WorkorderListApprovalView.as_view()),
+    
 
 ]

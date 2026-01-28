@@ -21,6 +21,7 @@ class RequestedItems(models.Model):
     position = models.IntegerField(default=0,null=True)
     icon = models.CharField(max_length=100,null=True)
     static_file = models.ForeignKey(StaticFiles, on_delete=models.PROTECT,null=True)
+    name_arabic = models.CharField(max_length=255,null=True)
 
     class Meta:
         db_table = 'workorder_api_requested_items'

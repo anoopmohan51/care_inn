@@ -14,7 +14,7 @@ class WorkOrderTimelineCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        try:
+        # try:
             data = request.data
             activity = data.get('activity')
             workorder_id = data.get('workorder')
@@ -85,6 +85,9 @@ class WorkOrderTimelineCreateView(APIView):
                         timeline_id = data.get("id")
                         if timeline_id:
                             timeline = WorkOrderTimeline.objects.get(id=timeline_id)
+                            timeline_data.update({
+                                "from_date":timeline.from_date,
+                            })
                             timeline_serializer = WorkOrderTimelineSerializer(
                                 timeline,
                                 data=timeline_data,
@@ -122,22 +125,23 @@ class WorkOrderTimelineCreateView(APIView):
                 status_code=status.HTTP_201_CREATED,
                 content_type="application/json"
             )        
-        except WorkOrder.DoesNotExist:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Work order not found"],
-                status_code=status.HTTP_404_NOT_FOUND,
-                content_type="application/json"
-            )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in updating workorder"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except WorkOrder.DoesNotExist:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Work order not found"],
+        #         status_code=status.HTTP_404_NOT_FOUND,
+        #         content_type="application/json"
+        #     )
+        # except Exception as e:
+        #     print("error::::::::::::::::::::::",e)
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Error in updating workorder"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
 
 class WorkOrderTimelineListView(APIView):
     authentication_classes = [JWTAuthentication]

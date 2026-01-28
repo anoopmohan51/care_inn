@@ -51,5 +51,7 @@ class Services(models.Model):
     color = models.CharField(max_length=50,null=True)
     position = models.IntegerField(default=0,null=True)
     department = models.ForeignKey(Department, on_delete=models.PROTECT,null=True)
+    name_arabic = models.CharField(max_length=255,null=True)
+    description_arabic = models.TextField(null=True)
     class Meta:
         db_table = 'workorder_api_services'
