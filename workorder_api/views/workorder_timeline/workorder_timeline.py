@@ -14,7 +14,7 @@ class WorkOrderTimelineCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        # try:
+        try:
             data = request.data
             activity = data.get('activity')
             workorder_id = data.get('workorder')
@@ -70,6 +70,55 @@ class WorkOrderTimelineCreateView(APIView):
                 WorkOrderActivity.objects.create(**activity_data)
             workorder = WorkOrder.objects.get(id=data.get('workorder'),is_delete=False)
             workorder_data = _prepare_workorder_status_for_activity(self,activity)
+            # if activity in ['TIMER_START','TIMER_END']:
+            #     timeline_data = _perpare_timeline_data(self,data,activity,user_id)
+            #     timeline_id = data.get("id")
+            #     if timeline_id:
+            #         timeline = WorkOrderTimeline.objects.get(id=timeline_id)
+            #         timeline_data.update({
+            #             "from_date":timeline.from_date,
+            #         })
+            #         timeline_serializer = WorkOrderTimelineSerializer(
+            #             timeline,
+            #             data=timeline_data,
+            #             context={'request': request},
+            #             partial=True
+            #         )
+            #         timeline_serializer.is_valid(raise_exception=True)
+            #         timeline_serializer.save()
+            #         timeline_response_data = timeline_serializer.data
+            #         workorder_data.update({
+
+            #             "actual_end_date":timeline_response_data.get('to_date'),
+            #         })
+            #         # workorder_data.update(
+            #         #     {'timeline_id':timeline_response_data.get('id')}
+            #         # )
+            #     else:
+            #         timeline_serializer = WorkOrderTimelineSerializer(
+            #             data=timeline_data,
+            #             context={'request': request}
+            #         )
+            #         timeline_serializer.is_valid(raise_exception=True)
+            #         timeline_serializer.save()
+            #         timeline_response_data = timeline_serializer.data
+            #         workorder_data.update({
+            #             "actual_start_date":timeline_response_data.get('from_date'),
+            #             "actual_end_date":timeline_response_data.get('to_date'),
+            #         })
+            #         # workorder_data.update(
+            #         #     {'timeline_id':timeline_response_data.get('id')}
+            #         # )
+            # if workorder_data:
+            #     workorder_serializer = WorkOrderSerializer(
+            #         workorder,
+            #         data=workorder_data,
+            #         context={'request': request},
+            #         partial=True
+            #     )
+            #     workorder_serializer.is_valid(raise_exception=True)
+            #     workorder_serializer.save()
+            
             if workorder_data:
                 workorder_serializer = WorkOrderSerializer(
                     workorder,
@@ -125,23 +174,22 @@ class WorkOrderTimelineCreateView(APIView):
                 status_code=status.HTTP_201_CREATED,
                 content_type="application/json"
             )        
-        # except WorkOrder.DoesNotExist:
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=["Work order not found"],
-        #         status_code=status.HTTP_404_NOT_FOUND,
-        #         content_type="application/json"
-        #     )
-        # except Exception as e:
-        #     print("error::::::::::::::::::::::",e)
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=["Error in updating workorder"],
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content_type="application/json"
-        #     )
+        except WorkOrder.DoesNotExist as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Work order not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in updating workorder"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
 
 class WorkOrderTimelineListView(APIView):
     authentication_classes = [JWTAuthentication]

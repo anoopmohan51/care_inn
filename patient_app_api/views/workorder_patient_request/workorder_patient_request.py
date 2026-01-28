@@ -28,7 +28,7 @@ class WorkOrderNursingStationRequestCreateView(APIView):
             api_key = request.headers.get('X-API-KEY')
             external_api_key = ExternalApiKey.objects.get(key=api_key,is_active=True)
             data=request.data
-            request_items = data.get('items',None)
+            request_items = data.get('items',[])
             service = Services.objects.get(id=data.get('service'),is_delete=False)
             if not service:
                 return CustomResponse(
@@ -48,7 +48,10 @@ class WorkOrderNursingStationRequestCreateView(APIView):
                 sla_minutes = None
                 end_date = None
             if service.service_type =="REQUEST":
-                description = ",".join(f"{k}:{v}" for k, v in request_items.items())
+                if request_items:
+                    description = ",".join(f"{k}:{v}" for k, v in request_items.items())
+                else:
+                    description = data.get('description',None)
             else:
                 description = data.get('description',None)
             workorder_data = {
