@@ -64,7 +64,7 @@ class WorkorderFilterView(APIView):
                 field_lookup,
                 WorkOrderTemp,
                 base_filter=Q(tenant=external_api_key.tenant,mrd_id=mrd_id,room__room_number=room_number,is_delete=False),
-                default_sort="created_at"
+                default_sort="-created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderTempSerializer)
             return CustomResponse(
