@@ -141,12 +141,12 @@ class WorkorderNursingStationView(APIView):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
-            if status == "APPROVED":
+            if workorder_status == "APPROVED":
                 workorder_data.update({
                     'status': WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED
                 })
             with transaction.atomic():
-                if status == "APPROVED":
+                if workorder_status == "APPROVED":
                         serializer = WorkOrderNursingStationSerializer(data=workorder_data,context={'request': request})
                         if serializer.is_valid(raise_exception=True):
                             serializer.save()                           
@@ -154,17 +154,18 @@ class WorkorderNursingStationView(APIView):
                             return CustomResponse(
                                 data=serializer.data,
                                 status="success",
-                                message=["Workorder rejected successfully"],
+                                message=["Workorder approved"],
                                 status_code=status.HTTP_201_CREATED,
                                 content_type="application/json"
                             )
                 else:
+                    print("inside rejected::::::::::::::::::::::::::")
                     temp = WorkOrderTemp.objects.get(id=data.get('id'))
                     serializer = WorkOrderTempSerializer(temp)
                     return CustomResponse(
                         data=serializer.data,
                         status="success",
-                        message=["Workorder rejected successfully"],
+                        message=["Workorder rejected"],
                         status_code=status.HTTP_201_CREATED,
                         content_type="application/json"
                     )

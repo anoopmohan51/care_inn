@@ -61,7 +61,7 @@ class UserUpdateView(generics.UpdateAPIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        except AppUsers.DoesNotExist:
+        except AppUsers.DoesNotExist as e:
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -92,13 +92,13 @@ class UserUpdateView(generics.UpdateAPIView):
                     content_type="application/json"
                 )
             return CustomResponse(
-                data=serializer.errors,
+                data=None,
                 status="failed",
-                message=["Error in User updating"],
+                message=[serializer.errors],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
-        except AppUsers.DoesNotExist:
+        except AppUsers.DoesNotExist as e:
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -129,9 +129,9 @@ class UserUpdateView(generics.UpdateAPIView):
                     content_type="application/json"
                 )
             return CustomResponse(
-                data=serializer.errors,
+                data=None,
                 status="failed",
-                message=["Error in User updating"],
+                message=[serializer.errors],
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content_type="application/json"
             )
@@ -247,7 +247,7 @@ class UserFilterView(APIView):
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter._get_result()
+            queryset, count = global_filter.get_serialized_result(serializer=UserSerializer)
             return CustomResponse(
                 data={
                     "data": queryset,

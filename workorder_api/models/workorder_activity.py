@@ -26,6 +26,9 @@ class WorkOrderActivity(models.Model):
         ('TIMER_END','TIMER_END'),
         ('WAITING','WAITING'),
         ('SLA','SLA'),
+        ('CLOSED','CLOSED'),
+        ('OPEN','OPEN'),
+        ('PAUSED','PAUSED'),
     ]
     SOURCE_CHOICES = [
         ('SYSTEM','SYSTEM'),

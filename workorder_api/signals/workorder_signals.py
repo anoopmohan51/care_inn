@@ -150,9 +150,25 @@ def workorder_post_save(sender, instance, created, **kwargs):
                         if instance.status==WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED and \
                             original.status==WorkOrder.WORKORDER_STATUS_CLOSED:
                             changes.append({
-                                'activity': 'STATUS',
+                                'activity': 'OPEN',
                                 'from_value':original.status,
                                 'to_value': 'OPEN',
+                                'initiated_by': created_user,
+                                'workorder': instance
+                            })
+                        elif instance.status==WorkOrder.WORKORDER_STATUS_CLOSED:
+                            changes.append({
+                                'activity': 'CLOSED',
+                                'from_value': None,
+                                'to_value': 'CLOSED',
+                                'initiated_by': created_user,
+                                'workorder': instance
+                            })
+                        elif instance.status==WorkOrder.WORKORDER_STATUS_PAUSED:
+                            changes.append({
+                                'activity': 'PAUSED',
+                                'from_value': None,
+                                'to_value': 'PAUSED',
                                 'initiated_by': created_user,
                                 'workorder': instance
                             })
