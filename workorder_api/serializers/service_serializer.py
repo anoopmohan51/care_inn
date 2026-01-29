@@ -17,5 +17,6 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         request = self.context.get('request')
+        validated_data.pop('position')
         validated_data['updated_user'] = request.user
         return super().update(instance, validated_data)
