@@ -22,6 +22,7 @@ class WorkOrderTimelineCreateView(APIView):
             message = data.get('message',None)
             to = data.get('to',None)
             user_id = request.user.id
+            activity_data = {}
             if not activity or not workorder_id:
                 return CustomResponse(
                     data=None,
@@ -61,14 +62,8 @@ class WorkOrderTimelineCreateView(APIView):
                         'initiated_by_id':user_id,
                         'message':message,
                     }
-                # elif activity == 'CLOSE':
-                #     activity_data={
-                #         'activity':'CLOSE',
-                #         'workorder_id':workorder_id,
-                #         'initiated_by_id':user_id,
-                #         'message':message,
-                #     }
-                WorkOrderActivity.objects.create(**activity_data)
+                if activity_data:
+                    WorkOrderActivity.objects.create(**activity_data)
             workorder = WorkOrder.objects.get(id=data.get('workorder'),is_delete=False)
             workorder_data = _prepare_workorder_status_for_activity(self,activity)
             if activity in ['TIMER_START','TIMER_END']:
