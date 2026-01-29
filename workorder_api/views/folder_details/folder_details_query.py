@@ -91,7 +91,7 @@ def _get_folder_details(folder_id,limit,offset):
                     i.static_file_id::uuid,
                     i.folder_id::integer,
                     i.workorder_settings_id,
-                    i.information::text,
+                    i.title::text,
                     'INFORMATION'::text,
                     NULL::integer,
                     NULL::integer,
