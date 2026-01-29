@@ -156,6 +156,14 @@ def workorder_post_save(sender, instance, created, **kwargs):
                                 'initiated_by': created_user,
                                 'workorder': instance
                             })
+                        elif instance.status==WorkOrder.WORKORDER_STATUS_CLOSED:
+                            changes.append({
+                                'activity': 'STATUS',
+                                'from_value': original.status,
+                                'to_value': 'CLOSED',
+                                'initiated_by': created_user,
+                                'workorder': instance
+                            })
                         else:
                             changes.append({
                                 'activity': 'STATUS',
