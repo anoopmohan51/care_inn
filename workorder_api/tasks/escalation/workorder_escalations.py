@@ -9,7 +9,7 @@ load_dotenv()
 @shared_task
 def workorder_escalations_task(tenant_id:int):
     try:
-        print("inside escalation task::::::::::::")
+        print("inside escalation task::::::::::::::::::::::::::")
         workorder_records = WorkOrder.objects.filter(tenant_id=tenant_id,is_delete=False)
         for workorder in workorder_records:
             status = workorder.status
