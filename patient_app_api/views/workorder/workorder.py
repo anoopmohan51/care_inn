@@ -10,6 +10,7 @@ from workorder_api.models import WorkOrderTemp
 from workorder_api.serializers.workorder_temp_serializer import WorkOrderTempSerializer
 from core_api.models.external_api_key import ExternalApiKey
 from rest_framework import status
+from .workorder_query import get_workorder_query
 
 class WorkorderDetailsView(APIView):
     permission_classes = [AllowAny,HasValidApiKey]
@@ -52,21 +53,25 @@ class WorkorderFilterView(APIView):
             mrd_id = request.query_params.get('mrd_id')
             room_number = request.query_params.get('room_number')
             external_api_key = ExternalApiKey.objects.get(key=api_key,is_active=True)
-            field_lookup = {
-                "id": "id",
-                "name": "name",
-                "description": "description",
-                "created_at": "created_at",
-                "updated_at": "updated_at"
-            }
-            global_filter = GlobalFilter(
-                request,
-                field_lookup,
-                WorkOrderTemp,
-                base_filter=Q(tenant=external_api_key.tenant,mrd_id=mrd_id,room__room_number=room_number,is_delete=False),
-                default_sort="-created_at"
-            )
-            queryset, count = global_filter.get_serialized_result(serializer=WorkOrderTempSerializer)
+            limit = request.query_params.get('limit')
+            offset = request.query_params.get('offset')
+            queryset = get_workorder_query(external_api_key.tenant.id,mrd_id,limit,offset)
+            count = len(queryset)
+            # field_lookup = {
+            #     "id": "id",
+            #     "name": "name",
+            #     "description": "description",
+            #     "created_at": "created_at",
+            #     "updated_at": "updated_at"
+            # }
+            # global_filter = GlobalFilter(
+            #     request,
+            #     field_lookup,
+            #     WorkOrderTemp,
+            #     base_filter=Q(tenant=external_api_key.tenant,mrd_id=mrd_id,room__room_number=room_number,is_delete=False),
+            #     default_sort="-created_at"
+            # )
+            # queryset, count = global_filter.get_serialized_result(serializer=WorkOrderTempSerializer)
             return CustomResponse(
                 data={
                     "data": queryset,
