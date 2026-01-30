@@ -50,43 +50,43 @@ services:
       redis:
         condition: service_healthy
   
-  # celery_worker:
-  #   build: .
-  #   command: celery -A care_inn worker --loglevel=info
-  #   volumes:
-  #     - .:/app
-  #   environment:
-  #     - DEBUG=1
-  #     - DB_NAME=careinn_dev1_db
-  #     - DB_USER=careinn_user
-  #     - DB_PASSWORD=Careinn12**
-  #     - DB_HOST=db
-  #     - DB_PORT=5432
-  #     - CELERY_BROKER_URL=redis://redis:6379/0
-  #     - CELERY_RESULT_BACKEND=redis://redis:6379/0
-  #   depends_on:
-  #     - db
-  #     - redis
-  #     - care_inn
+  celery_worker:
+    build: .
+    command: celery -A care_inn worker --loglevel=info --uid=nobody --gid=nogroup
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=1
+      - DB_NAME=careinn_dev1_db
+      - DB_USER=careinn_user
+      - DB_PASSWORD=Careinn12**
+      - DB_HOST=db
+      - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - care_inn
 
-  # celery_beat:
-  #   build: .
-  #   command: celery -A care_inn beat --loglevel=info
-  #   volumes:
-  #     - .:/app
-  #   environment:
-  #     - DEBUG=1
-  #     - DB_NAME=careinn_dev1_db
-  #     - DB_USER=careinn_user
-  #     - DB_PASSWORD=Careinn12**
-  #     - DB_HOST=db
-  #     - DB_PORT=5432
-  #     - CELERY_BROKER_URL=redis://redis:6379/0
-  #     - CELERY_RESULT_BACKEND=redis://redis:6379/0
-  #   depends_on:
-  #     - db
-  #     - redis
-  #     - care_inn
+  celery_beat:
+    build: .
+    command: celery -A care_inn beat --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=1
+      - DB_NAME=careinn_dev1_db
+      - DB_USER=careinn_user
+      - DB_PASSWORD=Careinn12**
+      - DB_HOST=db
+      - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - care_inn
 
   adminer:
     image: adminer:latest
