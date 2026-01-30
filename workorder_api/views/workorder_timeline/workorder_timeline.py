@@ -66,8 +66,8 @@ class WorkOrderTimelineCreateView(APIView):
                     WorkOrderActivity.objects.create(**activity_data)
             workorder = WorkOrder.objects.get(id=data.get('workorder'),is_delete=False)
             workorder_data = _prepare_workorder_status_for_activity(self,activity)
+            timeline_data = _perpare_timeline_data(self,data,activity,user_id)
             if activity in ['TIMER_START','TIMER_END','CLOSE']:
-                timeline_data = _perpare_timeline_data(self,data,activity,user_id)
                 timeline_id = data.get("id")
                 if timeline_id and activity in ['TIMER_END','CLOSE']:
                     timeline = WorkOrderTimeline.objects.get(id=timeline_id)
@@ -171,8 +171,8 @@ def _perpare_timeline_data(self,data,activity,user_id):
     timeline_data = data.copy()
     timeline_data['initiated_by'] = user_id
     workorder = WorkOrder.objects.get(id=data.get('workorder'))
+    current_time = datetime.now()
     if activity=='TIMER_START':
-        current_time = datetime.now()
         timeline_data.update({
             'from_date':current_time,
             'actual_start_date':current_time,
@@ -180,15 +180,20 @@ def _perpare_timeline_data(self,data,activity,user_id):
         })
     elif activity=='TIMER_END':
         timeline_data.update({
-            'to_date':datetime.now(),
-            'actual_end_date':datetime.now(),
+            'to_date':current_time,
+            'actual_end_date':current_time,
         })
     elif activity=='CLOSE':
         if workorder.status==WorkOrder.WORKORDER_STATUS_IN_PROGRESS:
             timeline_data.update({
-                'to_date':datetime.now(),
-                'actual_end_date':datetime.now(),
+                'to_date':current_time,
+                'actual_end_date':current_time,
             })
+    elif activity=='OPEN':
+        timeline_data.update({
+            'actual_start_date':current_time,
+            'actual_end_date':current_time + timedelta(minutes=int(workorder.sla_minutes)),
+        })
     return timeline_data
 
 def _prepare_workorder_status_for_activity(self,activity):
