@@ -7,8 +7,11 @@ from django.contrib.auth import get_user_model,authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from core_api.models.role_permission import RolePermission
 from core_api.serializers.role_permission_serializer import RolePermissionSerializer
+from rest_framework.permissions import AllowAny
 
 class UserLoginView(generics.CreateAPIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
     def post(self, request):
         try:
             data = request.data
