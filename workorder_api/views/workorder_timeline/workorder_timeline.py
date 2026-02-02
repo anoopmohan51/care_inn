@@ -10,6 +10,7 @@ from datetime import datetime
 from workorder_api.models import WorkOrder
 from workorder_api.models import WorkOrderActivity
 from datetime import timedelta,datetime
+from workorder_api.models import WorkOrderTimeline
 
 class WorkOrderTimelineCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -28,6 +29,14 @@ class WorkOrderTimelineCreateView(APIView):
                     data=None,
                     status="failed",
                     message=["Activity and workorder are required"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
+            if WorkOrderTimeline.objects.exclude(workorder=workorder_id).filter(assigned_to=user_id,in_progress=True).exists():
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=["Another work order is already in progress."],
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content_type="application/json"
                 )
@@ -67,7 +76,7 @@ class WorkOrderTimelineCreateView(APIView):
             workorder = WorkOrder.objects.get(id=data.get('workorder'),is_delete=False)
             workorder_data = _prepare_workorder_status_for_activity(self,activity)
             timeline_data = _perpare_timeline_data(self,data,activity,user_id)
-            if activity in ['TIMER_START','TIMER_END','CLOSE']:
+            if activity in ['TIMER_START','TIMER_END','CLOSE','OPEN']:
                 timeline_id = data.get("id")
                 if timeline_id and activity in ['TIMER_END','CLOSE']:
                     timeline = WorkOrderTimeline.objects.get(id=timeline_id)
@@ -134,6 +143,7 @@ class WorkOrderTimelineCreateView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print("error::::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -177,11 +187,13 @@ def _perpare_timeline_data(self,data,activity,user_id):
             'from_date':current_time,
             'actual_start_date':current_time,
             'actual_end_date':current_time + timedelta(minutes=int(workorder.sla_minutes)),
+            'in_progress':True,
         })
     elif activity=='TIMER_END':
         timeline_data.update({
             'to_date':current_time,
-            'actual_end_date':current_time,
+            'actual_end_date':current_time + timedelta(minutes=int(workorder.sla_minutes)),
+            'in_progress':False,
         })
     elif activity=='CLOSE':
         if workorder.status==WorkOrder.WORKORDER_STATUS_IN_PROGRESS:

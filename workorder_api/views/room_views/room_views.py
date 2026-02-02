@@ -181,7 +181,9 @@ class RoomFilterView(APIView):
                 "name": "name",
                 "description": "description",
                 "created_at": "created_at",
-                "updated_at": "updated_at"
+                "updated_at": "updated_at",
+                "room_type_name": "room_type__name",
+                "sector_name": "sector__name",
             }
             global_filter = GlobalFilter(
                 request,
@@ -192,6 +194,8 @@ class RoomFilterView(APIView):
             )
             queryset, count = global_filter._get_result(
                 created_user_name = Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
+                room_type_name = F('room_type__name'),
+                sector_name = F('sector__name'),
             )
             return CustomResponse(
                 data={"data":queryset,"total_count":count},
