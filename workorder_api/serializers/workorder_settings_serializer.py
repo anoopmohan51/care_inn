@@ -196,5 +196,5 @@ class FolderSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         request = self.context.get('request')
-        validated_data.pop('position')
+        validated_data.pop('position',None)
         return super().update(instance, validated_data)
