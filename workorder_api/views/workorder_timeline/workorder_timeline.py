@@ -11,6 +11,7 @@ from workorder_api.models import WorkOrder
 from workorder_api.models import WorkOrderActivity
 from datetime import timedelta,datetime
 from workorder_api.models import WorkOrderTimeline
+from django.db.models import Sum
 
 class WorkOrderTimelineCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -92,6 +93,13 @@ class WorkOrderTimelineCreateView(APIView):
                     timeline_serializer.is_valid(raise_exception=True)
                     timeline_serializer.save()
                     timeline_response_data = timeline_serializer.data
+                    if activity == "TIMER_END":
+                        total_duration = WorkOrderTimeline.objects.filter(workorder=workorder_id).aggregate(total_duration=Sum('duration'))['total_duration']
+                        print('total_duration::::::::::::::::::::',total_duration)
+                        workorder_data.update({
+                    "actual_end_date":timeline_data.get('actual_end_date')-timedelta(minutes= int(total_duration))
+                })
+
                     workorder_data.update({
                     "actual_end_date":timeline_data.get('actual_end_date')
                 })
@@ -143,7 +151,6 @@ class WorkOrderTimelineCreateView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error::::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
