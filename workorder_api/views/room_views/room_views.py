@@ -194,7 +194,7 @@ class RoomFilterView(APIView):
             )
             queryset, count = global_filter._get_result(
                 created_user_name = Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
-                room_type_name = F('room_type__name'),
+                room_type_name = F('room_type__room_type'),
                 sector_name = F('sector__name'),
             )
             return CustomResponse(
@@ -205,6 +205,7 @@ class RoomFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print("error::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
