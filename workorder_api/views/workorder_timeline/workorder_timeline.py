@@ -95,7 +95,6 @@ class WorkOrderTimelineCreateView(APIView):
                     timeline_response_data = timeline_serializer.data
                     if activity == "TIMER_END":
                         total_duration = WorkOrderTimeline.objects.filter(workorder=workorder_id).aggregate(total_duration=Sum('duration'))['total_duration']
-                        print('total_duration::::::::::::::::::::',total_duration)
                         workorder_data.update({
                     "actual_end_date":timeline_data.get('actual_end_date')-timedelta(minutes= int(total_duration))
                 })
@@ -111,10 +110,15 @@ class WorkOrderTimelineCreateView(APIView):
                     timeline_serializer.is_valid(raise_exception=True)
                     timeline_serializer.save()
                     timeline_response_data = timeline_serializer.data
-                    workorder_data.update({
-                    "actual_start_date":timeline_data.get('actual_start_date'),
-                    "actual_end_date":timeline_data.get('actual_end_date')
-                })
+                    if not WorkorderTimeline.objects.filter(workorder=workorder_id).exists():   
+                        workorder_data.update({
+                            "actual_start_date":timeline_data.get('actual_start_date'),
+                            "actual_end_date":timeline_data.get('actual_end_date')
+                        })
+                    else:
+                        workorder_data.update({
+                            "actual_end_date":timeline_data.get('actual_end_date')
+                        })
             if workorder_data:
                 workorder_serializer = WorkOrderSerializer(
                     workorder,
