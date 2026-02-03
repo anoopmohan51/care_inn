@@ -205,7 +205,6 @@ class RoomFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
