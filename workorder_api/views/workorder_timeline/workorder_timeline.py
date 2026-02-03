@@ -76,7 +76,12 @@ class WorkOrderTimelineCreateView(APIView):
             workorder = WorkOrder.objects.get(id=data.get('workorder'),is_delete=False)
             workorder_data = _prepare_workorder_status_for_activity(self,activity)
             timeline_data = _perpare_timeline_data(self,data,activity,user_id)
-            if activity in ['TIMER_START','TIMER_END','CLOSE','OPEN']:
+            if activity == 'OPEN':
+                workorder_data.update({
+                    "actual_start_date":timeline_data.get("actual_start_date"),
+                    "actual_end_date":timeline_data.get("actual_end_date")
+                })
+            if activity in ['TIMER_START','TIMER_END','CLOSE']:
                 timeline_id = data.get("id")
                 if timeline_id and activity in ['TIMER_END','CLOSE']:
                     timeline = WorkOrderTimeline.objects.get(id=timeline_id)
