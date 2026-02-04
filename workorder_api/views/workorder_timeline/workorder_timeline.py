@@ -81,6 +81,7 @@ class WorkOrderTimelineCreateView(APIView):
                     "actual_start_date":timeline_data.get("actual_start_date"),
                     "actual_end_date":timeline_data.get("actual_end_date")
                 })
+                WorkOrderTimeline.objects.filter(workorder=workorder_id,is_delete=False).update(is_colse=False)
             if activity in ['TIMER_START','TIMER_END','CLOSE']:
                 timeline_id = data.get("id")
                 if timeline_id and activity in ['TIMER_END','CLOSE']:
