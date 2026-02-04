@@ -103,6 +103,7 @@ class WorkOrderTimelineCreateView(APIView):
                         workorder_data.update({
                             "actual_end_date":timeline_data.get('actual_end_date')-timedelta(seconds= int(total_duration))
                         })
+                        print("inside:::::::::::::::::::::::::::::::::::::")
                     else:
                         workorder_data.update({
                             "actual_end_date":timeline_data.get('actual_end_date')
