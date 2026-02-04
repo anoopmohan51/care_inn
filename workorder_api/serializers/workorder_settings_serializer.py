@@ -40,6 +40,7 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
     information_id = serializers.SerializerMethodField('get_information_id')
     request_id = serializers.SerializerMethodField('get_request_id')
     position = serializers.SerializerMethodField('get_position')
+    name_arabic = serializers.SerializerMethodField('get_name_arabic')
 
     def get_information_id(self, obj):
         if obj.type == 'INFORMATION':
@@ -153,6 +154,21 @@ class WorkOrderSettingsListSerializer(serializers.ModelSerializer):
         elif obj.type == 'REQUEST':
             request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
             return request.position if request else None
+        return None
+    
+    def get_name_arabic(self, obj):
+        if obj.type == 'FOLDER':
+            folder = Folder.objects.filter(workorder_settings_id=obj.id,parent_folder_id__isnull=True).first()
+            return folder.name_arabic if folder else None
+        elif obj.type == 'SERVICE':
+            service = Services.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return service.name_arabic if service else None
+        elif obj.type == 'INFORMATION':
+            information = Informations.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return information.title_arabic if information else None
+        elif obj.type == 'REQUEST':
+            request = RequestedItems.objects.filter(workorder_settings_id=obj.id,is_delete=False,folder_id__isnull=True).first()
+            return request.name_arabic if request else None
         return None
     
     class Meta:
