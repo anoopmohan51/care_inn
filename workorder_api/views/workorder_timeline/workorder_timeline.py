@@ -100,7 +100,7 @@ class WorkOrderTimelineCreateView(APIView):
                     if activity == "TIMER_END":
                         total_duration = WorkOrderTimeline.objects.filter(workorder=workorder_id).aggregate(total_duration=Sum('duration'))['total_duration']
                         workorder_data.update({
-                    "actual_end_date":timeline_data.get('actual_end_date')-timedelta(minutes= int(total_duration))
+                    "actual_end_date":timeline_data.get('actual_end_date')-timedelta(seconds= int(total_duration))
                 })
 
                     workorder_data.update({
