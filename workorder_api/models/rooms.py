@@ -6,7 +6,7 @@ from workorder_api.models.room_types import RoomTypes
 
 class Rooms(models.Model):
     room_number = models.CharField(max_length=255)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_user = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True,related_name='rooms_created_user')
