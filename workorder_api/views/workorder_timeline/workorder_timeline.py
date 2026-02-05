@@ -221,7 +221,7 @@ def _perpare_timeline_data(self,data,activity,user_id):
     elif activity=='TIMER_END':
         timeline_data.update({
             'to_date':current_time,
-            'actual_end_date':current_time + timedelta(minutes=int(sla_minutes)),
+            'actual_end_date':current_time,
             'in_progress':False,
         })
     elif activity=='CLOSE':
