@@ -109,7 +109,8 @@ class WorkOrderTimelineCreateView(APIView):
                         total_working_time_minutes = total_working_time/60 if total_working_time else 0
                         time_difference = float(sla_minutes) - total_working_time_minutes
                         print("time_difference::::::::::::::::::::",time_difference)
-                        if wo_start_date <= actual_end_date <= wo_end_date:
+                        # if wo_start_date <= actual_end_date <= wo_end_date:
+                        if time_difference > 0:
                             print("inside greater than 0:::::::::::::::::::::::::::::::::::::")
                             actual_end_date = actual_end_date+timedelta(minutes=float(time_difference))
                         else:
