@@ -14,7 +14,7 @@ class WorkOrderTimeline(models.Model):
     is_delete = models.BooleanField(default=False)
     duration = models.IntegerField(null=True)
     in_progress = models.BooleanField(default=False)
-    is_colse = models.BooleanField(default=False)
+    is_close = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'workorder_timeline'

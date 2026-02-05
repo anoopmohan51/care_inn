@@ -52,7 +52,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
         return timeline.id if timeline else None
     
     def get_total_working_time(self, obj):
-        return WorkOrderTimeline.objects.filter(workorder=obj.id,is_delete=False).aggregate(total_duration=Sum('duration'))['total_duration']
+        return WorkOrderTimeline.objects.filter(workorder=obj.id,is_delete=False, is_close=False).aggregate(total_duration=Sum('duration'))['total_duration']
     
     def get_room_number(self, obj):
         return obj.room.room_number if obj.room else None
