@@ -106,6 +106,7 @@ class WorkOrderTimelineCreateView(APIView):
                     if activity == "TIMER_END":
                         total_working_time = WorkOrderTimeline.objects.filter(
                             workorder=workorder_id,
+                            is_close=False,
                         ).aggregate(total_duration=Sum('duration'))['total_duration']
                         total_working_time_minutes = total_working_time/60 if total_working_time else 0
                         time_difference = float(sla_minutes) - total_working_time_minutes
@@ -213,7 +214,6 @@ def _perpare_timeline_data(self,data,activity,user_id):
     timeline_data['initiated_by'] = user_id
     workorder = WorkOrder.objects.get(id=data.get('workorder'))
     sla_minutes = workorder.sla_minutes if workorder.sla_minutes else 0
-    # current_time = datetime.now()
     current_time = timezone.now()
     if activity=='TIMER_START':
         timeline_data.update({

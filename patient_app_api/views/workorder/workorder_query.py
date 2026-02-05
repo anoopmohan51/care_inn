@@ -33,7 +33,8 @@ def get_workorder_query(tenant_id,mrd_id,limit,offset):
                     temp.created_user_id AS created_user,
                     temp.updated_user_id AS updated_user,
                     temp.service_id      AS service,
-                    s.name               AS service_name
+                    s.name               AS service_name,
+                    s.name_arabic        AS service_name_arabic
                 FROM workorder_temp temp
                 LEFT JOIN workorder_api_services s
                     ON s.id = temp.service_id
@@ -70,7 +71,8 @@ def get_workorder_query(tenant_id,mrd_id,limit,offset):
                     wo.created_user_id  AS created_user,
                     wo.updated_user_id  AS updated_user,
                     wo.service_id       AS service,
-                    s.name              AS service_name
+                    s.name              AS service_name,
+                    s.name_arabic       AS service_name_arabic
                 FROM workorder wo
                 LEFT JOIN workorder_api_services s
                     ON s.id = wo.service_id

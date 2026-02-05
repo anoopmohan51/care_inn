@@ -57,21 +57,6 @@ class WorkorderFilterView(APIView):
             offset = request.query_params.get('offset')
             queryset = get_workorder_query(external_api_key.tenant.id,mrd_id,limit,offset)
             count = len(queryset)
-            # field_lookup = {
-            #     "id": "id",
-            #     "name": "name",
-            #     "description": "description",
-            #     "created_at": "created_at",
-            #     "updated_at": "updated_at"
-            # }
-            # global_filter = GlobalFilter(
-            #     request,
-            #     field_lookup,
-            #     WorkOrderTemp,
-            #     base_filter=Q(tenant=external_api_key.tenant,mrd_id=mrd_id,room__room_number=room_number,is_delete=False),
-            #     default_sort="-created_at"
-            # )
-            # queryset, count = global_filter.get_serialized_result(serializer=WorkOrderTempSerializer)
             return CustomResponse(
                 data={
                     "data": queryset,
@@ -83,7 +68,6 @@ class WorkorderFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print("error::::::::::::::::::::",e)
             return CustomResponse(
                 data=None,
                 status="failed",
