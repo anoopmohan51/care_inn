@@ -99,6 +99,8 @@ class WorkOrderTimelineCreateView(APIView):
                     timeline_serializer.save()
                     timeline_response_data = timeline_serializer.data
                     actual_end_date = timeline_data.get('actual_end_date')
+                    wo_start_date = workorder.start_date
+                    wo_end_date = workorder.end_date
                     sla_minutes = workorder.sla_minutes if workorder.sla_minutes else 0
                     if activity == "TIMER_END":
                         total_working_time = WorkOrderTimeline.objects.filter(
@@ -107,7 +109,7 @@ class WorkOrderTimelineCreateView(APIView):
                         total_working_time_minutes = total_working_time/60 if total_working_time else 0
                         time_difference = float(sla_minutes) - total_working_time_minutes
                         print("time_difference::::::::::::::::::::",time_difference)
-                        if time_difference > 0:
+                        if wo_start_date <= actual_end_date <= wo_end_date:
                             print("inside greater than 0:::::::::::::::::::::::::::::::::::::")
                             actual_end_date = actual_end_date+timedelta(minutes=float(time_difference))
                         else:
