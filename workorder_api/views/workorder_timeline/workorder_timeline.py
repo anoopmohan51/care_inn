@@ -81,7 +81,7 @@ class WorkOrderTimelineCreateView(APIView):
                     "actual_start_date":timeline_data.get("actual_start_date"),
                     "actual_end_date":timeline_data.get("actual_end_date")
                 })
-                WorkOrderTimeline.objects.filter(workorder=workorder_id,is_delete=False).update(is_colse=False)
+                WorkOrderTimeline.objects.filter(workorder=workorder_id,is_delete=False).update(is_colse=True)
             if activity in ['TIMER_START','TIMER_END','CLOSE']:
                 timeline_id = data.get("id")
                 if timeline_id and activity in ['TIMER_END','CLOSE']:
@@ -98,17 +98,17 @@ class WorkOrderTimelineCreateView(APIView):
                     timeline_serializer.is_valid(raise_exception=True)
                     timeline_serializer.save()
                     timeline_response_data = timeline_serializer.data
-                    if activity == "TIMER_END":
-                        total_duration = WorkOrderTimeline.objects.filter(workorder=workorder_id).aggregate(total_duration=Sum('duration'))['total_duration']
-                        workorder_data.update({
-                            "actual_end_date":timeline_data.get('actual_end_date')-timedelta(seconds= int(total_duration))
-                        })
-                        print("inside:::::::::::::::::::::::::::::::::::::")
-                    else:
-                        workorder_data.update({
-                            "actual_end_date":timeline_data.get('actual_end_date')
-                        })
-                    print("workorder_data::::::::::::::::::::",workorder_data)
+                    # if activity == "TIMER_END":
+                    #     total_duration = WorkOrderTimeline.objects.filter(workorder=workorder_id).aggregate(total_duration=Sum('duration'))['total_duration']
+                    #     workorder_data.update({
+                    #         "actual_end_date":timeline_data.get('actual_end_date')-timedelta(seconds= int(total_duration))
+                    #     })
+                    #     print("inside:::::::::::::::::::::::::::::::::::::")
+                    # else:
+                    workorder_data.update({
+                        "actual_end_date":timeline_data.get('actual_end_date')
+                    })
+                    # print("workorder_data::::::::::::::::::::",workorder_data)
                 else:
                     exists_timeline = WorkOrderTimeline.objects.filter(workorder_id=workorder_id,is_delete=False).exists()
                     timeline_serializer = WorkOrderTimelineSerializer(
@@ -200,18 +200,29 @@ def _perpare_timeline_data(self,data,activity,user_id):
     timeline_data = data.copy()
     timeline_data['initiated_by'] = user_id
     workorder = WorkOrder.objects.get(id=data.get('workorder'))
+    sla_minutes = workorder.sla_minutes if workorder.sla_minutes else 0
     current_time = datetime.now()
     if activity=='TIMER_START':
         timeline_data.update({
             'from_date':current_time,
             'actual_start_date':current_time,
-            'actual_end_date':current_time + timedelta(minutes=int(workorder.sla_minutes)),
+            'actual_end_date':current_time + timedelta(minutes=int(sla_minutes)),
             'in_progress':True,
         })
     elif activity=='TIMER_END':
+        total_working_time = WorkOrderTimeline.objects.filter(
+            workorder=workorder.id,
+            is_close=False,
+        ).aggregate(total_duration=Sum('duration'))['total_duration']
+        total_working_time_minutes = total_working_time//60 if total_working_time else 0
+        time_difference = int(sla_minutes) - total_working_time_minutes
+        if time_difference > 0:
+            actual_end_date = current_time + timedelta(minutes=int(time_difference))
+        else:
+            actual_end_date = current_time
         timeline_data.update({
             'to_date':current_time,
-            'actual_end_date':current_time + timedelta(minutes=int(workorder.sla_minutes)),
+            'actual_end_date':actual_end_date,
             'in_progress':False,
         })
     elif activity=='CLOSE':
@@ -223,7 +234,7 @@ def _perpare_timeline_data(self,data,activity,user_id):
     elif activity=='OPEN':
         timeline_data.update({
             'actual_start_date':current_time,
-            'actual_end_date':current_time + timedelta(minutes=int(workorder.sla_minutes)),
+            'actual_end_date':current_time + timedelta(minutes=int(sla_minutes)),
         })
     return timeline_data
 
