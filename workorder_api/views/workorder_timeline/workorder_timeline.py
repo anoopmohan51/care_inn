@@ -11,12 +11,13 @@ from workorder_api.models import WorkOrder
 from workorder_api.models import WorkOrderActivity
 from datetime import timedelta,datetime
 from django.db.models import Sum
+from django.utils import timezone
 
 class WorkOrderTimelineCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        try:
+        # try:
             data = request.data
             activity = data.get('activity')
             workorder_id = data.get('workorder')
@@ -109,8 +110,11 @@ class WorkOrderTimelineCreateView(APIView):
                         total_working_time_minutes = total_working_time/60 if total_working_time else 0
                         time_difference = float(sla_minutes) - total_working_time_minutes
                         print("time_difference::::::::::::::::::::",time_difference)
-                        # if wo_start_date <= actual_end_date <= wo_end_date:
-                        if time_difference > 0:
+                        print("actual_end_date::::::::::::::::::::",actual_end_date)
+                        print("wo_start_date::::::::::::::::::::",wo_start_date)
+                        print("wo_end_date::::::::::::::::::::",wo_end_date)
+                        if actual_end_date <= wo_end_date:
+                            # if time_difference > 0:
                             print("inside greater than 0:::::::::::::::::::::::::::::::::::::")
                             actual_end_date = actual_end_date+timedelta(minutes=float(time_difference))
                         else:
@@ -168,22 +172,22 @@ class WorkOrderTimelineCreateView(APIView):
                 status_code=status.HTTP_201_CREATED,
                 content_type="application/json"
             )         
-        except WorkOrder.DoesNotExist as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Work order not found"],
-                status_code=status.HTTP_404_NOT_FOUND,
-                content_type="application/json"
-            )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in updating workorder"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except WorkOrder.DoesNotExist as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Work order not found"],
+        #         status_code=status.HTTP_404_NOT_FOUND,
+        #         content_type="application/json"
+        #     )
+        # except Exception as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Error in updating workorder"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
 
 class WorkOrderTimelineListView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -215,7 +219,8 @@ def _perpare_timeline_data(self,data,activity,user_id):
     timeline_data['initiated_by'] = user_id
     workorder = WorkOrder.objects.get(id=data.get('workorder'))
     sla_minutes = workorder.sla_minutes if workorder.sla_minutes else 0
-    current_time = datetime.now()
+    # current_time = datetime.now()
+    current_time = timezone.now()
     if activity=='TIMER_START':
         timeline_data.update({
             'from_date':current_time,
