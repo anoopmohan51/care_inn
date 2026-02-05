@@ -106,8 +106,9 @@ class WorkOrderTimelineCreateView(APIView):
                         ).aggregate(total_duration=Sum('duration'))['total_duration']
                         total_working_time_minutes = total_working_time/60 if total_working_time else 0
                         time_difference = float(sla_minutes) - total_working_time_minutes
+                        print("time_difference::::::::::::::::::::",time_difference)
                         if time_difference > 0:
-                            actual_end_date = actual_end_date + timedelta(minutes=float(time_difference))
+                            actual_end_date = actual_end_date - timedelta(minutes=float(time_difference))
                         else:
                             actual_end_date = actual_end_date
                         workorder_data.update({
