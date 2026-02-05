@@ -108,8 +108,10 @@ class WorkOrderTimelineCreateView(APIView):
                         time_difference = float(sla_minutes) - total_working_time_minutes
                         print("time_difference::::::::::::::::::::",time_difference)
                         if time_difference > 0:
-                            actual_end_date = actual_end_date - timedelta(minutes=float(time_difference))
+                            print("inside greater than 0:::::::::::::::::::::::::::::::::::::")
+                            actual_end_date = actual_end_date+timedelta(minutes=float(time_difference))
                         else:
+                            print("inside less than 0:::::::::::::::::::::::::::::::::::::")
                             actual_end_date = actual_end_date
                         workorder_data.update({
                             "actual_end_date":actual_end_date
@@ -221,7 +223,7 @@ def _perpare_timeline_data(self,data,activity,user_id):
     elif activity=='TIMER_END':
         timeline_data.update({
             'to_date':current_time,
-            'actual_end_date':current_time + timedelta(minutes=int(sla_minutes)),
+            'actual_end_date':current_time,
             'in_progress':False,
         })
     elif activity=='CLOSE':
