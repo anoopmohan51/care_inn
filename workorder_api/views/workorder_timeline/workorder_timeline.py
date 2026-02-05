@@ -114,8 +114,8 @@ class WorkOrderTimelineCreateView(APIView):
                         print("wo_start_date::::::::::::::::::::",wo_start_date)
                         print("wo_end_date::::::::::::::::::::",wo_end_date)
                         if actual_end_date <= wo_end_date:
-                            actual_start_date = workorder.actual_start_date
-                            actual_end_date = actual_start_date+timedelta(minutes=float(time_difference))
+                            _actual_end_date = workorder.actual_end_date
+                            actual_end_date = _actual_end_date + timedelta(minutes=float(time_difference)) if time_difference > 0 else actual_end_date
                         else:
                             actual_end_date = actual_end_date
                         workorder_data.update({
