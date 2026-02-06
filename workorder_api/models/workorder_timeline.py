@@ -13,6 +13,8 @@ class WorkOrderTimeline(models.Model):
     assigned_to = models.ForeignKey(AppUsers, on_delete=models.PROTECT,null=True)
     is_delete = models.BooleanField(default=False)
     duration = models.IntegerField(null=True)
+    in_progress = models.BooleanField(default=False)
+    is_close = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'workorder_timeline'

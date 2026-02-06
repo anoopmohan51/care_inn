@@ -25,9 +25,10 @@ def _get_folder_details(folder_id,limit,offset):
                     NULL::integer as tenant_id,
                     NULL::integer AS created_user_id,
                     NULL::integer AS updated_user_id,
-                    f.position ::integer
+                    f.position ::integer,
+                    f.name_arabic::text
                 FROM workorder_api_folder f
-                WHERE f.parent_folder_id = %s
+                WHERE f.parent_folder_id = %(folder_id)s
 
                 UNION ALL
 
@@ -51,9 +52,10 @@ def _get_folder_details(folder_id,limit,offset):
                     s.tenant_id,
                     s.created_user_id,
                     s.updated_user_id,
-                    s.position ::integer
+                    s.position ::integer,
+                    s.name_arabic::text 
                 FROM workorder_api_services s
-                WHERE s.folder_id = %s
+                WHERE s.folder_id = %(folder_id)s
 
                 UNION ALL
 
@@ -77,9 +79,10 @@ def _get_folder_details(folder_id,limit,offset):
                     r.tenant_id,
                     r.created_user_id,
                     r.updated_user_id,
-                    r.position ::integer
+                    r.position ::integer,
+                    r.name_arabic::text
                 FROM workorder_api_requested_items r
-                WHERE r.folder_id = %s
+                WHERE r.folder_id = %(folder_id)s
 
                 UNION ALL
 
@@ -103,12 +106,17 @@ def _get_folder_details(folder_id,limit,offset):
                     i.tenant_id,
                     i.created_user_id,
                     i.updated_user_id,
-                    i.position ::integer
+                    i.position ::integer,
+                    i.title_arabic::text AS name_arabic
                 FROM workorder_api_informations i
-                WHERE i.folder_id = %s
+                WHERE i.folder_id = %(folder_id)s
                 ORDER BY position ASC
-                LIMIT %s OFFSET %s
-
-                """,[folder_id,folder_id,folder_id,folder_id,limit,offset]
+                LIMIT %(limit)s OFFSET %(offset)s
+                """,{
+                    "folder_id":folder_id,
+                    "limit":limit,
+                    "offset":offset
+                }
+                
         )
         return dictfetchall(cursor)

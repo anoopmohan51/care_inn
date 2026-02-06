@@ -50,8 +50,7 @@ def _get_workorder_summary(tenant_id,workorder_id):
                             created_at AS closed_at,
                             initiated_by_id
                         FROM workorder_activity
-                        WHERE activity = 'STATUS'
-                        AND to_value = 'CLOSED'
+                        WHERE activity = 'CLOSED'
                         ORDER BY workorder_id, created_at DESC
                     ) close_activity
                         ON close_activity.workorder_id = w.id

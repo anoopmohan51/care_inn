@@ -18,6 +18,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
     created_user_name = serializers.SerializerMethodField('get_created_user_name')
     timeline_id = serializers.SerializerMethodField('get_timeline_id')
     total_working_time = serializers.SerializerMethodField('get_total_working_time')
+    room_number = serializers.SerializerMethodField('get_room_number')
 
     def get_created_user_name(self, obj):
         if obj.created_user:
@@ -51,7 +52,10 @@ class WorkOrderSerializer(serializers.ModelSerializer):
         return timeline.id if timeline else None
     
     def get_total_working_time(self, obj):
-        return WorkOrderTimeline.objects.filter(workorder=obj.id,is_delete=False).aggregate(total_duration=Sum('duration'))['total_duration']
+        return WorkOrderTimeline.objects.filter(workorder=obj.id,is_delete=False, is_close=False).aggregate(total_duration=Sum('duration'))['total_duration']
+    
+    def get_room_number(self, obj):
+        return obj.room.room_number if obj.room else None
 
     class Meta:
         model = WorkOrder

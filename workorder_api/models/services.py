@@ -53,5 +53,7 @@ class Services(models.Model):
     department = models.ForeignKey(Department, on_delete=models.PROTECT,null=True)
     name_arabic = models.CharField(max_length=255,null=True)
     description_arabic = models.TextField(null=True)
+    is_approval_required = models.BooleanField(default=False)
+
     class Meta:
         db_table = 'workorder_api_services'

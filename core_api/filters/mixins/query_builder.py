@@ -3,14 +3,13 @@ from django.db.models import Q
 class QueryBuilderMixin:
     def build_group_query(self,group :dict):
         query = Q()
-        next_operator = None
         for condition in group.get('conditions',[]):
             query_object = self.built_condition_query(condition)
-            if next_operator=="OR":
+            if condition.get('operator')=="OR":
                 query |= query_object
             else:
                 query &= query_object
-            next_operator = group.get('operator')
+            # next_operator = group.get('operator')
         return query
     
     def build_main_filter_query(self,filters:list):
