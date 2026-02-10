@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Work Order Escalation</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:6px; overflow:hidden;">
+
+```
+      <!-- Header -->
+      <tr>
+        <td style="background-color:#e74c3c; color:#ffffff; padding:16px 24px;">
+          <h2 style="margin:0; font-size:20px;">🚨 Work Order Escalation</h2>
+        </td>
+      </tr>
+
+      <!-- Body -->
+      <tr>
+        <td style="padding:24px; color:#333333; font-size:14px; line-height:1.6;">
+          <p>Hello <strong>{Recipient Name}</strong>,</p>
+
+          <p>
+            This is to notify you that the following work order requires
+            <strong>immediate attention</strong>, as it is approaching or has exceeded the defined SLA.
+          </p>
+
+          <!-- Work Order Details -->
+          <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; margin:16px 0;">
+            <tr style="background-color:#f9fafb;">
+              <td style="border:1px solid #ddd;"><strong>Work Order ID</strong></td>
+              <td style="border:1px solid #ddd;">{WORK_ORDER_ID}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #ddd;"><strong>Title</strong></td>
+              <td style="border:1px solid #ddd;">{WORK_ORDER_TITLE}</td>
+            </tr>
+            <tr style="background-color:#f9fafb;">
+              <td style="border:1px solid #ddd;"><strong>Priority</strong></td>
+              <td style="border:1px solid #ddd;">{PRIORITY}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #ddd;"><strong>Assigned To</strong></td>
+              <td style="border:1px solid #ddd;">{ASSIGNEE}</td>
+            </tr>
+            <tr style="background-color:#f9fafb;">
+              <td style="border:1px solid #ddd;"><strong>SLA Due By</strong></td>
+              <td style="border:1px solid #ddd;">{SLA_DUE_DATE}</td>
+            </tr>
+          </table>
+
+          <p>
+            Please take the necessary action at the earliest and provide an update
+            on the resolution timeline.
+          </p>
+
+          <p>
+            If additional support is required, feel free to reach out.
+          </p>
+
+          <p style="margin-top:24px;">
+            Regards,<br />
+            <strong>{Your Name}</strong><br />
+            {Your Role}<br />
+            {Company Name}
+          </p>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="background-color:#f1f1f1; padding:12px 24px; font-size:12px; color:#666666;">
+          This is an automated escalation email. Please do not reply directly.
+        </td>
+      </tr>
+
+    </table>
+  </td>
+</tr>
+```
+
+  </table>
+
+</body>
+</html>
