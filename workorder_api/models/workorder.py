@@ -5,6 +5,9 @@ from workorder_api.models.services import Services
 from workorder_api.models.rooms import Rooms
 from core_api.models.usergroups import UserGroup
 from staticfiles_api.models.staticfiles import StaticFiles
+from django.db.models import F, Value
+from django.db.models.functions import Concat
+
 
 class WorkOrder(models.Model):
     ASSIGNEE_USER = "USER"
@@ -75,6 +78,17 @@ class WorkOrder(models.Model):
 
     class Meta:
         db_table = 'workorder'
+    
+    def get_assignee_name(self):
+        if self.assignee_type == 'USER' and self.user:
+            user = AppUsers.objects.filter(id=self.user.id,is_delete=False).annotate(
+                full_name = Concat(F('first_name'), Value(' '), F('last_name'))
+            ).values('full_name').first()
+            return user.get('full_name') if user else None
+        elif self.assignee_type == 'TEAM' and self.user_group:
+            user_group = UserGroup.objects.filter(id=self.user_group.id,is_delete=False).values('name').first()
+            return user_group.get('name') if user_group else None
+        return None
 
 
 class WorkOrderImages(models.Model):

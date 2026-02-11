@@ -63,7 +63,7 @@ def workorder_escalations_task(tenant_id=1):
                         # print("escalation level triggered::::::::::::::::::::::::::>>>:")
                         # if _has_escalation_been_triggered(workorder,escalation,escalation_level.level):
                         #     continue
-                        if _trigger_escalation_level(workorder,escalation,escalation_level.level):
+                        if _trigger_escalation_level(workorder,workorder_escalation,escalation_level.level):
                             escalated_count += 1
                     processed_count += 1
             

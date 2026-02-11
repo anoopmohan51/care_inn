@@ -4,6 +4,8 @@ from core_api.models.appusers import AppUsers,Role
 from workorder_api.models.workorder import WorkOrder
 from workorder_api.models.services import Services
 from workorder_api.models.workorder_identifier import WorkOrderIdentifier
+from django.db.models import F, Value
+from django.db.models.functions import Concat
 
 
 class WorkOrderEscalations(models.Model):
@@ -51,4 +53,15 @@ class WorkorderEscalationRecipients(models.Model):
 
     class Meta:
         db_table = 'workorder_api_escalations_recipients'
+    
+    def get_recipient_name(self):
+        if self._type == WorkorderEscalationRecipients.TYPE_USER:
+            user = AppUsers.objects.filter(id=self.user.id).annotate(
+                name = Concat(F('first_name'),Value(' '),F('last_name'))
+            ).values('name').first()
+            return user.get('name') if user else None
+        else:
+            role = Role.objects.filter(id=self.role.id).values('name').first()
+            return role.get('name') if role else None
+        return None
 

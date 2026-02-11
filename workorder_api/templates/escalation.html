@@ -23,7 +23,7 @@
       <!-- Body -->
       <tr>
         <td style="padding:24px; color:#333333; font-size:14px; line-height:1.6;">
-          <p>Hello <strong>{Recipient Name}</strong>,</p>
+          <p>Hello <strong>{{ recipient_name }}</strong>,</p>
 
           <p>
             This is to notify you that the following work order requires
@@ -34,7 +34,7 @@
           <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; margin:16px 0;">
             <tr style="background-color:#f9fafb;">
               <td style="border:1px solid #ddd;"><strong>Work Order ID</strong></td>
-              <td style="border:1px solid #ddd;">{WORK_ORDER_ID}</td>
+              <td style="border:1px solid #ddd;">{{ workorder_unique_id }}</td>
             </tr>
             <tr>
               <td style="border:1px solid #ddd;"><strong>Title</strong></td>
@@ -42,15 +42,15 @@
             </tr>
             <tr style="background-color:#f9fafb;">
               <td style="border:1px solid #ddd;"><strong>Priority</strong></td>
-              <td style="border:1px solid #ddd;">{PRIORITY}</td>
+              <td style="border:1px solid #ddd;">{{ priority }}</td>
             </tr>
             <tr>
               <td style="border:1px solid #ddd;"><strong>Assigned To</strong></td>
-              <td style="border:1px solid #ddd;">{ASSIGNEE}</td>
+              <td style="border:1px solid #ddd;">{{ assigned_to }}</td>
             </tr>
             <tr style="background-color:#f9fafb;">
               <td style="border:1px solid #ddd;"><strong>SLA Due By</strong></td>
-              <td style="border:1px solid #ddd;">{SLA_DUE_DATE}</td>
+              <td style="border:1px solid #ddd;">{{ due_date }}</td>
             </tr>
           </table>
 
@@ -58,11 +58,6 @@
             Please take the necessary action at the earliest and provide an update
             on the resolution timeline.
           </p>
-
-          <p>
-            If additional support is required, feel free to reach out.
-          </p>
-
           <p style="margin-top:24px;">
             Regards,<br />
             <strong>{Your Name}</strong><br />
