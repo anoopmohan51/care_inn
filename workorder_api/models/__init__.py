@@ -15,6 +15,7 @@ from .sector import Sector
 from .workorder_identifier import WorkOrderIdentifier
 from .workorder_escalations import WorkOrderEscalations,WorkorderEscalationServices,WorkorderEscalationRecipients
 from .workorder_rating import WorkOrderRating
+from .workorder_escalations_log import WorkOrderEscalationsLog
 __all__ = [
     'Services', 
     'Rooms',
@@ -37,4 +38,5 @@ __all__ = [
     'WorkorderEscalationServices',
     'WorkorderEscalationRecipients',
     'WorkOrderRating',
+    'WorkOrderEscalationsLog',
 ]

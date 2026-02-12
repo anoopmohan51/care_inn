@@ -3,6 +3,8 @@ from core_api.models.appusers import AppUsers
 from workorder_api.workorder_activity.workorder_activity_service import WorkOrderActivityService
 from core_api.send_email.send_email import send_email
 from django.template.loader import render_to_string
+from workorder_api.tasks.send_email import send_email_task
+from workorder_api.models.workorder_escalations_log import WorkOrderEscalationsLog
 
 def _trigger_escalation_level(workorder,escalation_level,level):
     users_to_notify = resolve_recipients_users(escalation_level,workorder)
@@ -21,12 +23,14 @@ def _trigger_escalation_level(workorder,escalation_level,level):
         'level':level
     }
     notification_sent = False
+    print("users_to_notify::::::::::::::::::::::::::",users_to_notify)
     for user_record in users_to_notify:
         context.update({
             'recipient_name':user_record.get('name'),
         })
         body = render_to_string('escalation.html',context)
         # send_email(subject,body,user_record.get('email'))
+        # send_email_task.delay(subject,body,user_record.get('email'))
         notification_sent = True
     if notification_sent:
         # WorkorderActivityServices.create_workorder_activity({
@@ -36,6 +40,11 @@ def _trigger_escalation_level(workorder,escalation_level,level):
         #     'to_value': level,
         #     'message': f"Escalated to {level} level"
         # })
+        # WorkOrderEscalationsLog.objects.create(
+        #     workorder=workorder,
+        #     escalation_level=escalation_level,
+        #     level=level
+        # )
         return True
     # print("notification not sent::::::::::::::::::::::::::")
     return False
