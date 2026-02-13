@@ -67,5 +67,6 @@ app/images/**
 myenv/
 
 
-#firebase credentials
+# firebase credentials
 push_credentials/
+app/push_credentials/
