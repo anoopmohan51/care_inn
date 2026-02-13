@@ -2,6 +2,7 @@ from rest_framework.permissions import BasePermission
 from core_api.models.external_api_key import ExternalApiKey
 import os
 
+
 class HasValidApiKey(BasePermission):
 
     def has_permission(self, request, view):
@@ -18,10 +19,7 @@ class HasValidApiKeyForPatientApp(BasePermission):
         api_key_env = os.environ.get('CAREINN_API_KEY')
         print(api_key_env)
         if not api_key:
-            print("api_key is not present1")
             return False
         if api_key == api_key_env:
-            print("api_key is present")
             return True
-        print("api_key is not present2")
         return False
