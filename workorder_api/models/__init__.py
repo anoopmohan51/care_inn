@@ -16,6 +16,7 @@ from .workorder_identifier import WorkOrderIdentifier
 from .workorder_escalations import WorkOrderEscalations,WorkorderEscalationServices,WorkorderEscalationRecipients
 from .workorder_rating import WorkOrderRating
 from .workorder_escalations_log import WorkOrderEscalationsLog
+from .patient_mrn import Mrn
 __all__ = [
     'Services', 
     'Rooms',
@@ -39,4 +40,5 @@ __all__ = [
     'WorkorderEscalationRecipients',
     'WorkOrderRating',
     'WorkOrderEscalationsLog',
+    'Mrn',
 ]

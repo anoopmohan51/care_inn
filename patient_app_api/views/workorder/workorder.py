@@ -11,6 +11,7 @@ from workorder_api.serializers.workorder_temp_serializer import WorkOrderTempSer
 from core_api.models.external_api_key import ExternalApiKey
 from rest_framework import status
 from .workorder_query import get_workorder_query
+from .update_mrd import _update_mrn
 
 class WorkorderDetailsView(APIView):
     permission_classes = [AllowAny,HasValidApiKey]
@@ -50,11 +51,13 @@ class WorkorderFilterView(APIView):
     def post(self, request):
         try:
             api_key = request.headers.get('X-API-KEY')
-            mrd_id = request.query_params.get('mrd_id')
+            mrd_id = request.query_params.get('mrd_id',None)
             room_number = request.query_params.get('room_number')
+            # mrn = request.query_params.get('mrn',None)
             external_api_key = ExternalApiKey.objects.get(key=api_key,is_active=True)
             limit = request.query_params.get('limit')
             offset = request.query_params.get('offset')
+            _update_mrn(mrd_id,room_number)
             queryset = get_workorder_query(external_api_key.tenant.id,mrd_id,limit,offset)
             count = len(queryset)
             return CustomResponse(
