@@ -44,7 +44,6 @@ class WorkOrderEscalationsCreateView(APIView):
                         content_type="application/json"
                     )
         except Exception as e:
-            print("error in Work order escalations creation",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -183,14 +182,16 @@ class WorkorderEscalationsFilterView(APIView):
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderEscalationsSerializer)
             return CustomResponse(
-                data=queryset,
+                data={
+                    "data": queryset,
+                    "total_count": count
+                },
                 status="success",
                 message=["Work order escalations fetched successfully"],
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
         except Exception as e:
-            print("error in Work order escalations filtering",e)
             return CustomResponse(
                 data=None,
                 status="failed",
