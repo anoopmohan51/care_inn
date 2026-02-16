@@ -68,4 +68,4 @@ myenv/
 
 
 # firebase credentials
-push_credentials/push_credentials/
+push_credentials/careinn-dev.json
