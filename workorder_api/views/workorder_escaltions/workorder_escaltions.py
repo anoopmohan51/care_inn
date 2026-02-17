@@ -171,7 +171,8 @@ class WorkorderEscalationsFilterView(APIView):
             field_lookup = {
                 "name": "name",
                 "services": "services__service__name",
-                "levels": "levels__level"
+                "levels": "levels__level",
+                "identifier_name": "identifier__name"
             }
             global_filter = GlobalFilter(
                 request,
