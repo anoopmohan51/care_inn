@@ -26,7 +26,7 @@ class WorkOrderEscalationsCreateView(APIView):
                     serializer.save()
                     _create_update_escalation_services(request,data.get('services'),serializer.data.get('id'))
                     _create_update_escalation_levels(request,data.get('levels'),serializer.data.get('id'))
-                    escalations_instance = WorkOrderEscalations.objects.get(id=serializer.data.get('id'))
+                    escalations_instance = WorkOrderEscalations.objects.get(id=serializer.instance.id)
                     respance_serializer = WorkOrderEscalationsSerializer(escalations_instance)
                     return CustomResponse(
                         data=respance_serializer.data,
@@ -106,8 +106,11 @@ class WorkorderEscalationsDetailsView(APIView):
                 serializer.save()
                 _create_update_escalation_services(request,data.get('services'),serializer.data.get('id'))
                 _create_update_escalation_levels(request,data.get('levels'),serializer.data.get('id'))
+                escalation_id = serializer.instance.id
+                escalation = WorkOrderEscalations.objects.get(id=escalation_id,is_delete=False)
+                escalation_serializer = WorkOrderEscalationsSerializer(escalation)
                 return CustomResponse(
-                    data=serializer.data,
+                    data=escalation_serializer.data,
                     status="success",
                     message=["Work order escalations updated successfully"],
                     status_code=status.HTTP_200_OK,
