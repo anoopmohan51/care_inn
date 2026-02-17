@@ -7,13 +7,14 @@ def _create_update_escalation_services(request,data:list,workorder_escalation_id
     try:
         with transaction.atomic():
             to_create = []
+            incoming_service_ids = set([
+                record.get('service') for record in data
+            ])
             existing_service_ids = set(
                 WorkorderEscalationServices.objects.filter(
                     workorder_escalation_id=workorder_escalation_id
                 ).values_list("service_id",flat=True)
             )
-            incoming_service_ids = set(data)
-            print(incoming_service_ids)
             to_create = [
                 WorkorderEscalationServices(
                     workorder_escalation_id=workorder_escalation_id,

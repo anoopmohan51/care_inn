@@ -17,3 +17,4 @@ class Rooms(models.Model):
     sector = models.ForeignKey(Sector, on_delete=models.PROTECT,null=True,related_name='rooms_sector')
     room_type = models.ForeignKey(RoomTypes, on_delete=models.PROTECT,null=True,related_name='rooms_room_type')
     mrn = models.ForeignKey(Mrn, on_delete=models.PROTECT,null=True,related_name='rooms_mrn')
+    code = models.CharField(max_length=255,null=True,blank=True)

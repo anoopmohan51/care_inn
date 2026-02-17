@@ -38,5 +38,5 @@ def _create_update_escalation_recipients(request,data:list,workorder_escalation_
                 escalation_level=workorder_escalation_id
             ).exclude(id__in=ids_list).delete()
     except Exception as e:
-        print(e)
+        print("error in create update escalation recipients",e)
             

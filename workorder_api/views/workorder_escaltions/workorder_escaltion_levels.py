@@ -40,4 +40,4 @@ def _create_update_escalation_levels(request,data:list,workorder_escalation_id:i
                         ids_list.append(serializer.data.get('id'))
             WorkorderEscaltionLevels.objects.filter(escalation=workorder_escalation_id).exclude(id__in=ids_list).delete()
     except Exception as e:
-        print(e)
+        print("error in create update escalation levels",e)

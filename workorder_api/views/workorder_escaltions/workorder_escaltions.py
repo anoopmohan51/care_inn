@@ -26,7 +26,7 @@ class WorkOrderEscalationsCreateView(APIView):
                     serializer.save()
                     _create_update_escalation_services(request,data.get('services'),serializer.data.get('id'))
                     _create_update_escalation_levels(request,data.get('levels'),serializer.data.get('id'))
-                    escalations_instance = WorkOrderEscalations.objects.get(id=serializer.data.get('id'))
+                    escalations_instance = WorkOrderEscalations.objects.get(id=serializer.instance.id)
                     respance_serializer = WorkOrderEscalationsSerializer(escalations_instance)
                     return CustomResponse(
                         data=respance_serializer.data,
@@ -44,7 +44,6 @@ class WorkOrderEscalationsCreateView(APIView):
                         content_type="application/json"
                     )
         except Exception as e:
-            print("error in Work order escalations creation",e)
             return CustomResponse(
                 data=None,
                 status="failed",
@@ -107,8 +106,11 @@ class WorkorderEscalationsDetailsView(APIView):
                 serializer.save()
                 _create_update_escalation_services(request,data.get('services'),serializer.data.get('id'))
                 _create_update_escalation_levels(request,data.get('levels'),serializer.data.get('id'))
+                escalation_id = serializer.instance.id
+                escalation = WorkOrderEscalations.objects.get(id=escalation_id,is_delete=False)
+                escalation_serializer = WorkOrderEscalationsSerializer(escalation)
                 return CustomResponse(
-                    data=serializer.data,
+                    data=escalation_serializer.data,
                     status="success",
                     message=["Work order escalations updated successfully"],
                     status_code=status.HTTP_200_OK,
@@ -172,7 +174,8 @@ class WorkorderEscalationsFilterView(APIView):
             field_lookup = {
                 "name": "name",
                 "services": "services__service__name",
-                "levels": "levels__level"
+                "levels": "levels__level",
+                "identifier_name": "identifier__name"
             }
             global_filter = GlobalFilter(
                 request,
@@ -183,14 +186,16 @@ class WorkorderEscalationsFilterView(APIView):
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderEscalationsSerializer)
             return CustomResponse(
-                data=queryset,
+                data={
+                    "data": queryset,
+                    "total_count": count
+                },
                 status="success",
                 message=["Work order escalations fetched successfully"],
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
         except Exception as e:
-            print("error in Work order escalations filtering",e)
             return CustomResponse(
                 data=None,
                 status="failed",
