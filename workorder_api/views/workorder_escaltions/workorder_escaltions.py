@@ -175,14 +175,15 @@ class WorkorderEscalationsFilterView(APIView):
                 "name": "name",
                 "services": "services__service__name",
                 "levels": "levels__level",
-                "identifier_name": "identifier__name"
+                "identifier_name": "identifier__name",
+                "description": "description"
             }
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
                 WorkOrderEscalations,
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
-                default_sort="created_at"
+                default_sort="-created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderEscalationsSerializer)
             return CustomResponse(
@@ -196,6 +197,7 @@ class WorkorderEscalationsFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print('error in work order escalations filtering',e)
             return CustomResponse(
                 data=None,
                 status="failed",

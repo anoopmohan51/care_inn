@@ -178,11 +178,11 @@ class RoomFilterView(APIView):
         try:
             field_lookup = {
                 "id": "id",
-                "name": "name",
+                "room_number": "room_number",
                 "description": "description",
                 "created_at": "created_at",
                 "updated_at": "updated_at",
-                "room_type_name": "room_type__name",
+                "room_type_name": "room_type__room_type",
                 "sector_name": "sector__name",
             }
             global_filter = GlobalFilter(
@@ -192,11 +192,7 @@ class RoomFilterView(APIView):
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
                 default_sort="created_at"
             )
-            queryset, count = global_filter._get_result(
-                created_user_name = Concat(F('created_user__first_name'), Value(' '), F('created_user__last_name')),
-                room_type_name = F('room_type__room_type'),
-                sector_name = F('sector__name'),
-            )
+            queryset, count = global_filter.get_serialized_result(serializer=RoomSerializer)
             return CustomResponse(
                 data={"data":queryset,"total_count":count},
                 status="success",
@@ -205,6 +201,7 @@ class RoomFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print('error in rooms filter fetching',e)
             return CustomResponse(
                 data=None,
                 status="failed",

@@ -234,7 +234,8 @@ class UserFilterView(APIView):
         try:
             field_lookup = {
                 "id": "id",
-                "name": "name",
+                "first_name": "first_name",
+                'last_name': 'last_name',
                 "description": "description",
                 "created_at": "created_at",
                 "updated_at": "updated_at",
@@ -245,7 +246,7 @@ class UserFilterView(APIView):
                 field_lookup,
                 AppUsers,
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
-                default_sort="created_at"
+                default_sort="-created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=UserSerializer)
             return CustomResponse(
@@ -259,6 +260,7 @@ class UserFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print('error in users filter fetching',e)
             return CustomResponse(
                 data=None,
                 status="failed",
