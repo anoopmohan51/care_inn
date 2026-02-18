@@ -10,6 +10,7 @@ from .views.role_permission.permission import *
 from .views.user_group.list_users import *
 from .views.department.department import *
 from .views.permission.permission import *
+from .views.user_device_details.user_device_details import *
 urlpatterns = [
     path('user',UserCreateView.as_view()),
     path('user/<int:pk>',UserUpdateView.as_view()),
@@ -31,5 +32,6 @@ urlpatterns = [
     path('list-users',ListUsersView.as_view()),
     path('department/filter',DepartmentFilterView.as_view()),
     path('permissions',PermissionListView.as_view()),
+    path('user-device-details',UserDeviceDetailsView.as_view()),
 
 ]
