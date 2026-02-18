@@ -18,7 +18,7 @@ class WorkOrderEscalationsCreateView(APIView):
     permission_classes = [IsAuthenticated]
     # @has_permission("WorkOrderEscalations", "create")
     def post(self, request):
-        try:
+        # try:
             data = request.data
             with transaction.atomic():
                 serializer = WorkOrderEscalationsSerializer(data=data, context={'request': request})
@@ -43,14 +43,14 @@ class WorkOrderEscalationsCreateView(APIView):
                         status_code=status.HTTP_400_BAD_REQUEST,
                         content_type="application/json"
                     )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in Work order escalations creation"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except Exception as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Error in Work order escalations creation"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
 
 class WorkorderEscalationsDetailsView(APIView):
     authentication_classes = [JWTAuthentication]
