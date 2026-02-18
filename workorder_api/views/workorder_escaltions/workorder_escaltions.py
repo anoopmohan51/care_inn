@@ -18,7 +18,7 @@ class WorkOrderEscalationsCreateView(APIView):
     permission_classes = [IsAuthenticated]
     # @has_permission("WorkOrderEscalations", "create")
     def post(self, request):
-        try:
+        # try:
             data = request.data
             with transaction.atomic():
                 serializer = WorkOrderEscalationsSerializer(data=data, context={'request': request})
@@ -43,14 +43,14 @@ class WorkOrderEscalationsCreateView(APIView):
                         status_code=status.HTTP_400_BAD_REQUEST,
                         content_type="application/json"
                     )
-        except Exception as e:
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in Work order escalations creation"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except Exception as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Error in Work order escalations creation"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
 
 class WorkorderEscalationsDetailsView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -175,14 +175,15 @@ class WorkorderEscalationsFilterView(APIView):
                 "name": "name",
                 "services": "services__service__name",
                 "levels": "levels__level",
-                "identifier_name": "identifier__name"
+                "identifier_name": "identifier__name",
+                "description": "description"
             }
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
                 WorkOrderEscalations,
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
-                default_sort="created_at"
+                default_sort="-created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderEscalationsSerializer)
             return CustomResponse(
@@ -196,6 +197,7 @@ class WorkorderEscalationsFilterView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
+            print('error in work order escalations filtering',e)
             return CustomResponse(
                 data=None,
                 status="failed",
