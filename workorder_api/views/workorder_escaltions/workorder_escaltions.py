@@ -18,7 +18,7 @@ class WorkOrderEscalationsCreateView(APIView):
     permission_classes = [IsAuthenticated]
     # @has_permission("WorkOrderEscalations", "create")
     def post(self, request):
-        try:
+        # try:
             data = request.data
             with transaction.atomic():
                 serializer = WorkOrderEscalationsSerializer(data=data, context={'request': request})
@@ -26,7 +26,7 @@ class WorkOrderEscalationsCreateView(APIView):
                     serializer.save()
                     _create_update_escalation_services(request,data.get('services'),serializer.data.get('id'))
                     _create_update_escalation_levels(request,data.get('levels'),serializer.data.get('id'))
-                    escalations_instance = WorkOrderEscalations.objects.get(id=serializer.data.get('id'))
+                    escalations_instance = WorkOrderEscalations.objects.get(id=serializer.instance.id)
                     respance_serializer = WorkOrderEscalationsSerializer(escalations_instance)
                     return CustomResponse(
                         data=respance_serializer.data,
@@ -43,15 +43,14 @@ class WorkOrderEscalationsCreateView(APIView):
                         status_code=status.HTTP_400_BAD_REQUEST,
                         content_type="application/json"
                     )
-        except Exception as e:
-            print("error in Work order escalations creation",e)
-            return CustomResponse(
-                data=None,
-                status="failed",
-                message=["Error in Work order escalations creation"],
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content_type="application/json"
-            )
+        # except Exception as e:
+        #     return CustomResponse(
+        #         data=None,
+        #         status="failed",
+        #         message=["Error in Work order escalations creation"],
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         content_type="application/json"
+        #     )
 
 class WorkorderEscalationsDetailsView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -107,8 +106,11 @@ class WorkorderEscalationsDetailsView(APIView):
                 serializer.save()
                 _create_update_escalation_services(request,data.get('services'),serializer.data.get('id'))
                 _create_update_escalation_levels(request,data.get('levels'),serializer.data.get('id'))
+                escalation_id = serializer.instance.id
+                escalation = WorkOrderEscalations.objects.get(id=escalation_id,is_delete=False)
+                escalation_serializer = WorkOrderEscalationsSerializer(escalation)
                 return CustomResponse(
-                    data=serializer.data,
+                    data=escalation_serializer.data,
                     status="success",
                     message=["Work order escalations updated successfully"],
                     status_code=status.HTTP_200_OK,
@@ -172,25 +174,30 @@ class WorkorderEscalationsFilterView(APIView):
             field_lookup = {
                 "name": "name",
                 "services": "services__service__name",
-                "levels": "levels__level"
+                "levels": "levels__level",
+                "identifier_name": "identifier__name",
+                "description": "description"
             }
             global_filter = GlobalFilter(
                 request,
                 field_lookup,
                 WorkOrderEscalations,
                 base_filter=Q(tenant=request.user.tenant,is_delete=False),
-                default_sort="created_at"
+                default_sort="-created_at"
             )
             queryset, count = global_filter.get_serialized_result(serializer=WorkOrderEscalationsSerializer)
             return CustomResponse(
-                data=queryset,
+                data={
+                    "data": queryset,
+                    "total_count": count
+                },
                 status="success",
                 message=["Work order escalations fetched successfully"],
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
         except Exception as e:
-            print("error in Work order escalations filtering",e)
+            print('error in work order escalations filtering',e)
             return CustomResponse(
                 data=None,
                 status="failed",

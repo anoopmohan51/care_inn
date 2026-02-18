@@ -7,25 +7,43 @@ def _create_update_escalation_recipients(request,data:list,workorder_escalation_
         with transaction.atomic():
             ids_list = []
             for record in data:
-                if "id" in record:
-                    update_data = {
-                        "user": record.get('user'),
-                        "role": record.get('role'),
-                        "_type": WorkorderEscalationRecipients.TYPE_USER if record.get('user') else WorkorderEscalationRecipients.TYPE_ROLE
-                    }
+                user = record.get('user')
+                role = record.get('role')
+                if not user and not role:
+                    continue
+                recipient_type = (
+                    WorkorderEscalationRecipients.TYPE_USER if user else 
+                    WorkorderEscalationRecipients.TYPE_ROLE
+                )
+                base_data = {
+                    "user": user,
+                    "role": role,
+                    "_type": recipient_type
+                }
+                existing = None
+                if user:
+                    existing = WorkorderEscalationRecipients.objects.filter(
+                        user=user,
+                        escalation_level=workorder_escalation_id
+                    ).first()
+                if not existing and role:
+                    existing = WorkorderEscalationRecipients.objects.filter(
+                        role=role,
+                        escalation_level=workorder_escalation_id
+                    ).first()
+                if existing:
                     serializer = WorkorderEscalationRecipientsSerializer(
-                        WorkorderEscalationRecipients.objects.get(id=record.get('id')),
-                        data=update_data,
+                        existing,
+                        data=base_data,
                         context={'request': request}
                     )
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
+                        ids_list.append(serializer.data.get('id'))
                 else:
                     create_data = {
-                        "user": record.get('user'),
-                        "role": record.get('role'),
-                        "escalation_level": workorder_escalation_id,
-                        "_type": WorkorderEscalationRecipients.TYPE_USER if record.get('user') else WorkorderEscalationRecipients.TYPE_ROLE
+                        **base_data,
+                        "escalation_level": workorder_escalation_id
                     }
                     serializer = WorkorderEscalationRecipientsSerializer(
                         data=create_data,
@@ -33,7 +51,7 @@ def _create_update_escalation_recipients(request,data:list,workorder_escalation_
                     )
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
-                ids_list.append(serializer.data.get('id'))
+                        ids_list.append(serializer.data.get('id'))
             WorkorderEscalationRecipients.objects.filter(
                 escalation_level=workorder_escalation_id
             ).exclude(id__in=ids_list).delete()
