@@ -17,6 +17,7 @@ from .workorder_escalations import WorkOrderEscalations,WorkorderEscalationServi
 from .workorder_rating import WorkOrderRating
 from .workorder_escalations_log import WorkOrderEscalationsLog
 from .patient_mrn import Mrn
+from .fcm_push_log import FcmPushLog
 __all__ = [
     'Services', 
     'Rooms',
@@ -41,4 +42,5 @@ __all__ = [
     'WorkOrderRating',
     'WorkOrderEscalationsLog',
     'Mrn',
+    'FcmPushLog',
 ]

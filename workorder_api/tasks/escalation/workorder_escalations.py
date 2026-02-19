@@ -4,14 +4,14 @@ from workorder_api.models.workorder import WorkOrder
 from core_api.send_email.send_email import send_email
 from django.utils import timezone
 from dotenv import load_dotenv
-# from workorder_api.escalation_utils.has_escalation_triggered import _has_escalation_been_triggered
+from workorder_api.escalation_utils.has_escalation_triggered import _has_escalation_been_triggered
 from workorder_api.escalation_utils.trigger_escalation_level import _trigger_escalation_level
 import os
 load_dotenv()
 
 @shared_task
 def workorder_escalations_task(tenant_id=1):
-    # try:
+    try:
         print("inside escalation task::::::::::::::::::::::::::")
         workorders = WorkOrder.objects.filter(
             tenant_id=tenant_id,
@@ -61,49 +61,15 @@ def workorder_escalations_task(tenant_id=1):
                     # print("elapsed_minutes::::::::::::::::::::::::::>>>:",elapsed_minutes)
                     if elapsed_minutes >= escalation_level.trigger_time:
                         # print("escalation level triggered::::::::::::::::::::::::::>>>:")
-                        # if _has_escalation_been_triggered(workorder,escalation,escalation_level.level):
-                        #     continue
+                        if _has_escalation_been_triggered(workorder,escalation_level):
+                            continue
                         if _trigger_escalation_level(workorder,workorder_escalation,escalation_level.level):
                             escalated_count += 1
                     processed_count += 1
-            
-            
-            
-            
-            
-            
-            #         if escalation_level.trigger_time > current_time:
-            #             continue
-                        
-            #     start_time = workorder.start_date
-            #     print("start_time::::::::::::::::::::::::::>>>:",start_time)
-            #     if not start_time:
-            #         continue
-                
-            #     elapsed_minutes = (current_time - start_time).total_seconds()/60
-
-            #     for level in escalation_levels:
-            #         if not level.trigger_time:
-            #             continue
-
-            #         print("elapsed_minutes::::::::::::::::::::::::::>>>:",elapsed_minutes)
-            #         print("level.trigger_time::::::::::::::::::::::::::>>>:",level.trigger_time)
-            #         if elapsed_minutes >= level.trigger_time:
-            #             print("escalation level triggered::::::::::::::::::::::::::>>>:")
-            #             # if _has_escalation_been_triggered(workorder,escalation,level.level):
-            #             #     continue
-            #             if _trigger_escalation_level(workorder,escalation,level.level):
-            #                 escalated_count += 1
-            # processed_count += 1
-
-            # if status == WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED:
-            #     pass
-            # elif status == WorkOrder.WORKORDER_STATUS_CLOSED:
-            #     pass
-        
-    # except Exception as e:
-    #     print(e)
-    #     return False
-    # return True
+    
+    except Exception as e:
+        print(e)
+        return False
+    return True
 
 

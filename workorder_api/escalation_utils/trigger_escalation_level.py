@@ -5,6 +5,7 @@ from core_api.send_email.send_email import send_email
 from django.template.loader import render_to_string
 from workorder_api.tasks.send_email import send_email_task
 from workorder_api.models.workorder_escalations_log import WorkOrderEscalationsLog
+from workorder_api.escalation_push.push_notification import send_escalation_push_notification
 
 def _trigger_escalation_level(workorder,escalation_level,level):
     users_to_notify = resolve_recipients_users(escalation_level,workorder)
@@ -15,6 +16,7 @@ def _trigger_escalation_level(workorder,escalation_level,level):
     due_date = workorder.end_date
     subject = f"Escalation level {level} triggered for workorder {workorder.unique_id}"
     context = {
+        "action":"escalation",
         'recipient_name':assignee_name,
         'workorder_unique_id':workorder.unique_id,
         'priority':priority,
@@ -31,6 +33,7 @@ def _trigger_escalation_level(workorder,escalation_level,level):
         body = render_to_string('escalation.html',context)
         # send_email(subject,body,user_record.get('email'))
         # send_email_task.delay(subject,body,user_record.get('email'))
+        send_escalation_push_notification(users_to_notify,workorder.id,escalation_level.id,level)
         notification_sent = True
     if notification_sent:
         # WorkorderActivityServices.create_workorder_activity({

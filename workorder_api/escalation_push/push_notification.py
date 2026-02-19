@@ -8,6 +8,7 @@ def send_escalation_push_notification(users_to_notify,workorder_id,escalation_le
     title = "Escalation Level Triggered",
     body = f"Escalation level Triggered for Workorder {workorder_id}"
     push_data = {
+        'activity':'ESCALATION_TRIGGERED',
         'workorder_id':str(workorder_id),
         'escalation_level':str(escalation_level),
         'level':str(level),
@@ -16,4 +17,5 @@ def send_escalation_push_notification(users_to_notify,workorder_id,escalation_le
     users_email = [user.get('email') for user in users_to_notify]
     users_device_details = UserDeviceDetails.objects.filter(user__email__in=users_email)
     users_device_tokens = [user_device_detail.device_token for user_device_detail in users_device_details]
-    # send_escalation_push_notification_task.delay(users_device_tokens,title,body,push_data)
+    # if users_device_tokens:
+    #     send_escalation_push_notification_task.delay(users_device_tokens,title,body,push_data)

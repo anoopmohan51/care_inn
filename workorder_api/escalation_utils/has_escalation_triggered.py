@@ -1,10 +1,10 @@
-# from workorder_api.models.workorder_escalations import WorkOrderEscalations
+from workorder_api.models.workorder_escalations_log import WorkOrderEscalationsLog
 
-# def _has_escalation_been_triggered(workorder,escalation,level):
-#     print("inside has escalation been triggered::::::::::::::::::::::::::")
-#     existing_escalation = WorkOrderEscalations.objects.filter(
-#         workorder=workorder,
-#         escalation=escalation,
-#         to_value=str(level)
-#     ).exists()
-#     return existing_escalation
+def _has_escalation_been_triggered(workorder,escalation_level):
+    level = escalation_level.level if escalation_level.level else None
+    existing_escalation = WorkOrderEscalationsLog.objects.filter(
+        workorder=workorder,
+        escalation_level=escalation_level,
+        level=level
+    ).exists()
+    return existing_escalation
