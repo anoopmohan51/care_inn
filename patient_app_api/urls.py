@@ -18,13 +18,14 @@ urlpatterns = [
     path('informations/<int:id>',InformationsDetailsView.as_view()),
     path('requested-items/<int:id>',RequestedItemsDetailsView.as_view()),
     path('patient-request/workorder',WorkOrderNursingStationRequestCreateView.as_view()),
-    path('nursing-station/approve/workorder',WorkorderNursingStationView.as_view()),
+    path('workorder/approve',WorkorderNursingStationView.as_view()),
     path('workorder/filter',WorkorderFilterView.as_view()),
     path('workorder/<int:id>',WorkorderDetailsView.as_view()),
     path('folder-details/<int:id>',FolderDetailsView.as_view()),
+    path('workorder/pending-approval',WorkorderListApprovalView.as_view()),
+    path('webhook',MrnView.as_view()),
     path('workorder-ratings',WorkOrderRatingView.as_view()),
-    path('workorder-list-approval',WorkorderListApprovalView.as_view()),
-    path('patient/webhook',MrnView.as_view()),
+
     
 
 ]

@@ -66,6 +66,11 @@ app/images/**
 *.env
 myenv/
 
+<<<<<<< HEAD
 
 # firebase credentials
 push_credentials/careinn-dev.json
+=======
+#firebase credentials
+push_credentials/careinn-dev.json
+>>>>>>> release/dev
