@@ -2,12 +2,12 @@ from workorder_api.models.patient_mrn import Mrn
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from core_api.response_utils.custom_response import CustomResponse
-from core_api.permission.external_api_permission import HasValidApiKeyForPatientApp
+from core_api.permission.external_api_permission import HasValidApiKey
 from rest_framework import status
 from patient_app_api.serializers.mrn_serializer import MrnSerializer
 
 class MrnView(APIView):
-    permission_classes = [AllowAny,HasValidApiKeyForPatientApp]
+    permission_classes = [AllowAny,HasValidApiKey]
     def post(self, request):
         try:
             data = request.data
@@ -47,7 +47,6 @@ class MrnView(APIView):
                 content_type="application/json"
             )
         except Exception as e:
-            print(e)
             return CustomResponse(
                 data=None,
                 status="failed",
