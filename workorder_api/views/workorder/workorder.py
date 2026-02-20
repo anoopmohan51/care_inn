@@ -90,7 +90,7 @@ class WorkorderDeleteView(APIView):
     permission_classes = [IsAuthenticated]
     # @has_permission("Workorder", "read")
     def get(self, request,pk):
-        # try:
+        try:
             workorders = WorkOrder.objects.get(id=pk,is_delete=False)
             if not workorders:
                 return CustomResponse(
@@ -108,22 +108,22 @@ class WorkorderDeleteView(APIView):
                 status_code=status.HTTP_200_OK,
                 content_type="application/json"
             )
-        # except WorkOrder.DoesNotExist as e:
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=[f"Work order not found"],
-        #         status_code=status.HTTP_404_NOT_FOUND,
-        #         content_type="application/json"
-        #     )
-        # except Exception as e:
-        #     return CustomResponse(
-        #         data=None,
-        #         status="failed",
-        #         message=["Error in Work orders fetching"],
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content_type="application/json"
-        #     )
+        except WorkOrder.DoesNotExist as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=[f"Work order not found"],
+                status_code=status.HTTP_404_NOT_FOUND,
+                content_type="application/json"
+            )
+        except Exception as e:
+            return CustomResponse(
+                data=None,
+                status="failed",
+                message=["Error in Work orders fetching"],
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json"
+            )
     
     # @has_permission("Workorder", "update")
     def put(self, request, pk):
