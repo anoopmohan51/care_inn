@@ -15,6 +15,6 @@ def send_escalation_push_notification(users_to_notify,workorder_id,escalation_le
         'time_stamp':str(time_stamp)
     }
     users_email = [user.get('email') for user in users_to_notify]
-    users_device_tokens = list(UserDeviceDetails.objects.filter(user__email__in=users_email).values_list('device_id',flat=True))
+    users_device_tokens = list(UserDeviceDetails.objects.filter(user__email__in=users_email,is_logged_in=True).values_list('device_id',flat=True))
     if users_device_tokens:
         send_escalation_push_notification_task(users_device_tokens,title,body,push_data)

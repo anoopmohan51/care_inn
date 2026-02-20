@@ -9,7 +9,7 @@ from .role_permission import RolePermission
 from .external_api_key import ExternalApiKey
 from .department import Department
 from .user_device_details import UserDeviceDetails
-
+from .fcm_log import FcmPushLog
 __all__ = [
     'AppUsers', 
     'Tenant', 
@@ -22,4 +22,5 @@ __all__ = [
     'ExternalApiKey',
     'Department',
     'UserDeviceDetails',
+    'FcmPushLog',
 ]
