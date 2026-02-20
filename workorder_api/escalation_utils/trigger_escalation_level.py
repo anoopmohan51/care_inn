@@ -7,11 +7,12 @@ from workorder_api.tasks.send_email import send_email_task
 from workorder_api.models.workorder_escalations_log import WorkOrderEscalationsLog
 from workorder_api.escalation_push.push_notification import send_escalation_push_notification
 
-def _trigger_escalation_level(workorder,escalation_level,level):
-    users_to_notify = resolve_recipients_users(escalation_level,workorder)
+def _trigger_escalation_level(workorder,escalation_service,escalation_level):
+    users_to_notify = resolve_recipients_users(escalation_service,workorder)
     if not users_to_notify:
         return False
     assignee_name = workorder.get_assignee_name()
+    level = escalation_level.level
     priority = workorder.priority
     due_date = workorder.end_date
     subject = f"Escalation level {level} triggered for workorder {workorder.unique_id}"
@@ -24,31 +25,29 @@ def _trigger_escalation_level(workorder,escalation_level,level):
         'level':level
     }
     notification_sent = False
-    # print("users_to_notify::::::::::::::::::::::::::",users_to_notify)
     for user_record in users_to_notify:
         context.update({
             'recipient_name':user_record.get('name'),
         })
         body = render_to_string('escalation.html',context)
         # send_email(subject,body,user_record.get('email'))
-        # send_email_task.delay(subject,body,user_record.get('email'))
+        # send_email_task(subject,body,user_record.get('email'))
         notification_sent = True
     send_escalation_push_notification(users_to_notify,workorder.id,escalation_level.id,level)
     if notification_sent:
-        # WorkorderActivityServices.create_workorder_activity({
-        #     'activity': 'ESCALATED',
-        #     'workorder': workorder,
-        #     'initiated_by': None,
-        #     'to_value': level,
-        #     'message': f"Escalated to {level} level"
-        # })
-        # WorkOrderEscalationsLog.objects.create(
-        #     workorder=workorder,
-        #     escalation_level=escalation_level,
-        #     level=level
-        # )
+        WorkOrderActivityService.create_workorder_activity({
+            'activity': 'ESCALATED',
+            'workorder': workorder,
+            'initiated_by': None,
+            'to_value': level,
+            'message': f"Escalated to {level} level"
+        })
+        WorkOrderEscalationsLog.objects.create(
+            workorder=workorder,
+            escalation_level=escalation_level,
+            level=level
+        )
         return True
-    # print("notification not sent::::::::::::::::::::::::::")
     return False
 
 

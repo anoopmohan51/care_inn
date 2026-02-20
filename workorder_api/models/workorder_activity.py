@@ -29,6 +29,7 @@ class WorkOrderActivity(models.Model):
         ('CLOSED','CLOSED'),
         ('OPEN','OPEN'),
         ('PAUSED','PAUSED'),
+        ('ESCALATED','ESCALATED'),
     ]
     SOURCE_CHOICES = [
         ('SYSTEM','SYSTEM'),
