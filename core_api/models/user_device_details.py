@@ -13,4 +13,3 @@ class UserDeviceDetails(models.Model):
     device_id = models.CharField(max_length=255,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_logged_in = models.BooleanField(default=False)
-    device_unique_id = models.CharField(max_length=255,null=True)

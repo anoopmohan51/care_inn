@@ -16,7 +16,6 @@ def _trigger_escalation_level(workorder,escalation_level,level):
     due_date = workorder.end_date
     subject = f"Escalation level {level} triggered for workorder {workorder.unique_id}"
     context = {
-        "action":"escalation",
         'recipient_name':assignee_name,
         'workorder_unique_id':workorder.unique_id,
         'priority':priority,
@@ -25,7 +24,7 @@ def _trigger_escalation_level(workorder,escalation_level,level):
         'level':level
     }
     notification_sent = False
-    print("users_to_notify::::::::::::::::::::::::::",users_to_notify)
+    # print("users_to_notify::::::::::::::::::::::::::",users_to_notify)
     for user_record in users_to_notify:
         context.update({
             'recipient_name':user_record.get('name'),
@@ -33,8 +32,8 @@ def _trigger_escalation_level(workorder,escalation_level,level):
         body = render_to_string('escalation.html',context)
         # send_email(subject,body,user_record.get('email'))
         # send_email_task.delay(subject,body,user_record.get('email'))
-        send_escalation_push_notification(users_to_notify,workorder.id,escalation_level.id,level)
         notification_sent = True
+    send_escalation_push_notification(users_to_notify,workorder.id,escalation_level.id,level)
     if notification_sent:
         # WorkorderActivityServices.create_workorder_activity({
         #     'activity': 'ESCALATED',
