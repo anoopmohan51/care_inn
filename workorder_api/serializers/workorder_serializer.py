@@ -31,12 +31,12 @@ class WorkOrderSerializer(serializers.ModelSerializer):
         return obj.service.department.name if obj.service and obj.service.department else None
 
     def get_assignee_name(self, obj):
-        if obj.assignee_type == 'USER':
+        if obj.assignee_type == 'USER' and obj.user:
             user = AppUsers.objects.filter(id=obj.user.id,is_delete=False).annotate(
                 name = Concat(F('first_name'), Value(' '), F('last_name'))
             ).values('name').first()
             return user.get('name') if user else None
-        elif obj.assignee_type == 'TEAM':
+        elif obj.assignee_type == 'TEAM' and obj.user_group:
             user_group = UserGroup.objects.filter(id=obj.user_group.id,is_delete=False).values('name').first()
             return user_group.get('name') if user_group else None
         return None
