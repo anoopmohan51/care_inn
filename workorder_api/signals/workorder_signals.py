@@ -4,7 +4,7 @@ from workorder_api.models.workorder import WorkOrder
 from workorder_api.workorder_activity.workorder_activity_service import WorkOrderActivityService
 from workorder_api.activity_context.activity_context import set_activity_user, clear_activity_user, get_activity_user
 import logging
-from workorder_api.workorder_push import _send_workorder_push_notification
+from workorder_api.tasks.workorder_push_notification.workorder_push import workorder_push_notification_task
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ def workorder_post_save(sender, instance, created, **kwargs):
                     'workorder': instance
                 })
             WorkOrderActivityService.log_creation(activity_data)
-            _send_workorder_push_notification(
+            workorder_push_notification_task(
                 instance.unique_id,
                 instance.priority,
                 instance.start_date,
@@ -100,15 +100,6 @@ def workorder_post_save(sender, instance, created, **kwargs):
                         'initiated_by': created_user,
                         'workorder': instance
                     })
-                    _send_workorder_push_notification(
-                        instance.unique_id,
-                        instance.priority,
-                        instance.start_date,
-                        instance.end_date,
-                        instance.sla_minutes,
-                        instance.user.id if instance.user else None,
-                        instance.user_group.id if instance.user_group else None
-                    )
                 elif original.assignee_type != instance.assignee_type:
                     if instance.assignee_type == 'USER' and original.assignee_type=='TEAM':
                         changes.append({
@@ -118,6 +109,15 @@ def workorder_post_save(sender, instance, created, **kwargs):
                             'initiated_by': created_user,
                             'workorder': instance
                         })
+                        workorder_push_notification_task(
+                            instance.unique_id,
+                            instance.priority,
+                            instance.start_date,
+                            instance.end_date,
+                            instance.sla_minutes,
+                            instance.user.id if instance.user else None,
+                            instance.user_group.id if instance.user_group else None
+                        )
                     elif instance.assignee_type == 'TEAM' and original.assignee_type=='USER':
                         changes.append({
                             'activity': 'ASSIGNED',
@@ -126,7 +126,25 @@ def workorder_post_save(sender, instance, created, **kwargs):
                             'initiated_by': created_user,
                             'workorder': instance
                         })
-                        _send_workorder_push_notification(
+                        workorder_push_notification_task(
+                            instance.unique_id,
+                            instance.priority,
+                            instance.start_date,
+                            instance.end_date,
+                            instance.sla_minutes,
+                            instance.user_group.id if instance.user_group else None,
+                            instance.user.id if instance.user else None
+                        )
+                elif original.assignee_type == instance.assignee_type:
+                    if original.user!=instance.user:
+                        changes.append({
+                            'activity': 'ASSIGNED',
+                            'from_value': f"USER-{original.user.id}",
+                            'to_value': f"USER-{instance.user.id}" if instance.user else None,
+                            'initiated_by': created_user,
+                            'workorder': instance
+                        })
+                        workorder_push_notification_task(
                             instance.unique_id,
                             instance.priority,
                             instance.start_date,
@@ -134,6 +152,23 @@ def workorder_post_save(sender, instance, created, **kwargs):
                             instance.sla_minutes,
                             instance.user.id if instance.user else None,
                             instance.user_group.id if instance.user_group else None
+                        )
+                    elif original.user_group!=instance.user_group:
+                        changes.append({
+                            'activity': 'ASSIGNED',
+                            'from_value': f"TEAM-{original.user_group.id}",
+                            'to_value': f"TEAM-{instance.user_group.id}" if instance.user_group else None,
+                            'initiated_by': created_user,
+                            'workorder': instance
+                        })
+                        workorder_push_notification_task(
+                            instance.unique_id,
+                            instance.priority,
+                            instance.start_date,
+                            instance.end_date,
+                            instance.sla_minutes,
+                            instance.user_group.id if instance.user_group else None,
+                            instance.user.id if instance.user else None
                         )
                 elif instance.start_date!=original.start_date:
                     changes.append({
