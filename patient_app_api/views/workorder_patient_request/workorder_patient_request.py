@@ -29,12 +29,29 @@ class WorkOrderNursingStationRequestCreateView(APIView):
             api_key = request.headers.get('X-API-KEY')
             external_api_key = ExternalApiKey.objects.get(key=api_key,is_active=True)
             data=request.data
+            if not data.get('service'):
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=["Service is required"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
+            if not data.get('mrd_id'):
+                return CustomResponse(
+                    data=None,
+                    status="failed",
+                    message=["MRD ID is required"],
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content_type="application/json"
+                )
             request_items = data.get('items',[])
             service = Services.objects.get(id=data.get('service'),is_delete=False)
             room = Rooms.objects.filter(room_number=data.get('room'),is_delete=False).first()
             now = datetime.now()
             year = '{:02d}'.format(now.year)
             month = '{:02d}'.format(now.month)
+            is_approval_required = service.is_approval_required if service.is_approval_required else False
             if service.sla:
                 sla_minutes = int(service.sla)
                 end_date = datetime.now() + timedelta(minutes=sla_minutes)
@@ -70,11 +87,22 @@ class WorkOrderNursingStationRequestCreateView(APIView):
                 'start_date': datetime.now()+timedelta(minutes=1),
                 'end_date': end_date,
                 'service': service.id,
-                'is_approved': False,
+                'is_approved': True if is_approval_required else False,
             }
             serializer = WorkOrderTempSerializer(data=workorder_data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                if is_approval_required:
+                    workorder_data=WorkOrderTemp.objects.filter(id=serializer.data.get('id')).values(
+                        'workorder_type','room','assignee_type','user','user_group','tenant','description','priority','when_to_start','sla_minutes','mrd_id','status','created_at','updated_at','created_user','updated_user','is_delete','unique_id','start_date','service'
+                    ).first()
+                    workorder_data.update({
+                        'status': WorkOrder.WORKORDER_STATUS_ASSIGNED_NOT_STARTED
+                    })
+                    serializer = WorkOrderNursingStationSerializer(data=workorder_data,context={'request': request})
+                    if serializer.is_valid(raise_exception=True):
+                        serializer.save()
+
                 return CustomResponse(
                     data=serializer.data,
                     status="success",
@@ -107,7 +135,7 @@ class WorkOrderNursingStationRequestCreateView(APIView):
                 content_type="application/json"
             )
 
-class WorkorderNursingStationView(APIView):
+class ApproveWorkorderView(APIView):
     permission_classes = [AllowAny,HasValidApiKey]
     def post(self, request):
         try:
@@ -159,7 +187,6 @@ class WorkorderNursingStationView(APIView):
                                 content_type="application/json"
                             )
                 else:
-                    print("inside rejected::::::::::::::::::::::::::")
                     temp = WorkOrderTemp.objects.get(id=data.get('id'))
                     serializer = WorkOrderTempSerializer(temp)
                     return CustomResponse(
