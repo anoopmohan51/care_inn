@@ -31,6 +31,7 @@ def _trigger_escalation_level(workorder,escalation_service,escalation_level):
         })
         body = render_to_string('escalation.html',context)
         # send_email(subject,body,user_record.get('email'))
+        print("before sending email::::::::::::::::::::::::::>>>")
         send_email_task(subject,body,user_record.get('email'))
         notification_sent = True
     send_escalation_push_notification(users_to_notify,workorder.id,escalation_level.id,level)

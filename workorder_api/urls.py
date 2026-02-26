@@ -23,6 +23,7 @@ from workorder_api.views.workorder_escaltions.workorder_escaltions import *
 from workorder_api.views.workorder_identifier.workorder_identifier import *
 from workorder_api.views.position_change.position_chnage import *
 from workorder_api.views.push_notification.push import *
+from workorder_api.views.workorder_escalations_log.workorder_escalation_details import *
 
 urlpatterns = [
     path('service',ServiceCreateView.as_view()),
@@ -74,4 +75,5 @@ urlpatterns = [
     path('position-change',WorkorderPositionChangeView.as_view()),
 
     path('push-notification',PushNotificationView.as_view()),
+    path('escalation-details/<int:workorder_id>',WorkorderEscalationDetailsView.as_view()),
 ]
