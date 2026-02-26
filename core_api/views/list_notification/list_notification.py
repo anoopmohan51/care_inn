@@ -21,7 +21,7 @@ class ListNotificationView(APIView):
                 )
             limit = request.query_params.get('limit',10)
             offset = request.query_params.get('offset',0)
-            notifications = FcmPushLog.objects.filter(user_id=user_id).values().order_by('-created_at')[offset:offset+limit]
+            notifications = FcmPushLog.objects.filter(user_id=user_id).values('id','push_data','created_at').order_by('-created_at')[offset:offset+limit]
             return CustomResponse(
                 data=notifications,
                 status="success",
