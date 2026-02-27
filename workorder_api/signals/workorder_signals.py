@@ -135,41 +135,41 @@ def workorder_post_save(sender, instance, created, **kwargs):
                             instance.user_group.id if instance.user_group else None,
                             instance.user.id if instance.user else None
                         )
-                elif original.assignee_type == instance.assignee_type:
-                    if original.user!=instance.user:
-                        changes.append({
-                            'activity': 'ASSIGNED',
-                            'from_value': f"USER-{original.user.id}",
-                            'to_value': f"USER-{instance.user.id}" if instance.user else None,
-                            'initiated_by': created_user,
-                            'workorder': instance
-                        })
-                        workorder_push_notification_task(
-                            instance.unique_id,
-                            instance.priority,
-                            instance.start_date,
-                            instance.end_date,
-                            instance.sla_minutes,
-                            instance.user.id if instance.user else None,
-                            instance.user_group.id if instance.user_group else None
-                        )
-                    elif original.user_group!=instance.user_group:
-                        changes.append({
-                            'activity': 'ASSIGNED',
-                            'from_value': f"TEAM-{original.user_group.id}",
-                            'to_value': f"TEAM-{instance.user_group.id}" if instance.user_group else None,
-                            'initiated_by': created_user,
-                            'workorder': instance
-                        })
-                        workorder_push_notification_task(
-                            instance.unique_id,
-                            instance.priority,
-                            instance.start_date,
-                            instance.end_date,
-                            instance.sla_minutes,
-                            instance.user_group.id if instance.user_group else None,
-                            instance.user.id if instance.user else None
-                        )
+                        
+                elif original.user!=instance.user and instance.assignee_type=='USER':  
+                    changes.append({
+                        'activity': 'ASSIGNED',
+                        'from_value': f"USER-{original.user.id}",
+                        'to_value': f"USER-{instance.user.id}" if instance.user else None,
+                        'initiated_by': created_user,
+                        'workorder': instance
+                    })
+                    workorder_push_notification_task(
+                        instance.unique_id,
+                        instance.priority,
+                        instance.start_date,
+                        instance.end_date,
+                        instance.sla_minutes,
+                        instance.user.id if instance.user else None,
+                        instance.user_group.id if instance.user_group else None
+                    )
+                elif original.user_group!=instance.user_group and instance.assignee_type=='TEAM':
+                    changes.append({
+                        'activity': 'ASSIGNED',
+                        'from_value': f"TEAM-{original.user_group.id}",
+                        'to_value': f"TEAM-{instance.user_group.id}" if instance.user_group else None,
+                        'initiated_by': created_user,
+                        'workorder': instance
+                    })
+                    workorder_push_notification_task(
+                        instance.unique_id,
+                        instance.priority,
+                        instance.start_date,
+                        instance.end_date,
+                        instance.sla_minutes,
+                        instance.user_group.id if instance.user_group else None,
+                        instance.user.id if instance.user else None
+                    )
                 elif instance.start_date!=original.start_date:
                     changes.append({
                         'activity': 'SLA_STARTTIME',
